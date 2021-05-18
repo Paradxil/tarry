@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@marko/build": "^4.2.1",
+    "@marko/serve": "^4.2.1",
+    "axios": "^0.21.1",
+    "feather-marko": "^0.0.3",
+    "marko": "^5.10.3",
+    "simple-marko-ui": "file:../../simple-marko-ui"
+  },
+  "name": "front-end",
+  "version": "0.0.1",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "build": "npx marko-build ./src/templates/template.marko --static",
+    "dev": "npx marko-serve ./src/templates/template.marko"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "proxy": "http://localhost:8080"
+}

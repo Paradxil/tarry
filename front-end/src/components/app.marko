@@ -1,0 +1,93 @@
+import Settings from "<settings>"
+import Login from "<login>"
+import Register from "<register>"
+import Tracker from "<tracker>"
+
+import utils from '../utils.js'
+
+class {
+    async onCreate() {
+        this.state = {
+            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker},
+            page: "login",
+            user: null,
+            loggedin: false
+        };
+
+        let response = await utils.get("/api/user");
+
+        if(response.success) {
+            this.state.loggedin = true;
+            this.state.user = response.data;
+            this.changePage("tracker");
+        }
+    }
+
+    login(event) {
+        this.state.user = event.user;
+        this.state.loggedin = true;
+        this.changePage("tracker");
+    }
+
+    logout(event) {
+        this.state.user = null;
+        this.state.loggedin = false;
+        this.changePage("login");
+    }
+
+    async logoutUser(event) {
+        let response = await utils.post("/api/logout");
+
+        if(response.success) {
+            this.logout(event);
+        }
+    }
+
+    changePage(page) {
+        this.state.page = page;
+        this.setStateDirty("page");
+    }
+}
+
+style {
+    :root {
+        --background-1: #f8f4f1;
+        --background-2: #9a8c98;
+        --accent-1: #ebddd6;
+        --accent-2: #9a8c98;
+        --text-1: #444;
+        --text-2: #fff;
+        --rounded-radius: 4px;
+        --padding: 8px;
+        --padding-narrow: 4px;
+        --padding-wide: 16px;
+    }
+
+    .page {
+        max-width: 1200px;
+    }
+}
+
+static function handleClick(event) {
+    console.log("Clicked!");
+}
+
+ui-linear-layout vertical fillspace aligncenter
+    @element fullwidth
+        ui-linear-layout padded aligncenter gutter="4px"
+            @element fillspace
+                ui-text -- Time Tracker
+            if(state.loggedin)
+                @element
+                    ui-button rounded icon="clock" on-click("changePage", 'tracker') title="Time tracker"
+                @element
+                    ui-button rounded icon="settings" on-click("changePage", 'settings') title="Settings"
+                @element
+                    ui-button rounded icon="log-out" on-click('logoutUser') title="Logout"
+            else
+                @element
+                    ui-button rounded icon="log-in" on-click('changePage', 'login') title="Login"
+                @element
+                    ui-button rounded icon="user-plus" on-click("changePage", 'register') title="Register"
+    @element class="page" fullwidth
+        <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user/>

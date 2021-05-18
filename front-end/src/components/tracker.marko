@@ -1,0 +1,171 @@
+import utils from '../utils.js';
+
+class {
+    async onCreate(input) {
+        this.state = {
+            tracking: false,
+            startTime: null,
+            now: Date.now(),
+            name: "",
+            tasks: []
+        };
+
+        this.userid = input.user?input.user._id||null:null;
+
+        if(this.userid !== null) {
+            let response = await utils.get("/api/task/all/"+this.userid);
+
+            if(response.success) {
+                this.state.tasks = response.data;
+            }
+
+            response = await utils.get("/api/task/active/"+this.userid);
+
+            if(response.success) {
+                let task = response.data;
+                this.state.tracking = true;
+                this.state.startTime = task.start;
+                this.state.name = task.name;
+            }
+        }
+        else {
+            this.emit('logout');
+        }
+
+        window.setInterval(()=>this.state.now = Date.now(), 500);
+    }
+
+    async deleteTask(id, index) {
+        let response = await utils.delete("/api/task/"+id);
+
+        if(response.success) {
+            this.state.tasks.splice(index, 1);
+            this.setStateDirty("tasks");
+        }
+    }
+
+    async startTracker(event) {
+        this.state.name = this.getComponent("task-name").state.value;
+
+        if(this.state.name === null || this.state.name.length === 0) {
+            return;
+        }
+
+        this.state.tracking = true;
+        this.state.startTime = Date.now();
+        this.state.now = Date.now();
+
+        let response = await utils.post("/api/start", {
+            userid: this.userid,
+            name: this.state.name,
+            start: this.state.startTime
+        });
+
+        if(!response.success) {
+            console.log("Error starting tracking.");
+            this.state.tracking = false;
+        }
+    }
+
+    async stopTracker(event) {
+        let response = await utils.post("/api/stop", {
+            userid: this.userid,
+            end: Date.now()
+        });
+
+        if(response.success) {
+            this.state.tasks.push(response.data);
+            this.setStateDirty("tasks");
+            this.state.tracking = false;
+        }
+        else {
+            console.log("Error stopping task!");
+        }
+    }
+}
+
+$ const getNiceTime = function(millseconds, full=false) {
+    let seconds = Math.floor(millseconds/1000);
+    let minutes = Math.floor(seconds/60);
+    let hours = Math.floor(minutes/60);
+    let days = Math.floor(hours/24);
+
+    seconds = seconds - minutes*60;
+    minutes = minutes - hours*60;
+    hours = hours - days*24;
+
+    let time = "";
+
+    if(days > 0) {
+        time += days + " ";
+    }
+
+    if(hours > 0 || full) {
+        time += hours + ":";
+    }
+
+    if(hours > 0 || minutes > 0 || full) {
+        if(minutes < 10 && (hours > 0 || full)) {
+            time += "0" + minutes;
+        }
+        else {
+            time += minutes
+        }
+        time += ":";
+    }
+
+    time += (seconds<10&&(minutes>0||hours>0||full))?"0"+seconds:seconds;
+
+    return time;
+}
+
+$ const getNiceDate = function(millseconds) {
+    let date = new Date(millseconds);
+    return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+}
+
+
+$ const getNiceHour = function(millseconds) {
+    let date = new Date(millseconds);
+    return date.getHours() + ":" + (date.getMinutes() < 10 ? "0" : '') + date.getMinutes();
+}
+
+ui-container centered paddedwide
+    ui-linear-layout vertical fillspace fullwidth gutter="8px"
+        @element fillspace
+            ui-heading -- Time Tracker
+            ui-spacer
+        @element fillspace fullwidth
+            ui-linear-layout fillspace fullwidth accent padded rounded aligncenter
+                @element fillspace
+                    if(!state.tracking)
+                        ui-textbox key="task-name" placeholder="Task Name"
+                    else
+                        ui-linear-layout
+                            @element
+                                ui-text alignleft -- ${state.name}
+                            @element fillspace
+                                ui-text alignright -- ${getNiceTime(state.now - state.startTime, true)}
+                @element
+                    ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
+        @element fillspace
+            ui-spacer
+            ui-list gutter="8px"
+                for|task, index| of=state.tasks
+                    if((index>0 && new Date(state.tasks[index-1].start).getDate() !== new Date(task.start).getDate()) || index === 0)
+                        @item filled rounded padded
+                            ui-linear-layout aligncenter
+                                @element fillspace
+                                    ui-heading heading=3 -- ${getNiceDate(task.start)}
+                    @item padded alignleft key=task._id accent rounded
+                        ui-linear-layout aligncenter
+                            @element fillspace
+                                ui-text -- ${task.name}
+                            @element
+                                ui-text -- ${getNiceHour(task.start)} - ${getNiceHour(task.end)}
+                            @element
+                                ui-text -- ${getNiceTime(task.end - task.start, true)}
+                            @element
+                                ui-button icon="edit-2" rounded title="Edit task"
+                            @element
+                                ui-button icon="delete" rounded title="Delete task" on-click("deleteTask", task._id, index)

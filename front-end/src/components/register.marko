@@ -1,0 +1,58 @@
+import utils from '../utils.js';
+
+class {
+    onCreate() {
+        this.state = {
+            username: "",
+            password: "",
+            email: ""
+        }
+    }
+
+    onMount() {
+        window.loadCaptcha();
+    }
+
+    async register(event) {
+        let response = await utils.post('/api/register', {
+            username: this.state.username,
+            password: this.state.password,
+            email: this.state.email,
+            captchaid: window.getCaptchaID()
+        });
+
+        if(!response.success) {
+            //TODO: window.reloadCaptcha(); 
+        }
+    }
+
+    updatePassword(event) {
+        this.state.password = event.value;
+    }
+
+    updateUsername(event) {
+        this.state.username = event.value;
+    }
+
+    updateEmail(event) {
+        this.state.email = event.value;
+    }
+}
+
+ui-container centered padded
+    ui-linear-layout vertical padded gutter="16px"
+        @element
+            ui-text centered -- Register
+        @element
+            ui-form padded vertical gutter="16px"
+                @element
+                    ui-textbox placeholder="Username" id="username" value=state.username on-input("updateUsername")
+                @element
+                    ui-textbox placeholder="Password" id="password" value=state.password on-input("updatePassword") password
+                @element
+                    ui-textbox placeholder="Email" id="email" value=state.email on-input("updateEmail")
+                @element
+                    div.icon-captcha key="icon-captcha" no-update
+                @element
+                    ui-submit preventdefault on-click("register")
+                        -- Register
