@@ -18,6 +18,9 @@ const DeleteTaskHandler = require('../api/deleteTaskHandler');
 const StartTaskHandler = require('../api/startTaskHandler');
 const StopTaskHandler = require('../api/stopTaskHandler');
 const GetActiveTaskHandler = require('../api/getActiveTaskHandler');
+const AddProjectHandler = require('../api/addProjectHandler');
+const DeleteProjectHandler = require('../api/deleteProjectHandler');
+const AllProjectsHandler = require('../api/allProjectsHandler');
 
 const Response = require("../model/response/response");
 
@@ -137,6 +140,15 @@ class Server {
             }
         });
 
+        // Send the server status
+        this.app.get('/api/status', async function(req, res) {
+            res.send(Response.Success(
+                {
+                    loggedin: req.user!==null?true:false
+                }
+            ));
+        });
+
         // Add a task
         this.app.post('/api/task', this.isAuthenticated, async function(req, res) {
             let handler = new AddTaskHandler(req, res);
@@ -170,6 +182,24 @@ class Server {
         // Get the users active running task.
         this.app.get('/api/task/active/:userid', this.isAuthenticated, async function(req, res) {
             let handler = new GetActiveTaskHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        // Add a project
+        this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
+            let handler = new AddProjectHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        // Delete a project
+        this.app.delete('/api/project/:id', this.isAuthenticated, async function(req, res) {
+            let handler = new DeleteProjectHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        // Get all projects for a user
+        this.app.get('/api/project/all/:userid', this.isAuthenticated, async function(req, res) {
+            let handler = new AllProjectsHandler(req, res);
             await handler.handle(req, res);
         });
     }

@@ -2,13 +2,14 @@ import Settings from "<settings>"
 import Login from "<login>"
 import Register from "<register>"
 import Tracker from "<tracker>"
+import Projects from "<projects>"
 
 import utils from '../utils.js'
 
 class {
     async onCreate() {
         this.state = {
-            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker},
+            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects},
             page: "login",
             user: null,
             loggedin: false
@@ -21,6 +22,10 @@ class {
             this.state.user = response.data;
             this.changePage("tracker");
         }
+    }
+
+    onMount() {
+        window.setInterval(this.checkStatus.bind(this), 1000 * 60);
     }
 
     login(event) {
@@ -47,6 +52,20 @@ class {
         this.state.page = page;
         this.setStateDirty("page");
     }
+
+    async checkStatus() {
+        let response = await utils.get("/api/status");
+
+        if(response.success) {
+            if(!response.data.loggedin && this.state.loggedin) {
+                this.logout();
+            }
+        }
+        else {
+            //TODO: Display banner message to user
+            console.log("Error connecting to server.");
+        }
+    }
 }
 
 style {
@@ -57,7 +76,7 @@ style {
         --accent-2: #9a8c98;
         --text-1: #444;
         --text-2: #fff;
-        --rounded-radius: 4px;
+        --rounded-radius: 3px;
         --padding: 8px;
         --padding-narrow: 4px;
         --padding-wide: 16px;
@@ -80,6 +99,8 @@ ui-linear-layout vertical fillspace aligncenter
             if(state.loggedin)
                 @element
                     ui-button rounded icon="clock" on-click("changePage", 'tracker') title="Time tracker"
+                @element
+                    ui-button rounded icon="clipboard" on-click("changePage", 'projects') title="Projects"
                 @element
                     ui-button rounded icon="settings" on-click("changePage", 'settings') title="Settings"
                 @element

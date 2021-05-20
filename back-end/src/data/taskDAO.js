@@ -13,23 +13,25 @@ class TaskDAO {
         return await Task.find({userid: userid});
     }
 
-    async add(name, userid, start, end) {
+    async add(name, userid, start, end, projects=[]) {
         let task = new Task({
             name: name,
             userid: userid,
             start: start,
-            end: end
+            end: end,
+            projects: projects
         });
         await task.save();
         return task;
     }
 
-    async update(id, name, userid, start, end) {
+    async update(id, name, userid, start, end, projects=[]) {
         let task = await this.getTask(id);
         task.name = name;
         task.userid = userid;
         task.start = start;
         task.end = end;
+        task.projects = projects;
     }
 }
 

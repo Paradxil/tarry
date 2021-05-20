@@ -1,0 +1,118 @@
+import utils from '../utils.js';
+
+class {
+    async onCreate(input) {
+        this.state = {
+            addProject: false,
+            color: '#f94144',
+            name: '',
+            wage: 0,
+            projects: []
+        };
+
+        this.userid = input.user?input.user._id||null:null;
+
+        if(this.userid == null) {
+            this.emit('logout');
+            return;
+        }
+
+        let response = await utils.get("/api/project/all/"+this.userid);
+
+        if(response.success) {
+            this.state.projects = response.data;
+        }
+
+    }
+
+    toggleProject() {
+        this.state.addProject = !this.state.addProject;
+    }
+
+    setColor(event) {
+        this.state.color = event.color;
+    }
+
+    setName(event) {
+        this.state.name = event.value;
+    }
+
+    async addProject(event) {
+        let response = await utils.post('/api/project', {
+            userid: this.userid,
+            name: this.state.name,
+            color: this.state.color,
+            wage: 2
+        });
+
+        if(response.success) {
+            this.state.projects.push(response.data.project);
+            this.setStateDirty("projects");
+            this.state.addProject = false;
+        }
+    }
+
+    async deleteProject(id, index) {
+        let response = await utils.delete('/api/project/' + id);
+
+        if(response.success) {
+            this.state.projects.splice(index, 1);
+            this.setStateDirty("projects");
+        }
+    }
+}
+
+$ let colors = [[
+    '#fff',
+    '#444',
+    '#f94144',
+    '#f3722c',
+    '#f8961e'
+],
+
+[    
+    '#f9c74f',
+    '#90be6d',
+    '#43aa8b',
+    '#577590',
+    '#674e97'
+]]
+
+ui-container centered paddedwide
+    ui-linear-layout vertical fillspace fullwidth gutter="8px"
+        @element
+            ui-heading -- Projects
+            ui-spacer
+        @element
+            ui-button text="New Project" rounded icon=state.addProject?"minus":"plus" on-click("toggleProject")
+        @element hidden=!state.addProject
+            ui-linear-layout vertical accent paddedwide rounded
+                @element
+                    ui-heading heading=3 alignleft -- Display
+                @element
+                    ui-linear-layout aligncenter
+                        @element
+                            ui-color-select rounded paddedwide title="Choose Project Icon" on-input('setColor') color=state.color colors=colors
+                        @element fillspace
+                            ui-textbox placeholder="Project Name" value=state.name on-input('setName')
+                @element hidden
+                    ui-spacer
+                    ui-heading heading=3 alignleft -- Billing
+                @element hidden
+                    ui-linear-layout aligncenter
+                        @element
+                            ui-textbox placeholder="Hourly Wage" value=state.wage
+                @element
+                    ui-spacer
+                    ui-button text="Create Project" rounded centered on-click("addProject")
+        for|project, index| of=state.projects
+            @element
+                ui-linear-layout accent rounded padded aligncenter
+                    @element
+                        ui-element accent padded rounded theme={'--accent-1': project.color}
+                    @element fillspace alignleft
+                        ui-heading heading=3 -- ${project.name}
+                    @element
+                        ui-button icon="delete" rounded title="Delete project" on-click("deleteProject", project._id, index)
+
+                    

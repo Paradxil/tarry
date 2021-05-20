@@ -9,7 +9,7 @@ class StopTaskService {
         let task = await activeDAO.get(userid);
         await activeDAO.remove(userid);
 
-        task = await taskDAO.add(task.name, userid, task.start, end);
+        task = await taskDAO.add(task.name, userid, task.start, end, task.projects);
         return task;
     }
 }
