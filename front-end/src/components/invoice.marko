@@ -1,0 +1,25 @@
+import utils from '../utils.js';
+
+class {
+    async onCreate(input) {
+        this.state = {
+        };
+
+        this.userid = input.user?input.user._id||null:null;
+
+        if(this.userid == null) {
+            this.emit('logout');
+            return;
+        }
+    }
+}
+
+ui-container centered paddedwide
+    ui-linear-layout vertical fillspace fullwidth gutter="8px"
+        @element
+            ui-heading -- Invoice
+            ui-spacer
+        @element
+            ui-button rounded icon="plus" text="New Invoice"
+
+                    
