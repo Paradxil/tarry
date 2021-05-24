@@ -3,29 +3,41 @@ import Login from "<login>"
 import Register from "<register>"
 import Tracker from "<tracker>"
 import Projects from "<projects>"
+import Invoice from "<invoice>"
 
 import utils from '../utils.js'
 
 class {
     async onCreate() {
         this.state = {
-            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects},
-            page: "login",
+            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice},
+            page: "loading",
             user: null,
             loggedin: false
         };
+    }
+
+    async onMount() {
+        window.setInterval(this.checkStatus.bind(this), 1000 * 60);
 
         let response = await utils.get("/api/user");
 
         if(response.success) {
             this.state.loggedin = true;
             this.state.user = response.data;
-            this.changePage("tracker");
-        }
-    }
 
-    onMount() {
-        window.setInterval(this.checkStatus.bind(this), 1000 * 60);
+            let currentPage = window.location.pathname||null;
+            currentPage = currentPage.split('/')[1]||null;
+
+            if(currentPage !== null && currentPage.length === 0) {
+                currentPage = null;
+            }
+
+            this.changePage(currentPage||"tracker");
+        }
+        else {
+            this.changePage("login");
+        }
     }
 
     login(event) {
@@ -51,6 +63,10 @@ class {
     changePage(page) {
         this.state.page = page;
         this.setStateDirty("page");
+
+        this.emit('changetitle', page + " - Time Tracker")
+
+        window.history.replaceState({}, page, "/" + page);
     }
 
     async checkStatus() {
@@ -98,17 +114,21 @@ ui-linear-layout vertical fillspace aligncenter
                 ui-text -- Time Tracker
             if(state.loggedin)
                 @element
-                    ui-button rounded icon="clock" on-click("changePage", 'tracker') title="Time tracker"
+                    ui-button rounded filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
                 @element
-                    ui-button rounded icon="clipboard" on-click("changePage", 'projects') title="Projects"
+                    ui-button rounded filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
                 @element
-                    ui-button rounded icon="settings" on-click("changePage", 'settings') title="Settings"
+                    ui-button rounded filled=state.page==='invoice' icon="file" on-click("changePage", 'invoice') title="Invoice"
+                @element
+                    ui-button rounded filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
+                @element
+                    ui-button rounded filled=state.page==='settings' icon="settings" on-click("changePage", 'settings') title="Settings"
                 @element
                     ui-button rounded icon="log-out" on-click('logoutUser') title="Logout"
             else
                 @element
-                    ui-button rounded icon="log-in" on-click('changePage', 'login') title="Login"
+                    ui-button rounded filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
-                    ui-button rounded icon="user-plus" on-click("changePage", 'register') title="Register"
+                    ui-button rounded filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class="page" fullwidth
         <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user/>
