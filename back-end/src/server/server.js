@@ -144,7 +144,7 @@ class Server {
         this.app.get('/api/status', async function(req, res) {
             res.send(Response.Success(
                 {
-                    loggedin: req.user!==null?true:false
+                    loggedin: req.isAuthenticated()
                 }
             ));
         });
