@@ -60,8 +60,9 @@ class {
         }
     }
 
-    async continueTask(name, event) {
+    async continueTask(name, projects, event) {
         if(!this.state.tracking) {
+            this.state.taskProjects = projects;
             this.getComponent("task-name").state.value = name;
             this.startTracker(event);
         }
@@ -209,8 +210,10 @@ ui-container centered paddedwide
         @element fillspace
             ui-spacer
             ui-list gutter="8px"
-                for|task, index| of=state.tasks
-                    if((index>0 && new Date(state.tasks[index-1].start).getDate() !== new Date(task.start).getDate()) || index === 0)
+                $ let tasks = [].concat(state.tasks);
+                $ tasks.reverse();
+                for|task, index| of=tasks
+                    if((index>0 && new Date(tasks[index-1].start).getDate() !== new Date(task.start).getDate()) || index === 0)
                         @item filled rounded padded
                             ui-linear-layout aligncenter
                                 @element fillspace
@@ -228,6 +231,6 @@ ui-container centered paddedwide
                             @element
                                 ui-text -- ${getNiceTime(task.end - task.start, true)}
                             @element
-                                ui-button icon="play" rounded title="Continue" on-click("continueTask", task.name)
+                                ui-button icon="play" rounded title="Continue" on-click("continueTask", task.name, task.projects||[])
                             @element
                                 ui-button icon="delete" rounded title="Delete task" on-click("deleteTask", task._id, index)
