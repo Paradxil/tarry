@@ -9,6 +9,8 @@ class {
             now: Date.now(),
             name: "",
             tasks: [],
+            tasksMap: {},
+            entries: [],
             projects: [],
             projectsMap: {}
         };
@@ -20,6 +22,17 @@ class {
 
             if(response.success) {
                 this.state.tasks = response.data;
+
+                this.state.tasksMap = {};
+                for(let task of this.state.tasks) {
+                    this.state.tasksMap[task._id] = task;
+                }
+            }
+
+            response = await utils.get("/api/time/all/"+this.userid);
+
+            if(response.success) {
+                this.state.entries = response.data;
             }
 
             response = await utils.get("/api/project/all/"+this.userid);
@@ -51,12 +64,12 @@ class {
         window.setInterval(()=>this.state.now = Date.now(), 500);
     }
 
-    async deleteTask(id, index) {
-        let response = await utils.delete("/api/task/"+id);
+    async deleteEntry(id, index) {
+        let response = await utils.delete("/api/entry/"+id);
 
         if(response.success) {
             this.state.tasks.splice(index, 1);
-            this.setStateDirty("tasks");
+            this.setStateDirty("entries");
         }
     }
 
@@ -99,8 +112,9 @@ class {
         });
 
         if(response.success) {
-            this.state.tasks.push(response.data);
-            this.setStateDirty("tasks");
+            console.log(response.data);
+            this.state.entries.push(response.data);
+            this.setStateDirty("entries");
             this.state.tracking = false;
             this.state.taskProjects = [];
         }
@@ -210,27 +224,29 @@ ui-container centered paddedwide
         @element fillspace
             ui-spacer
             ui-list gutter="8px"
-                $ let tasks = [].concat(state.tasks);
-                $ tasks.reverse();
-                for|task, index| of=tasks
-                    if((index>0 && new Date(tasks[index-1].start).getDate() !== new Date(task.start).getDate()) || index === 0)
-                        @item filled rounded padded
+                $ let entries = [].concat(state.entries);
+                $ entries.reverse();
+                for|entry, index| of=entries
+                    $ let task = state.tasksMap[entry.taskid]||null;
+                    if(task != null)
+                        if((index>0 && new Date(entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
+                            @item filled rounded padded
+                                ui-linear-layout aligncenter
+                                    @element fillspace
+                                        ui-heading heading=3 -- ${getNiceDate(entry.start)}
+                        @item padded alignleft key=entry._id accent rounded
                             ui-linear-layout aligncenter
                                 @element fillspace
-                                    ui-heading heading=3 -- ${getNiceDate(task.start)}
-                    @item padded alignleft key=task._id accent rounded
-                        ui-linear-layout aligncenter
-                            @element fillspace
-                                ui-text -- ${task.name}
-                            for|id| of=task.projects
-                                $ let project = state.projectsMap[id]||{};
+                                    ui-text -- ${task.name}
+                                for|id| of=task.projects
+                                    $ let project = state.projectsMap[id]||{};
+                                    @element
+                                        ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
                                 @element
-                                    ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
-                            @element
-                                ui-text -- ${getNiceHour(task.start)} - ${getNiceHour(task.end)}
-                            @element
-                                ui-text -- ${getNiceTime(task.end - task.start, true)}
-                            @element
-                                ui-button icon="play" rounded title="Continue" on-click("continueTask", task.name, task.projects||[])
-                            @element
-                                ui-button icon="delete" rounded title="Delete task" on-click("deleteTask", task._id, index)
+                                    ui-text -- ${getNiceHour(entry.start)} - ${getNiceHour(entry.end)}
+                                @element
+                                    ui-text -- ${getNiceTime(entry.end - entry.start, true)}
+                                @element
+                                    ui-button icon="play" rounded title="Continue" on-click("continueTask", task._id, task.projects||[])
+                                @element
+                                    ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)

@@ -1,9 +1,9 @@
 const TaskDAO = require('../data/taskDAO');
 
 class AddTaskService {
-    async addTask(name, userid, start, end, projects) {
+    async addTask(name, userid, projects) {
         let taskDAO = new TaskDAO();
-        return await taskDAO.add(name, userid, start, end, projects);
+        return await taskDAO.add(name, userid, projects);
     }
 }
 

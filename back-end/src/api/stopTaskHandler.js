@@ -17,7 +17,8 @@ class StopTaskHandler {
             let task = await service.stopTask(userid, end);
             res.send(Response.Success(task));
         }
-        catch {
+        catch(err) {
+            console.log(err);
             res.send(Response.Error("Error stopping task."));
         }
     }

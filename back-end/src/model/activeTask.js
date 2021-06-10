@@ -3,7 +3,7 @@ var encrypt = require('mongoose-encryption');
 
 // Create a scheme for users
 const activeTaskSchema = new mongoose.Schema({
-    name: {type: String, required: true},
+    taskid: {type: String, required: true},
     userid: {type: String, required: true, unique: true},
     start: {type: Number, required: true},
     projects: {type: [String], required: false}

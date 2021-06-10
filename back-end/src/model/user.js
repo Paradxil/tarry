@@ -5,7 +5,8 @@ var encrypt = require('mongoose-encryption');
 const userSchema = new mongoose.Schema({
     username: {type: String, unique: true, required: true, lowercase: true},
     email: {type: String, unique: true, required: true, lowercase: true},
-    password: {type: String, required: true}
+    password: {type: String, required: true},
+    schemaVersion: {type: Number, required: true, default: process.env.SCHEMA_VESRION}
 });
 
 userSchema.plugin(encrypt, {secret: process.env.SECRET, additionalAuthenticatedFields: ['email', 'username']});

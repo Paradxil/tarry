@@ -15,7 +15,7 @@ class ActiveTaskDAO {
      * @param {ID} userid 
      * @returns 
      */
-    async remove(userid) {
+    async remove(userid) { 
         return await ActiveTask.deleteOne({userid: userid});
     }
 
@@ -23,14 +23,14 @@ class ActiveTaskDAO {
      * Add an active task for the current user. Each user can only 
      * have one active task at a time.
      * An active task is a task that is currently being tracked.
-     * @param {String} name The name of the task.
+     * @param {String} taskid Id of the task.
      * @param {Id} userid 
      * @param {Number} start The start time for the task.
      * @returns 
      */
-    async add(userid, name, start, projects = []) {
+    async add(userid, taskid, start, projects = []) {
         let task = new ActiveTask({
-            name: name,
+            taskid: taskid,
             userid: userid,
             start: start,
             projects: projects

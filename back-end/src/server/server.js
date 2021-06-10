@@ -21,6 +21,7 @@ const GetActiveTaskHandler = require('../api/getActiveTaskHandler');
 const AddProjectHandler = require('../api/addProjectHandler');
 const DeleteProjectHandler = require('../api/deleteProjectHandler');
 const AllProjectsHandler = require('../api/allProjectsHandler');
+const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
 
 const Response = require("../model/response/response");
 
@@ -147,6 +148,12 @@ class Server {
                     loggedin: req.isAuthenticated()
                 }
             ));
+        });
+
+        // Get all time entries for a user
+        this.app.get('/api/time/all/:userid', this.isAuthenticated, async function(req, res) {
+            let handler = new AllTimeEntriesHandler(req, res);
+            await handler.handle(req, res);
         });
 
         // Add a task

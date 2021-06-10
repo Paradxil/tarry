@@ -4,13 +4,14 @@ import Register from "<register>"
 import Tracker from "<tracker>"
 import Projects from "<projects>"
 import Invoice from "<invoice>"
+import Todo from "<todo>"
 
 import utils from '../utils.js'
 
 class {
     async onCreate() {
         this.state = {
-            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice},
+            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice, "todo": Todo},
             page: "loading",
             user: null,
             loggedin: false
@@ -115,6 +116,8 @@ ui-linear-layout vertical fillspace aligncenter
             if(state.loggedin)
                 @element
                     ui-button rounded filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
+                @element
+                    ui-button rounded filled=state.page==='todo' icon="list" on-click("changePage", 'todo') title="Todo"
                 @element
                     ui-button rounded filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
                 @element
