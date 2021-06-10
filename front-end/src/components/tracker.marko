@@ -8,8 +8,6 @@ class {
             taskProjects: [],
             now: Date.now(),
             name: "",
-            tasks: [],
-            tasksMap: {},
             entries: [],
             projects: [],
             projectsMap: {}
@@ -18,18 +16,11 @@ class {
         this.userid = input.user?input.user._id||null:null;
 
         if(this.userid !== null) {
-            let response = await utils.get("/api/task/all/"+this.userid);
-
-            if(response.success) {
-                this.state.tasks = response.data;
-
-                this.state.tasksMap = {};
-                for(let task of this.state.tasks) {
-                    this.state.tasksMap[task._id] = task;
-                }
-            }
-
-            response = await utils.get("/api/time/all/"+this.userid);
+            let response = await utils.post("/api/time/", {
+                userid: this.userid,
+                max: 10,
+                last: null
+            });
 
             if(response.success) {
                 this.state.entries = response.data;
@@ -224,29 +215,25 @@ ui-container centered paddedwide
         @element fillspace
             ui-spacer
             ui-list gutter="8px"
-                $ let entries = [].concat(state.entries);
-                $ entries.reverse();
-                for|entry, index| of=entries
-                    $ let task = state.tasksMap[entry.taskid]||null;
-                    if(task != null)
-                        if((index>0 && new Date(entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
-                            @item filled rounded padded
-                                ui-linear-layout aligncenter
-                                    @element fillspace
-                                        ui-heading heading=3 -- ${getNiceDate(entry.start)}
-                        @item padded alignleft key=entry._id accent rounded
+                for|entry, index| of=state.entries
+                    if((index>0 && new Date(state.entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
+                        @item filled rounded padded key=index
                             ui-linear-layout aligncenter
                                 @element fillspace
-                                    ui-text -- ${task.name}
-                                for|id| of=task.projects
-                                    $ let project = state.projectsMap[id]||{};
-                                    @element
-                                        ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
-                                @element
-                                    ui-text -- ${getNiceHour(entry.start)} - ${getNiceHour(entry.end)}
-                                @element
-                                    ui-text -- ${getNiceTime(entry.end - entry.start, true)}
-                                @element
-                                    ui-button icon="play" rounded title="Continue" on-click("continueTask", task._id, task.projects||[])
-                                @element
-                                    ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)
+                                    ui-heading heading=3 -- ${getNiceDate(entry.start)}
+                    @item padded alignleft key=entry._id accent rounded
+                        ui-linear-layout aligncenter
+                            @element fillspace
+                                ui-text -- ${entry.name}
+                            for|id| of=entry.projects||[]
+                                $ let project = state.projectsMap[id]||{};
+                                @element key=id
+                                    ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
+                            @element
+                                ui-text -- ${getNiceHour(entry.start)} - ${getNiceHour(entry.end)}
+                            @element
+                                ui-text -- ${getNiceTime(entry.end - entry.start, true)}
+                            @element
+                                ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.taskid, entry.projects||[])
+                            @element
+                                ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)

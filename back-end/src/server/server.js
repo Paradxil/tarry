@@ -22,6 +22,7 @@ const AddProjectHandler = require('../api/addProjectHandler');
 const DeleteProjectHandler = require('../api/deleteProjectHandler');
 const AllProjectsHandler = require('../api/allProjectsHandler');
 const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
+const PaginatedTimeEntriesHandler = require("../api/paginatedTimeEntriesHandler");
 
 const Response = require("../model/response/response");
 
@@ -153,6 +154,12 @@ class Server {
         // Get all time entries for a user
         this.app.get('/api/time/all/:userid', this.isAuthenticated, async function(req, res) {
             let handler = new AllTimeEntriesHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        // Get paginated time entries for a user
+        this.app.post('/api/time/', this.isAuthenticated, async function(req, res) {
+            let handler = new PaginatedTimeEntriesHandler(req, res);
             await handler.handle(req, res);
         });
 

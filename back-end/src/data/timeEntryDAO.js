@@ -17,6 +17,19 @@ class TimeEntryDAO {
         return await TimeEntry.find({taskid: taskid});
     }
 
+    async getPaginated(userid, max=10, last=null) {
+        let query = {
+            _id: {$gt: last},
+            userid: userid
+        };
+
+        if(last === null) {
+            delete query._id;
+        }
+
+        return await TimeEntry.find(query).sort({_id: -1}).limit(max);
+    }
+
     async add(userid, taskid, start, end) {
         let entry = new TimeEntry({
             userid: userid,
