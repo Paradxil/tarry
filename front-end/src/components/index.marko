@@ -2,6 +2,9 @@ style {
     .section {
         padding: 50px;
     }
+
+    .feature {
+    }
 }
 
 ui-linear-layout vertical centered fullwidth
@@ -15,6 +18,22 @@ ui-linear-layout vertical centered fullwidth
             @element
                 ui-button paddedwide rounded -- Instructions for self hosting
     @element class="section"
-        ui-heading -- Features
+        ui-linear-layout alignleft
+            @element class="feature" fillspace
+                ui-card paddedwide outlined accent rounded fillspace
+                    @header title="Track Time" 
+                    ui-text -- Manage your time with the click of a button.
+            @element class="feature" fillspace
+                ui-card paddedwide outlined accent rounded fillspace
+                    @header title="Manage Projects" 
+                    ui-text -- Easily create and add projects to tasks.
         ui-spacer
-        ui-text -- Track time, manage projects, send invoices and more.
+        ui-linear-layout alignleft
+            @element class="feature" fillspace
+                ui-card paddedwide outlined accent rounded fillspace
+                    @header title="Create Invoices" 
+                    ui-text -- Create invoices with a visual editor and send them automatically.
+            @element class="feature" fillspace
+                ui-card paddedwide outlined accent rounded fillspace
+                    @header title="Todo List" 
+                    ui-text -- A no nonsense way to track your tasks and progress.
