@@ -1,0 +1,20 @@
+style {
+    .section {
+        padding: 50px;
+    }
+}
+
+ui-linear-layout vertical centered fullwidth
+    @element class="section" fullwidth
+        ui-heading heading=1 -- The open source time tracker
+        ui-text -- The simple solution to time tracking.
+        ui-spacer padding="25px"
+        ui-linear-layout centered
+            @element
+                ui-button outlined paddedwide accent rounded -- Sign Up
+            @element
+                ui-button paddedwide rounded -- Instructions for self hosting
+    @element class="section"
+        ui-heading -- Features
+        ui-spacer
+        ui-text -- Track time, manage projects, send invoices and more.

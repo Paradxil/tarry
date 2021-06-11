@@ -23,6 +23,7 @@ class PaginatedTimeEntriesService {
 
                 if(task === null) {
                     console.log('ERROR locating task');
+                    continue;
                 }
                 else {
                     tasks[entry.taskid] = task;

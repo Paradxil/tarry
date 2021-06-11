@@ -1,11 +1,9 @@
 const StartTaskService = require('../services/startTaskService');
-const AddTaskService = require('../services/addTaskService');
 const Response = require("../model/response/response");
 
 class StartTaskHandler {
     async handle(req, res) {
         let service = new StartTaskService();
-        let addTaskService = new AddTaskService();
 
         let userid = req.body.userid||null;
         let name = req.body.name||null;
@@ -20,10 +18,7 @@ class StartTaskHandler {
         }
 
         try {
-            let task = await addTaskService.addTask(name, userid, projects);
-            let taskid = task._id;
-
-            await service.startTask(userid, taskid, start, projects);
+            await service.startTask(userid, name, start, projects);
             res.send(Response.Success());
         }
         catch {

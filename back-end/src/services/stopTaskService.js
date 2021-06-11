@@ -1,16 +1,24 @@
 const ActiveTaskDAO = require('../data/activeTaskDAO');
 const TimeEntryDAO = require('../data/timeEntryDAO');
+const TaskDAO = require('../data/taskDAO');
 
 class StopTaskService {
     async stopTask(userid, end) {
         let activeDAO = new ActiveTaskDAO();
         let timeEntryDAO = new TimeEntryDAO();
+        let taskDAO = new TaskDAO();
 
-        let task = await activeDAO.get(userid);
+        let activetask = await activeDAO.get(userid);
         await activeDAO.remove(userid);
 
-        task = await timeEntryDAO.add(userid, task.taskid, task.start, end);
-        return task;
+        let entry = await timeEntryDAO.add(userid, activetask.taskid, activetask.start, end);
+        let task = await taskDAO.getTask(entry.taskid); 
+
+        entry = entry.toJSON();
+        entry.name = task.name;
+        entry.projects = task.projects;
+
+        return entry;
     }
 }
 

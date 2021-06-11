@@ -18,7 +18,7 @@ class {
         if(this.userid !== null) {
             let response = await utils.post("/api/time/", {
                 userid: this.userid,
-                max: 10,
+                max: 100,
                 last: null
             });
 
@@ -56,10 +56,10 @@ class {
     }
 
     async deleteEntry(id, index) {
-        let response = await utils.delete("/api/entry/"+id);
+        let response = await utils.delete("/api/time/"+id);
 
         if(response.success) {
-            this.state.tasks.splice(index, 1);
+            this.state.entries.splice(index, 1);
             this.setStateDirty("entries");
         }
     }
@@ -104,7 +104,7 @@ class {
 
         if(response.success) {
             console.log(response.data);
-            this.state.entries.push(response.data);
+            this.state.entries.splice(0, 0, response.data);
             this.setStateDirty("entries");
             this.state.tracking = false;
             this.state.taskProjects = [];
@@ -217,12 +217,12 @@ ui-container centered paddedwide
             ui-list gutter="8px"
                 for|entry, index| of=state.entries
                     if((index>0 && new Date(state.entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
-                        @item filled rounded padded key=index
+                        @item filled rounded padded key=entry._id+"header"
                             ui-linear-layout aligncenter
                                 @element fillspace
                                     ui-heading heading=3 -- ${getNiceDate(entry.start)}
                     @item padded alignleft key=entry._id accent rounded
-                        ui-linear-layout aligncenter
+                        ui-linear-layout aligncenter class="task-wrapper"
                             @element fillspace
                                 ui-text -- ${entry.name}
                             for|id| of=entry.projects||[]
@@ -230,10 +230,19 @@ ui-container centered paddedwide
                                 @element key=id
                                     ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
                             @element
-                                ui-text -- ${getNiceHour(entry.start)} - ${getNiceHour(entry.end)}
+                                $ if(!entry.nicestart) {
+                                    entry.nicestart = getNiceHour(entry.start);
+                                }
+                                $ if(!entry.niceend) {
+                                    entry.niceend = getNiceHour(entry.end);
+                                }
+                                ui-text -- ${entry.nicestart} - ${entry.niceend}
                             @element
-                                ui-text -- ${getNiceTime(entry.end - entry.start, true)}
+                                $ if(!entry.nicetotal) {
+                                    entry.nicetotal = getNiceTime(entry.end - entry.start, true);
+                                }
+                                ui-text -- ${entry.nicetotal}
                             @element
-                                ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.taskid, entry.projects||[])
+                                ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.name, entry.projects||[])
                             @element
                                 ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)

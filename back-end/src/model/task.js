@@ -10,5 +10,16 @@ const taskSchema = new mongoose.Schema({
 
 taskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
 
+//Check for duplicates
+taskSchema.pre('validate', async function() {
+    let tasks = await this.constructor.find({userid: this.userid});
+
+    for(let t of tasks) {
+        if(t.name === this.name && JSON.stringify(t.projects||[]) === JSON.stringify(this.projects||[])) {
+            throw {message: "Task already exists.", taskid: t._id};
+        }
+    }
+});
+
 // Create a model for tasks
 module.exports = mongoose.model('Tasks', taskSchema);

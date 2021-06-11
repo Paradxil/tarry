@@ -19,7 +19,20 @@ class TaskDAO {
             userid: userid,
             projects: projects
         });
-        await task.save();
+
+        try {
+            await task.save();
+        }
+        catch(err) {
+            if('taskid' in err) { //The task already exists
+                return this.getTask(err.taskid);
+            }
+            else {
+                console.log(err);
+                throw new Error("Error adding task.");
+            }
+        }
+
         return task;
     }
 

@@ -1,3 +1,4 @@
+import Index from "<index>"
 import Settings from "<settings>"
 import Login from "<login>"
 import Register from "<register>"
@@ -11,8 +12,8 @@ import utils from '../utils.js'
 class {
     async onCreate() {
         this.state = {
-            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice, "todo": Todo},
-            page: "loading",
+            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice, "todo": Todo, "index": Index},
+            page: "index",
             user: null,
             loggedin: false
         };
@@ -37,7 +38,7 @@ class {
             this.changePage(currentPage||"tracker");
         }
         else {
-            this.changePage("login");
+            this.changePage("index");
         }
     }
 
@@ -97,6 +98,10 @@ style {
         --padding: 8px;
         --padding-narrow: 4px;
         --padding-wide: 16px;
+        --text-font: 'Montserrat', sans-serif;
+        --button-font: 'Dosis', sans-serif;
+        --header-font: 'Montserrat', sans-serif;
+        --font-size-h1: 2.5em;
     }
 
     .page {
@@ -111,27 +116,28 @@ static function handleClick(event) {
 ui-linear-layout vertical fillspace aligncenter
     @element fullwidth
         ui-linear-layout padded aligncenter gutter="4px"
+            @element
+                ui-button rounded text="Time Tracker" filled=state.page==='index' on-click("changePage", 'index') title="Home"
             @element fillspace
-                ui-text -- Time Tracker
             if(state.loggedin)
                 @element
-                    ui-button rounded filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
+                    ui-button rounded outlined filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
                 @element
-                    ui-button rounded filled=state.page==='todo' icon="list" on-click("changePage", 'todo') title="Todo"
+                    ui-button rounded outlined filled=state.page==='todo' icon="list" on-click("changePage", 'todo') title="Todo"
                 @element
-                    ui-button rounded filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
+                    ui-button rounded outlined filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
                 @element
-                    ui-button rounded filled=state.page==='invoice' icon="file" on-click("changePage", 'invoice') title="Invoice"
+                    ui-button rounded outlined filled=state.page==='invoice' icon="file" on-click("changePage", 'invoice') title="Invoice"
                 @element
-                    ui-button rounded filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
+                    ui-button rounded outlined filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
                 @element
-                    ui-button rounded filled=state.page==='settings' icon="settings" on-click("changePage", 'settings') title="Settings"
+                    ui-button rounded outlined filled=state.page==='settings' icon="settings" on-click("changePage", 'settings') title="Settings"
                 @element
-                    ui-button rounded icon="log-out" on-click('logoutUser') title="Logout"
+                    ui-button rounded outlined icon="log-out" on-click('logoutUser') title="Logout"
             else
                 @element
-                    ui-button rounded filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
+                    ui-button rounded outlined filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
-                    ui-button rounded filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
-    @element class="page" fullwidth
+                    ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
+    @element class=state.page!=='index'?"page":"" fullwidth
         <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user/>

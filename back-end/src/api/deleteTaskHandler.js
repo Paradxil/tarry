@@ -1,7 +1,7 @@
 const DeleteTaskService = require('../services/deleteTaskService');
 const Response = require("../model/response/response");
 
-class AddTaskHandler {
+class DeleteTaskHandler {
     async handle(req, res) {
         let service = new DeleteTaskService();
 
@@ -22,4 +22,4 @@ class AddTaskHandler {
     }
 }
 
-module.exports = AddTaskHandler;
+module.exports = DeleteTaskHandler;
