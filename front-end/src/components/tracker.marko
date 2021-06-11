@@ -129,6 +129,17 @@ class {
     }
 }
 
+style {
+    .blended {
+        background-color: inherit;
+        border: none;
+        color: inherit;
+        font-family: var(--text-font);
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+        border-radius: 0px;
+    }
+}
+
 $ const getNiceTime = function(millseconds, full=false) {
     let seconds = Math.floor(millseconds/1000);
     let minutes = Math.floor(seconds/60);
@@ -181,10 +192,10 @@ ui-container centered paddedwide
             ui-heading -- Time Tracker
             ui-spacer
         @element fillspace fullwidth
-            ui-linear-layout fillspace fullwidth accent padded rounded aligncenter
+            ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined
                 @element fillspace
                     if(!state.tracking)
-                        ui-textbox key="task-name" placeholder="Task Name"
+                        ui-textbox.blended key="task-name" placeholder="Task Name"
                     else
                         ui-linear-layout aligncenter
                             @element fillspace
@@ -213,15 +224,15 @@ ui-container centered paddedwide
                 @element
                     ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
         @element fillspace
-            ui-spacer
             ui-list gutter="8px"
                 for|entry, index| of=state.entries
                     if((index>0 && new Date(state.entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
-                        @item filled rounded padded key=entry._id+"header"
+                        @item padded key=entry._id+"header"
+                            ui-spacer
                             ui-linear-layout aligncenter
                                 @element fillspace
-                                    ui-heading heading=3 -- ${getNiceDate(entry.start)}
-                    @item padded alignleft key=entry._id accent rounded
+                                    ui-heading alignleft heading=3 -- ${getNiceDate(entry.start)}
+                    @item paddedwide alignleft key=entry._id rounded outlined accent
                         ui-linear-layout aligncenter class="task-wrapper"
                             @element fillspace
                                 ui-text -- ${entry.name}
