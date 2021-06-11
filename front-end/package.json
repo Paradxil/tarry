@@ -5,6 +5,7 @@
     "axios": "^0.21.1",
     "feather-marko": "^0.0.3",
     "marko": "^5.10.3",
+    "marko-block-editor": "file:../../marko-block-editor",
     "simple-marko-ui": "file:../../simple-marko-ui"
   },
   "name": "front-end",

@@ -3,6 +3,9 @@ import utils from '../utils.js';
 class {
     async onCreate(input) {
         this.state = {
+            editing: false,
+            name: "",
+            template: []
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -12,14 +15,56 @@ class {
             return;
         }
     }
+    async createInvoice() {
+        this.state.editing = true;
+    }
+    downloadPDF(data) {
+    }
 }
 
-ui-container centered paddedwide
-    ui-linear-layout vertical fillspace fullwidth gutter="8px"
-        @element
-            ui-heading -- Invoice
-            ui-spacer
-        @element
-            ui-button rounded icon="plus" text="New Invoice"
+block-editor-config blocks={
+    "Header": {
+        "tag": "<ui-heading>",
+        "icon": "type",
+        "attributes": {
+            "heading": {"name": "Heading","type": "select", "options": [{"name": "H1", "value":1}, {"name": "H2", "value":2}, {"name": "H3", "value":3}, {"name": "H4", "value":4}, {"name": "H5", "value":5}]}
+        }
+    },
+    "Text": {
+        "tag": "<ui-text>",
+        "icon": "align-left"
+    },
+    "Icon": {
+        "tag": "<ui-icon>",
+        "icon": "heart",
+        "attributes": {
+            "icon": {"name": "Icon", "type": "text"}
+        }
+    }
+}
 
-                    
+if(!state.editing)
+    ui-container centered paddedwide
+        ui-linear-layout vertical fillspace fullwidth gutter="8px"
+            @element
+                ui-heading -- Invoice
+                ui-spacer
+            @element
+                ui-button rounded icon="plus" text="New Invoice" on-click("createInvoice")
+else
+    ui-container centered paddedwide fillspace
+        ui-textbox.blended placeholder="Invoice name"
+        ui-spacer
+        $ let config = {
+            actions: {
+                download: {
+                    text: "Download PDF",
+                    icon: "download"
+                },
+                save: {
+                    text: "Save",
+                    icon: "save"
+                }
+            }
+        }
+        block-editor data=state.template config=config on-download("downloadPDF")

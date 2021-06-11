@@ -116,6 +116,15 @@ style {
     .page {
         max-width: 1200px;
     }
+
+    .blended {
+        background-color: inherit;
+        border: none;
+        color: inherit;
+        font-family: var(--text-font);
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+        border-radius: 0px;
+    }
 }
 
 static function handleClick(event) {
@@ -148,5 +157,5 @@ ui-linear-layout vertical fillspace aligncenter
                     ui-button rounded outlined filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
                     ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
-    @element class=state.page!=='index'?"page":"" fullwidth
+    @element class=state.page!=='index'?"page":"" fullwidth fillspace
         <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user/>
