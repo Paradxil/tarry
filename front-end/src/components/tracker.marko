@@ -129,6 +129,27 @@ class {
     }
 }
 
+style {
+    .overlay-wrapper {
+        position: relative;
+    }
+
+    .overlay-wrapper:hover > .overlay, .overlay:hover{
+        opacity: 1;
+    }
+
+    .overlay {
+        transition: 0.25s opacity;
+        position: absolute;
+        top: calc(0px - var(--padding));
+        right: 100%;
+        padding: var(--padding);
+        opacity: 0;
+        background-color: rgba(255,255,255,0.7);
+        backdrop-filter: blur(2px);
+    }
+}
+
 $ const getNiceTime = function(millseconds, full=false) {
     let seconds = Math.floor(millseconds/1000);
     let minutes = Math.floor(seconds/60);
@@ -242,7 +263,10 @@ ui-container centered paddedwide
                                     entry.nicetotal = getNiceTime(entry.end - entry.start, true);
                                 }
                                 ui-text -- ${entry.nicetotal}
-                            @element
+                            @element class="overlay-wrapper"
+                                ui-linear-layout class="overlay"
+                                    @element
+                                        ui-button icon="plus" rounded title="Mark as todo" on-click("markEntryTodo", entry._id, index)
+                                    @element
+                                        ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)
                                 ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.name, entry.projects||[])
-                            @element
-                                ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)
