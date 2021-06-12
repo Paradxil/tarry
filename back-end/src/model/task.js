@@ -5,6 +5,7 @@ var encrypt = require('mongoose-encryption');
 const taskSchema = new mongoose.Schema({
     name: {type: String, required: true},
     userid: {type: String, required: true},
+    status: {type: String, required: true, enum: ["untracked", "todo", "completed"], default: "untracked"},
     projects: {type: [String], required: false}
 });
 
