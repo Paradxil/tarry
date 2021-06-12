@@ -19,6 +19,20 @@ class {
         this.state.editing = true;
     }
     downloadPDF(data) {
+        window.print();
+    }
+}
+
+style {
+    @media print {
+        .block-editor {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            min-height: 100%;
+            background-color: var(--background-1);
+        }
     }
 }
 
@@ -27,7 +41,8 @@ block-editor-config blocks={
         "tag": "<ui-heading>",
         "icon": "type",
         "attributes": {
-            "heading": {"name": "Heading","type": "select", "options": [{"name": "H1", "value":1}, {"name": "H2", "value":2}, {"name": "H3", "value":3}, {"name": "H4", "value":4}, {"name": "H5", "value":5}]}
+            "heading": {"name": "Heading","type": "select", "options": [{"name": "H1", "value":1}, {"name": "H2", "value":2}, {"name": "H3", "value":3}, {"name": "H4", "value":4}, {"name": "H5", "value":5}]},
+            "alignright": {"name": "Align Right", "type": "boolean"}
         }
     },
     "Text": {
