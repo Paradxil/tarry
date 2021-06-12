@@ -13,11 +13,12 @@ class TaskDAO {
         return await Task.find({userid: userid});
     }
 
-    async add(name, userid, projects=[]) {
+    async add(name, userid, project=null, status="untracked") {
         let task = new Task({
             name: name,
             userid: userid,
-            projects: projects
+            project: project,
+            status: status
         });
 
         try {
@@ -36,11 +37,18 @@ class TaskDAO {
         return task;
     }
 
-    async update(id, name, userid, projects=[]) {
+    async update(id, name, userid, project) {
         let task = await this.getTask(id);
         task.name = name;
         task.userid = userid;
-        task.projects = projects;
+        task.project = project;
+        await task.save();
+    }
+
+    async setStatus(id, status) {
+        let task = await this.getTask(id);
+        task.status = status;
+        await task.save();
     }
 }
 

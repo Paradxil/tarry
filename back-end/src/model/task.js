@@ -6,7 +6,7 @@ const taskSchema = new mongoose.Schema({
     name: {type: String, required: true},
     userid: {type: String, required: true},
     status: {type: String, required: true, enum: ["untracked", "todo", "completed"], default: "untracked"},
-    projects: {type: [String], required: false}
+    project: {type: String, required: false}
 });
 
 taskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
@@ -16,7 +16,7 @@ taskSchema.pre('validate', async function() {
     let tasks = await this.constructor.find({userid: this.userid});
 
     for(let t of tasks) {
-        if(t.name === this.name && JSON.stringify(t.projects||[]) === JSON.stringify(this.projects||[])) {
+        if(t.name === this.name && t.project === this.project) {
             throw {message: "Task already exists.", taskid: t._id};
         }
     }

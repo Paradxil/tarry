@@ -32,7 +32,7 @@ class PaginatedTimeEntriesService {
 
             entry = entry.toJSON();
             entry.name = task.name;
-            entry.projects = task.projects;
+            entry.project = task.project||(task.projects?task.projects[0]:null);
             data.push(entry);
         }
 

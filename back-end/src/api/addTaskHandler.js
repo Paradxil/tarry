@@ -7,7 +7,7 @@ class AddTaskHandler {
 
         let name = req.body.name||null;
         let userid = req.body.userid||null;
-        let projects = req.body.projects||[];
+        let project = req.body.project||null;
 
         if(name === null || userid === null) {
             res.send(Response.InvalidRequest("Invalid request body."));
@@ -15,7 +15,7 @@ class AddTaskHandler {
         }
 
         try {
-            let task = await service.addTask(name, userid, projects);
+            let task = await service.addTask(name, userid, project);
             res.send(Response.Success({task: task}));
         }
         catch(err) {

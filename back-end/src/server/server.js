@@ -24,6 +24,7 @@ const AllProjectsHandler = require('../api/allProjectsHandler');
 const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
 const PaginatedTimeEntriesHandler = require("../api/paginatedTimeEntriesHandler");
 const DeleteTimeEntryHandler = require("../api/deleteTimeEntryHandler");
+const GetTaskHandler = require("../api/getTaskHandler");
 
 const Response = require("../model/response/response");
 
@@ -176,11 +177,23 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Delete a task
-        this.app.delete('/api/task/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteTaskHandler(req, res);
+        // Get a task
+        this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
+            let handler = new GetTaskHandler(req, res);
             await handler.handle(req, res);
         });
+
+        // Set the status of a task
+        this.app.post('/api/task/status', this.isAuthenticated, async function(req, res) {
+            let handler = new SetTaskStatusHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        // Delete a task
+        /*this.app.delete('/api/task/:id', this.isAuthenticated, async function(req, res) {
+            let handler = new DeleteTaskHandler(req, res);
+            await handler.handle(req, res);
+        });*/
 
         // Get all tasks for a user
         this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {

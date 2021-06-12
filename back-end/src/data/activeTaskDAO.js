@@ -28,12 +28,12 @@ class ActiveTaskDAO {
      * @param {Number} start The start time for the task.
      * @returns 
      */
-    async add(userid, taskid, start, projects = []) {
+    async add(userid, taskid, start, project = null) {
         let task = new ActiveTask({
             taskid: taskid,
             userid: userid,
             start: start,
-            projects: projects
+            project: project
         });
 
         try {

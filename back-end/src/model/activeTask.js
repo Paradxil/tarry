@@ -6,7 +6,7 @@ const activeTaskSchema = new mongoose.Schema({
     taskid: {type: String, required: true},
     userid: {type: String, required: true, unique: true},
     start: {type: Number, required: true},
-    projects: {type: [String], required: false}
+    project: {type: String, required: false}
 });
 
 activeTaskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});

@@ -8,7 +8,7 @@ class AllTasksHandler {
         let userid = req.params.userid||null;
 
         if(userid === null) {
-            res.send(Response.InvalidRequest("Bad request.", {name: "userid", expectedType: "Number"}));
+            res.send(Response.InvalidRequest("Bad request.", {name: "userid", expectedType: "String"}));
             return;
         }
 
