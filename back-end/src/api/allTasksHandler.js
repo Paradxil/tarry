@@ -16,7 +16,7 @@ class AllTasksHandler {
             let tasks = await service.getAllTasks(userid);
             res.send(Response.Success(tasks));
         }
-        catch {
+        catch(err) {
             res.send(Response.Error("Error getting tasks."));
         }
     }

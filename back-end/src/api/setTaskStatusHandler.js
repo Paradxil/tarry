@@ -15,7 +15,7 @@ class SetTaskStatusHandler {
         }
 
         try {
-            let task = await service.setStatus(taskid, userid, status);
+            let task = await service.setTaskStatus(taskid, userid, status);
             res.send(Response.Success(task));
         }
         catch(err) {

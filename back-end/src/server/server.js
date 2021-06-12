@@ -178,12 +178,6 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Get a task
-        this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
-            let handler = new GetTaskHandler(req, res);
-            await handler.handle(req, res);
-        });
-
         // Set the status of a task
         this.app.post('/api/task/status', this.isAuthenticated, async function(req, res) {
             let handler = new SetTaskStatusHandler(req, res);
@@ -201,6 +195,13 @@ class Server {
             let handler = new AllTasksHandler(req, res);
             await handler.handle(req, res);
         });
+
+        // Get a task
+        this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
+            let handler = new GetTaskHandler(req, res);
+            await handler.handle(req, res);
+        });
+    
 
         // Start a task. Each user can only have one running active task at a time.
         this.app.post('/api/start', this.isAuthenticated, async function(req, res) {

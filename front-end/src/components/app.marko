@@ -15,7 +15,10 @@ class {
             pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice, "todo": Todo, "index": Index},
             page: "index",
             user: null,
-            loggedin: false
+            loggedin: false,
+            entries: [],
+            projects: [],
+            projectsMap: {}
         };
     }
 
@@ -35,6 +38,8 @@ class {
                 currentPage = null;
             }
 
+            this.getData();
+
             this.changePage(currentPage||"tracker");
         }
         else {
@@ -46,11 +51,38 @@ class {
         this.state.user = event.user;
         this.state.loggedin = true;
         this.changePage("tracker");
+        this.getData();
+    }
+
+    async getData() {
+        let response = await utils.post("/api/time/", {
+            userid: this.state.user._id,
+            max: 100,
+            last: null
+        });
+
+        if(response.success) {
+            this.state.entries = response.data;
+        }
+
+        response = await utils.get("/api/project/all/"+this.state.user._id);
+
+        if(response.success) {
+            this.state.projects = response.data;
+
+            this.state.projectsMap = {};
+            for(let project of this.state.projects) {
+                this.state.projectsMap[project._id] = project;
+            }
+        }
     }
 
     logout(event) {
         this.state.user = null;
         this.state.loggedin = false;
+        this.state.entries = [];
+        this.state.projects = [];
+        this.state.projectsMap = {};
         this.changePage("login");
     }
 
@@ -158,4 +190,4 @@ ui-linear-layout vertical fillspace aligncenter
                 @element
                     ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class=state.page!=='index'?"page":"" fullwidth fillspace
-        <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user/>
+        <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user entries=state.entries projects=state.projectsMap/>

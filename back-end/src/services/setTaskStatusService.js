@@ -6,6 +6,7 @@ class SetTaskStatusService {
         let task = await taskDAO.getTask(taskid);
 
         if(task.userid !== userid) {
+            console.log("ERROR HERE!");
             throw new Error("Userid does not match task's userid.");
         }
 

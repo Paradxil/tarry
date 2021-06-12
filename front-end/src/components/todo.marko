@@ -1,0 +1,95 @@
+import utils from '../utils.js';
+
+class {
+    onCreate(input) {
+        this.state = {
+            tasks: {},
+            completed: [],
+            todo: [],
+            untracked: [],
+            tab: "todo",
+            projects: input.projects,
+            current: []
+        };
+
+        this.userid = input.user?input.user._id||null:null;
+
+        if(this.userid == null) {
+            this.emit('logout');
+            return;
+        }
+
+        this.getData();
+    }
+
+    onInput(input) {
+        this.state.projects = input.projects;
+    }
+
+    async getData() {
+        let response = await utils.get("/api/task/all/"+this.userid);
+
+        if(response.success) {
+            for(let task of response.data) {
+                this.state.tasks[task._id] = task;
+                if(task.status === "todo") {
+                    this.state.todo.push(task);
+                }
+                if(task.status === "completed") {
+                    this.state.completed.push(task);
+                }
+                if(task.status === "untracked") {
+                    this.state.untracked.push(task);
+                }
+            }
+
+            this.state.current = this.state.todo;
+        }
+    }
+
+    changeTab(tab) {
+        this.state.tab = tab;
+
+        if(tab === "todo") {
+            this.state.current = this.state.todo;
+        }
+        else if(tab === "completed") {
+            this.state.current = this.state.completed;
+        }
+        else if(tab === "untracked") {
+            this.state.current = this.state.untracked;
+        }
+    }
+}
+
+ui-container centered paddedwide
+    ui-heading heading=1 -- Todo List
+    ui-spacer
+    ui-linear-layout fillspace fullwidth
+        @element
+            ui-button filled=state.tab==="todo" rounded text="Todo" on-click("changeTab", "todo")
+        @element
+            ui-button filled=state.tab==="completed" rounded text="Completed" on-click("changeTab", "completed")
+        @element
+            ui-button filled=state.tab==="untracked" rounded text="Untracked" on-click("changeTab", "untracked")
+        @element
+            ui-button filled=state.tab==="all" rounded text="All" on-click("changeTab", "all")
+    ui-spacer
+    ui-linear-layout vertical fillspace fullwidth
+        for|task| of=state.current
+            @element paddedwide alignleft key=task._id rounded outlined accent
+                ui-linear-layout aligncenter class="task-wrapper"
+                    @element fillspace
+                        ui-text -- ${task.name}
+                    if(task.project)
+                        $ let project = state.projects[task.project]||{};
+                        @element key=id
+                            ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
+                    @element
+                        ui-text -- Time Total
+                    @element 
+                        ui-button icon=task.status==="untracked"?"plus":"x" rounded title=task.status==="untracked"?"Mark todo":"Untrack task" on-click("setStatus", task._id, "completed")
+                    @element 
+                        ui-button icon="check" rounded title="Mark completed" on-click("setStatus", task._id, "completed")
+                    @element
+                        ui-button icon="play" rounded title="Continue" on-click("continueTask", task.name, task.project)

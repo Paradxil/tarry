@@ -5,47 +5,17 @@ class {
         this.state = {
             tracking: false,
             startTime: null,
-            taskProjects: [],
+            project: null,
             now: Date.now(),
             name: "",
-            entries: [],
-            projects: [],
-            projectsMap: {}
+            entries: input.entries,
+            projects: input.projects
         };
 
         this.userid = input.user?input.user._id||null:null;
 
         if(this.userid !== null) {
-            let response = await utils.post("/api/time/", {
-                userid: this.userid,
-                max: 100,
-                last: null
-            });
-
-            if(response.success) {
-                this.state.entries = response.data;
-            }
-
-            response = await utils.get("/api/project/all/"+this.userid);
-
-            if(response.success) {
-                this.state.projects = response.data;
-
-                this.state.projectsMap = {};
-                for(let project of this.state.projects) {
-                    this.state.projectsMap[project._id] = project;
-                }
-            }
-
-            response = await utils.get("/api/task/active/"+this.userid);
-
-            if(response.success) {
-                let task = response.data;
-                this.state.tracking = true;
-                this.state.startTime = task.start;
-                this.state.name = task.name;
-                this.state.taskProjects = task.projects;
-            }
+            this.getData();
         }
         else {
             this.emit('logout');
@@ -53,6 +23,27 @@ class {
         }
 
         window.setInterval(()=>this.state.now = Date.now(), 500);
+    }
+
+    async getData() {
+        let response = utils.get("/api/task/active/"+this.userid);
+
+        if(response.success) {
+            let task = response.data;
+            this.state.tracking = true;
+            this.state.startTime = task.start;
+            this.state.name = task.name;
+            this.state.project = task.project;
+        }
+    }
+
+    onInput(input) {
+        if(input.entries) {
+            this.state.entries = input.entries;
+        }
+        if(input.projects) {
+            this.state.projects = input.projects;
+        }
     }
 
     async deleteEntry(id, index) {
@@ -64,9 +55,26 @@ class {
         }
     }
 
-    async continueTask(name, projects, event) {
+    async markTaskTodo(id, index) {
+        let response = await utils.post("/api/task/status", {
+            userid: this.userid,
+            taskid: id,
+            status: "todo"
+        });
+
+        if(response.success) {
+            for(let entry of this.input.entries) {
+                if(entry.taskid === id) {
+                    entry.status = "todo";
+                }
+            }
+            this.state.entries = this.input.entries;
+        }
+    }
+
+    async continueTask(name, project, event) {
         if(!this.state.tracking) {
-            this.state.taskProjects = projects;
+            this.state.project = project;
             this.getComponent("task-name").state.value = name;
             this.startTracker(event);
         }
@@ -87,7 +95,7 @@ class {
             userid: this.userid,
             name: this.state.name,
             start: this.state.startTime,
-            projects: this.state.taskProjects
+            project: this.state.project
         });
 
         if(!response.success) {
@@ -107,7 +115,7 @@ class {
             this.state.entries.splice(0, 0, response.data);
             this.setStateDirty("entries");
             this.state.tracking = false;
-            this.state.taskProjects = [];
+            this.state.project = null;
         }
         else {
             console.log("Error stopping task!");
@@ -119,13 +127,11 @@ class {
             return;
         }
 
-        if(this.state.taskProjects.includes(event.value) === false) {
-            this.state.taskProjects.push(event.value);
-        }
+        this.state.project = event.value;
     }
 
-    removeProject(id, index) {
-        this.state.taskProjects.splice(index, 1);
+    removeProject() {
+        this.state.project = null;
     }
 }
 
@@ -210,8 +216,8 @@ ui-container centered paddedwide
                         ui-linear-layout aligncenter
                             @element fillspace
                                 ui-text alignleft -- ${state.name}
-                            for|id| of=state.taskProjects
-                                $ let project = state.projectsMap[id]||{};
+                            if(state.project)
+                                $ let project = state.projects[state.project]||{};
                                 @element
                                     ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
                             @element
@@ -219,35 +225,35 @@ ui-container centered paddedwide
                             @element
                                 ui-text alignright -- ${getNiceTime(state.now - state.startTime, true)}
                 if(!state.tracking)
-                    for|id, index| of=state.taskProjects
-                        $ let project = state.projectsMap[id]||{};
+                    if(state.project)
+                        $ let project = state.projects[state.project];
                         @element
                             ui-linear-layout accent rounded theme={'--accent-1': project.color} aligncenter
                                 @element
                                     ui-text alignleft padded -- ${project.name||null}
                                 @element
-                                    ui-button rounded icon="delete" on-click("removeProject", id, index)
+                                    ui-button rounded icon="delete" on-click("removeProject")
                     @element
                         if(!state.tracking)
-                            $ let options = state.projects.map((item)=>{return {text: item.name, value: item._id}});
+                            $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
                             ui-select id="project-select" options=options key='task-project' on-input('selectProject') default="Add a project"
                 @element
                     ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
         @element fillspace
-            ui-list gutter="8px"
+            ui-linear-layout vertical gutter="8px"
                 for|entry, index| of=state.entries
                     if((index>0 && new Date(state.entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
-                        @item padded key=entry._id+"header"
+                        @element padded key=entry._id+"header"
                             ui-spacer
                             ui-linear-layout aligncenter
                                 @element fillspace
                                     ui-heading alignleft heading=3 -- ${getNiceDate(entry.start)}
-                    @item paddedwide alignleft key=entry._id rounded outlined accent
+                    @element paddedwide alignleft key=entry._id rounded outlined accent
                         ui-linear-layout aligncenter class="task-wrapper"
                             @element fillspace
                                 ui-text -- ${entry.name}
-                            for|id| of=entry.projects||[]
-                                $ let project = state.projectsMap[id]||{};
+                            if(entry.project)
+                                $ let project = state.projects[entry.project]||entry.project;
                                 @element key=id
                                     ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
                             @element
@@ -266,7 +272,7 @@ ui-container centered paddedwide
                             @element class="overlay-wrapper"
                                 ui-linear-layout class="overlay"
                                     @element
-                                        ui-button icon="plus" rounded title="Mark as todo" on-click("markEntryTodo", entry._id, index)
+                                        ui-button icon=entry.status==="untracked"?"plus":"check" rounded title="Mark as todo" on-click("markTaskTodo", entry.taskid, index)
                                     @element
                                         ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)
-                                ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.name, entry.projects||[])
+                                ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.name, entry.project)

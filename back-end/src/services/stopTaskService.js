@@ -17,7 +17,8 @@ class StopTaskService {
         entry = entry.toJSON();
         entry.name = task.name;
         entry.project = task.project;
-
+        entry.status = task.status;
+        
         return entry;
     }
 }
