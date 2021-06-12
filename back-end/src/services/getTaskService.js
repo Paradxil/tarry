@@ -3,7 +3,7 @@ const TaskDAO = require('../data/taskDAO');
 class GetTaskService {
     async getTask(userid, taskid) {
         let taskDAO = new TaskDAO();
-        let task = taskDAO.getTask(taskid);
+        let task = await taskDAO.getTask(taskid);
 
         if(task.userid === userid) {
             return task;

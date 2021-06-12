@@ -25,6 +25,7 @@ const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
 const PaginatedTimeEntriesHandler = require("../api/paginatedTimeEntriesHandler");
 const DeleteTimeEntryHandler = require("../api/deleteTimeEntryHandler");
 const GetTaskHandler = require("../api/getTaskHandler");
+const SetTaskStatusHandler = require('../api/setTaskStatusHandler');
 
 const Response = require("../model/response/response");
 

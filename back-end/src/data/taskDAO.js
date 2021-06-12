@@ -49,6 +49,7 @@ class TaskDAO {
         let task = await this.getTask(id);
         task.status = status;
         await task.save();
+        return task;
     }
 }
 
