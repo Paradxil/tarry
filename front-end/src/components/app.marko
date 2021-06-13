@@ -18,7 +18,8 @@ class {
             loggedin: false,
             entries: [],
             projects: [],
-            projectsMap: {}
+            projectsMap: {},
+            notifications: []
         };
     }
 
@@ -116,6 +117,12 @@ class {
             console.log("Error connecting to server.");
         }
     }
+
+    pushNotification(event) {
+        this.state.notifications.splice(0,0,{title: event.title||"Notification", message: event.message||"", id:Date.now()});
+        window.setTimeout(()=>{this.state.notifications.pop();this.setStateDirty("notifications");}, event.timeout?event.timeout*1000:1000*7);
+        this.setStateDirty("notifications");
+    }
 }
 
 style {
@@ -157,12 +164,36 @@ style {
         border-bottom: 1px solid rgba(0,0,0,0.25);
         border-radius: 0px;
     }
+
+    .notifications-wrapper {
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        z-index: 100;
+    }
+
+    .notification {
+        animation-name: fadeup;
+        animation-duration: 0.5s;
+        animation-timing-function: ease-in-out;
+    }
+
+    @keyframes fadeup {
+        0%   {opacity: 0; transform: translateY(10px);}
+        100% {opacity: 1; transform: translateY(0px);}
+    }
 }
 
 static function handleClick(event) {
     console.log("Clicked!");
 }
 
+ui-linear-layout.notifications-wrapper vertical
+    for|notification| of=state.notifications
+        @element class="notification" key=notification.id
+            ui-card rounded accent raised
+                @header title=notification.title heading=3 filled padded
+                ui-text padded -- ${notification.message}
 ui-linear-layout vertical fillspace aligncenter
     @element fullwidth
         ui-linear-layout padded aligncenter gutter="4px"
@@ -190,4 +221,4 @@ ui-linear-layout vertical fillspace aligncenter
                 @element
                     ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class=state.page!=='index'?"page":"" fullwidth fillspace
-        <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") user=state.user entries=state.entries projects=state.projectsMap/>
+        <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") user=state.user entries=state.entries projects=state.projectsMap/>

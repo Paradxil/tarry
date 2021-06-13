@@ -81,7 +81,7 @@ $ let colors = [[
 ui-container centered paddedwide
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         @element
-            ui-heading -- Projects
+            ui-heading heading=1 -- Projects
             ui-spacer
         @element
             ui-button text="New Project" rounded icon=state.addProject?"minus":"plus" on-click("toggleProject")

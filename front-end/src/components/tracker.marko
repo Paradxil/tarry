@@ -84,6 +84,7 @@ class {
         this.state.name = this.getComponent("task-name").state.value;
 
         if(this.state.name === null || this.state.name.length === 0) {
+            this.emit("push", {title: "Warning", message:"Unable to start tracker, no task name given."})
             return;
         }
 
@@ -205,7 +206,7 @@ $ const getNiceHour = function(millseconds) {
 ui-container centered paddedwide
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         @element fillspace
-            ui-heading -- Time Tracker
+            ui-heading heading=1 -- Time Tracker
             ui-spacer
         @element fillspace fullwidth
             ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined

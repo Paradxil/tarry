@@ -1,7 +1,7 @@
 import utils from '../utils.js';
 
 class {
-    onCreate(input) {
+    async onCreate(input) {
         this.state = {
             tasks: {},
             completed: [],
@@ -19,7 +19,7 @@ class {
             return;
         }
 
-        this.getData();
+        await this.getData();
     }
 
     onInput(input) {
@@ -59,6 +59,10 @@ class {
         else if(tab === "untracked") {
             this.state.current = this.state.untracked;
         }
+    }
+
+    setStatus(taskid, status) {
+        this.emit("push", {title:"TODO!", message:"Implement set status on tasks."})
     }
 }
 
