@@ -189,6 +189,12 @@ class Server {
             let handler = new DeleteTaskHandler(req, res);
             await handler.handle(req, res);
         });*/
+        
+        // Get the users active running task.
+        this.app.get('/api/task/active/:userid', this.isAuthenticated, async function(req, res) {
+            let handler = new GetActiveTaskHandler(req, res);
+            await handler.handle(req, res);
+        });
 
         // Get all tasks for a user
         this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {
@@ -212,12 +218,6 @@ class Server {
         // Stop the users running task.
         this.app.post('/api/stop', this.isAuthenticated, async function(req, res) {
             let handler = new StopTaskHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get the users active running task.
-        this.app.get('/api/task/active/:userid', this.isAuthenticated, async function(req, res) {
-            let handler = new GetActiveTaskHandler(req, res);
             await handler.handle(req, res);
         });
 

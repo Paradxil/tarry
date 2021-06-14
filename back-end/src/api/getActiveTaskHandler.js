@@ -22,8 +22,8 @@ class GetActiveTaskHandler {
                 res.send(Response.Error("No active task found."));
             }
         }
-        catch {
-            res.send(Response.Error("Error getting task."));
+        catch(err) {
+            res.send(Response.Error("Error getting active task."));
         }
     }
 }
