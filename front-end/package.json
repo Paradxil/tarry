@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
+    "@marko-tags/context": "^2.2.2",
     "@marko/build": "^4.2.1",
     "@marko/serve": "^4.2.1",
     "axios": "^0.21.1",

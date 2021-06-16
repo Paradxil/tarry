@@ -9,7 +9,8 @@ class {
             now: Date.now(),
             name: "",
             entries: input.entries,
-            projects: input.projects
+            projects: input.projects,
+            editid: null
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -46,16 +47,30 @@ class {
         }
     }
 
-    async deleteEntry(id, index) {
+    async deleteEntry(event) {
+        let id = event.id;
+
         let response = await utils.delete("/api/time/"+id);
 
         if(response.success) {
+            let index = event.index;
             this.state.entries.splice(index, 1);
             this.setStateDirty("entries");
         }
     }
 
-    async markTaskTodo(id, index) {
+    cancelEdit(event) {
+        this.state.editid = null;
+    }
+
+    editEntry(event) {
+        this.state.editid = event.id;
+    }
+
+    async markTaskTodo(event) {
+        let id = event.entry.taskid;
+        let index = event.index;
+
         let response = await utils.post("/api/task/status", {
             userid: this.userid,
             taskid: id,
@@ -72,7 +87,10 @@ class {
         }
     }
 
-    async continueTask(name, project, event) {
+    async continueTask(event) {
+        let entry = event.entry;
+        let name = entry.name;
+        let project = entry.project;
         if(!this.state.tracking) {
             this.state.project = project;
             this.getComponent("task-name").state.value = name;
@@ -112,7 +130,6 @@ class {
         });
 
         if(response.success) {
-            console.log(response.data);
             this.state.entries.splice(0, 0, response.data);
             this.setStateDirty("entries");
             this.state.tracking = false;
@@ -136,73 +153,6 @@ class {
     }
 }
 
-style {
-    .overlay-wrapper {
-        position: relative;
-    }
-
-    .overlay-wrapper:hover > .overlay, .overlay:hover{
-        opacity: 1;
-    }
-
-    .overlay {
-        transition: 0.25s opacity;
-        position: absolute;
-        top: calc(0px - var(--padding));
-        right: 100%;
-        padding: var(--padding);
-        opacity: 0;
-        background-color: rgba(255,255,255,0.7);
-        backdrop-filter: blur(2px);
-    }
-}
-
-$ const getNiceTime = function(millseconds, full=false) {
-    let seconds = Math.floor(millseconds/1000);
-    let minutes = Math.floor(seconds/60);
-    let hours = Math.floor(minutes/60);
-    let days = Math.floor(hours/24);
-
-    seconds = seconds - minutes*60;
-    minutes = minutes - hours*60;
-    hours = hours - days*24;
-
-    let time = "";
-
-    if(days > 0) {
-        time += days + " ";
-    }
-
-    if(hours > 0 || full) {
-        time += hours + ":";
-    }
-
-    if(hours > 0 || minutes > 0 || full) {
-        if(minutes < 10 && (hours > 0 || full)) {
-            time += "0" + minutes;
-        }
-        else {
-            time += minutes
-        }
-        time += ":";
-    }
-
-    time += (seconds<10&&(minutes>0||hours>0||full))?"0"+seconds:seconds;
-
-    return time;
-}
-
-$ const getNiceDate = function(millseconds) {
-    let date = new Date(millseconds);
-    return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
-}
-
-
-$ const getNiceHour = function(millseconds) {
-    let date = new Date(millseconds);
-    return (date.getHours()===0?'00':date.getHours()) + ":" + (date.getMinutes() < 10 ? "0" : '') + date.getMinutes();
-}
-
 ui-container centered paddedwide
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         @element fillspace
@@ -224,7 +174,7 @@ ui-container centered paddedwide
                             @element
                                 ui-spacer
                             @element
-                                ui-text alignright -- ${getNiceTime(state.now - state.startTime, true)}
+                                ui-time alignright showseconds=true milliseconds=(state.now - state.startTime)
                 if(!state.tracking)
                     if(state.project)
                         $ let project = state.projects[state.project];
@@ -248,32 +198,13 @@ ui-container centered paddedwide
                             ui-spacer
                             ui-linear-layout aligncenter
                                 @element fillspace
-                                    ui-heading alignleft heading=3 -- ${getNiceDate(entry.start)}
+                                    ui-heading alignleft heading=3
+                                        ui-date milliseconds=entry.start time=false
                     @element paddedwide alignleft key=entry._id rounded outlined accent
-                        ui-linear-layout aligncenter class="task-wrapper"
-                            @element fillspace
-                                ui-text -- ${entry.name}
-                            if(entry.project)
-                                $ let project = state.projects[entry.project]||entry.project;
-                                @element key=id
-                                    ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
-                            @element
-                                $ if(!entry.nicestart) {
-                                    entry.nicestart = getNiceHour(entry.start);
-                                }
-                                $ if(!entry.niceend) {
-                                    entry.niceend = getNiceHour(entry.end);
-                                }
-                                ui-text -- ${entry.nicestart} - ${entry.niceend}
-                            @element
-                                $ if(!entry.nicetotal) {
-                                    entry.nicetotal = getNiceTime(entry.end - entry.start, true);
-                                }
-                                ui-text -- ${entry.nicetotal}
-                            @element class="overlay-wrapper"
-                                ui-linear-layout class="overlay"
-                                    @element
-                                        ui-button icon=entry.status==="untracked"?"plus":"check" rounded title="Mark as todo" on-click("markTaskTodo", entry.taskid, index)
-                                    @element
-                                        ui-button icon="delete" rounded title="Delete task" on-click("deleteEntry", entry._id, index)
-                                ui-button icon="play" rounded title="Continue" on-click("continueTask", entry.name, entry.project)
+                        $ const controls = [{title:"Continue task", name:"continue", icon:"play"}];
+                        $ const overlaycontrols = [
+                            {title:"Delete entry", name:"delete", icon:"delete"}, 
+                            {title:"Edit entry", name:"edit", icon:"edit-2"},
+                            entry.status==="untracked"?{title:"Mark todo", name:"todo", icon:"flag"}:{title:"Mark completed", name:"complete", icon:"check"}
+                        ];
+                        entry index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("deleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit")

@@ -221,4 +221,5 @@ ui-linear-layout vertical fillspace aligncenter
                 @element
                     ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class=state.page!=='index'?"page":"" fullwidth fillspace
-        <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") user=state.user entries=state.entries projects=state.projectsMap/>
+        context user=state.user entries=state.entries projects=state.projectsMap
+            <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") user=state.user entries=state.entries projects=state.projectsMap/>

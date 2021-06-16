@@ -2,11 +2,13 @@ const TaskDAO = require('../data/taskDAO');
 
 class SetTaskStatusService {
     async setTaskStatus(taskid, userid, status) {
+        console.log(taskid);
         let taskDAO = new TaskDAO();
         let task = await taskDAO.getTask(taskid);
 
+        console.log(task);
+
         if(task.userid !== userid) {
-            console.log("ERROR HERE!");
             throw new Error("Userid does not match task's userid.");
         }
 

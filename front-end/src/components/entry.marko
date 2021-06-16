@@ -1,0 +1,102 @@
+class {
+    onAction(type, id, entry) {
+        this.emit(type, {id: id, entry: entry, index:this.input.index||null});
+    }
+
+    onSave(entry) {
+        let name = this.getComponent("task-name").state.value;
+        if(name.length > 0) {
+            entry.name = name;
+        }
+        this.emit("save", {id: entry._id, entry: entry, index:this.input.index||null});
+    }
+    
+    selectProject(event) {
+        if(event.value.length === 0) {
+            return;
+        }
+
+        this.input.entry.project = event.value;
+    }
+
+    removeProject() {
+        this.input.entry.project = null;
+    }
+}
+
+style {
+    .overlay-wrapper {
+        position: relative;
+    }
+
+    .overlay-wrapper:hover > .overlay, .overlay:hover{
+        opacity: 1;
+    }
+
+    .overlay {
+        transition: 0.25s opacity;
+        position: absolute;
+        top: calc(0px - var(--padding));
+        right: 100%;
+        padding: var(--padding);
+        opacity: 0;
+        background-color: rgba(255,255,255,0.7);
+        backdrop-filter: blur(2px);
+    }
+}
+
+context|{projects}, emit| from="app"
+    ui-linear-layout aligncenter class="task-wrapper"
+        @element fillspace
+            if(input.edit)
+                ui-textbox.blended placeholder="Task Name" key="task-name" value=input.entry.name||input.text
+            else
+                ui-text -- ${input.entry.name||input.text}
+        if(input.entry.project)
+            $ let project = projects[input.entry.project]||{};
+            @element
+                ui-linear-layout accent rounded theme={'--accent-1': project.color} aligncenter
+                    @element
+                        ui-text alignleft padded -- ${project.name||null}
+                    if(input.edit)
+                        @element
+                            ui-button rounded icon="delete" on-click("removeProject")
+        if(input.edit && !input.entry.project)
+            @element
+                $ let options = Object.values(projects).map((item)=>{return {text: item.name, value: item._id}});
+                ui-select id="project-select" options=options key='task-project' on-input('selectProject') default="Add a project"
+        @element
+            if(input.edit)
+                ui-linear-layout
+                    @element
+                        ui-date-select milliseconds=input.entry.start date=false rounded
+                    @element
+                        ui-text -- -
+                    @element
+                        ui-date-select milliseconds=input.entry.end date=false rounded
+            else
+                ui-linear-layout
+                    @element
+                        ui-date milliseconds=input.entry.start date=false
+                    @element
+                        ui-text -- -
+                    @element
+                        ui-date milliseconds=input.entry.end date=false
+        @element
+            ui-time milliseconds=(input.entry.end-input.entry.start)
+        @element class="overlay-wrapper"
+            if(input.edit)
+                ui-linear-layout
+                    @element
+                        ui-button rounded trailingicon="x" title="Cancel" on-click("onAction", "cancel", input.entry._id, input.entry)
+                    @element
+                        ui-button rounded trailingicon="save" title="Save" on-click("onSave", input.entry)
+            else
+                ui-linear-layout class="overlay"
+                    for|action| of=input.overlaycontrols||[]
+                        @element
+                            ui-button icon=action.icon rounded title=action.title on-click("onAction", action.name, input.entry._id, input.entry)
+                ui-linear-layout
+                    for|action| of=input.controls||[]
+                        @element
+                            ui-button icon=action.icon rounded title=action.title on-click("onAction", action.name, input.entry._id, input.entry)
