@@ -19,7 +19,8 @@ class {
             entries: [],
             projects: [],
             projectsMap: {},
-            notifications: []
+            notifications: [],
+            confirmations: []
         };
     }
 
@@ -123,6 +124,21 @@ class {
         window.setTimeout(()=>{this.state.notifications.pop();this.setStateDirty("notifications");}, event.timeout?event.timeout*1000:1000*7);
         this.setStateDirty("notifications");
     }
+
+    pushConfirmation(event) {
+        this.state.confirmations.push({title: event.title||"Confirmation", message: event.message||"", actions: event.actions||[]});
+        this.setStateDirty("confirmations");
+    }
+
+    closeConfirmation(event) {
+        this.state.confirmations.splice(0,1);
+        this.setStateDirty("confirmations");
+    }
+
+    confirmationCallback(action) {
+        this.closeConfirmation();
+        return action.callback?action.callback():console.log("No callback provided.");
+    }
 }
 
 style {
@@ -178,14 +194,24 @@ style {
         animation-timing-function: ease-in-out;
     }
 
+    .confirmation-wrapper {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        background-color: rgba(0,0,0,0.25);
+    }
+
+    .confirmation-dialogue {
+        max-width: 500px;
+    }
+
     @keyframes fadeup {
         0%   {opacity: 0; transform: translateY(10px);}
         100% {opacity: 1; transform: translateY(0px);}
     }
-}
-
-static function handleClick(event) {
-    console.log("Clicked!");
 }
 
 ui-linear-layout.notifications-wrapper vertical
@@ -194,6 +220,24 @@ ui-linear-layout.notifications-wrapper vertical
             ui-card rounded accent raised
                 @header title=notification.title heading=3 filled padded
                 ui-text padded -- ${notification.message}
+
+if(state.confirmations.length > 0)
+    $ let confirmation = state.confirmations[0];
+    ui-linear-layout.confirmation-wrapper vertical centered
+        @element class="confirmation-dialogue"
+            ui-card rounded accent raised
+                @header filled padded
+                    ui-linear-layout fillspace
+                        @element fillspace placecenter
+                            ui-heading heading=3 alignleft -- ${confirmation.title}
+                        @element
+                            ui-button icon="x" on-click("closeConfirmation")
+                ui-text padded alignleft -- ${confirmation.message}
+                ui-linear-layout padded centered
+                    for|action| of=confirmation.actions
+                        @element
+                            ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)
+
 ui-linear-layout vertical fillspace aligncenter
     @element fullwidth
         ui-linear-layout padded aligncenter gutter="4px"
@@ -222,4 +266,4 @@ ui-linear-layout vertical fillspace aligncenter
                     ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class=state.page!=='index'?"page":"" fullwidth fillspace
         context user=state.user entries=state.entries projects=state.projectsMap
-            <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") user=state.user entries=state.entries projects=state.projectsMap/>
+            <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") on-confirm("pushConfirmation") user=state.user entries=state.entries projects=state.projectsMap/>
