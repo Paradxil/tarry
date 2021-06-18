@@ -11,5 +11,12 @@ const timeEntrySchema = new mongoose.Schema({
 
 timeEntrySchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid', 'taskid'], additionalAuthenticatedFields: ['userid', 'taskid']});
 
+//Check that start < end
+taskEntrySchema.pre('validate', async function() {
+    if(this.end <= this.start) {
+        throw new Error("Error, entry must end after it starts.");
+    }
+});
+
 // Create a model for users
 module.exports = mongoose.model('TimeEntry', timeEntrySchema);
