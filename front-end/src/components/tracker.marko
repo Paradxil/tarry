@@ -28,7 +28,7 @@ class {
     }
 
     async getData() {
-        let response = await utils.get("/api/task/active/"+this.userid);
+        let response = await utils.get("/api/task/active/");
 
         if(response.success) {
             let task = response.data;

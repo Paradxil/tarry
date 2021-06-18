@@ -172,6 +172,12 @@ class Server {
             await handler.handle(req, res);
         });
 
+        // Update a time entry
+        this.app.post('/api/time/update', this.isAuthenticated, async function(req, res) {
+            let handler = new UpdateTimeEntryHandler(req, res);
+            await handler.handle(req, res);
+        });
+
         // Add a task
         this.app.post('/api/task', this.isAuthenticated, async function(req, res) {
             let handler = new AddTaskHandler(req, res);
@@ -191,13 +197,19 @@ class Server {
         });*/
         
         // Get the users active running task.
-        this.app.get('/api/task/active/:userid', this.isAuthenticated, async function(req, res) {
+        this.app.get('/api/task/active', this.isAuthenticated, async function(req, res) {
             let handler = new GetActiveTaskHandler(req, res);
             await handler.handle(req, res);
         });
 
         // Get all tasks for a user
         this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {
+            let handler = new AllTasksHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        // Get all tasks for current user
+        this.app.get('/api/task/all', this.isAuthenticated, async function(req, res) {
             let handler = new AllTasksHandler(req, res);
             await handler.handle(req, res);
         });

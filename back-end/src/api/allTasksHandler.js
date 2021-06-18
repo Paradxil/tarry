@@ -5,7 +5,7 @@ class AllTasksHandler {
     async handle(req, res) {
         let service = new AllTasksService();
 
-        let userid = req.params.userid||null;
+        let userid = req.params.userid||req.user._id||null;
 
         if(userid === null) {
             res.send(Response.InvalidRequest("Bad request.", {name: "userid", expectedType: "String"}));
