@@ -5,7 +5,7 @@ class GetActiveTaskHandler {
     async handle(req, res) {
         let service = new GetActiveTaskService();
 
-        let userid = req.params.userid||null;
+        let userid = req.user._id;
 
         if(userid == null) {
             res.send(Response.InvalidRequest("Invalid request."));
