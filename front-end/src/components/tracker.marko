@@ -10,7 +10,8 @@ class {
             name: "",
             entries: input.entries,
             projects: input.projects,
-            editid: null
+            editid: null,
+            deleting: []
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -50,12 +51,16 @@ class {
     confirmDeleteEntry(event) {
         this.emit("confirm", {
             title:"Delete Entry?", 
-            message:"Are you sure you want to delete the entry for " + event.entry.name + " on " + new Date(event.entry.start).toDateString() + "? This cannot be undone.",
+            message:"Are you sure you want to delete the entry for '" + event.entry.name + "' on " + new Date(event.entry.start).toDateString() + "? This cannot be undone.",
             actions: [
                 {
                     text: "Yes",
                     icon: "check",
-                    callback: ()=>this.deleteEntry(event)
+                    callback: ()=>{
+                        this.deleteEntry(event); 
+                        this.state.deleting.push(event.id);
+                        this.setStateDirty("deleting");
+                    }
                 },
                 {
                     text: "Cancel",
@@ -233,4 +238,4 @@ ui-container centered paddedwide
                             {title:"Edit entry", name:"edit", icon:"edit-2"},
                             entry.status==="untracked"?{title:"Mark todo", name:"todo", icon:"flag"}:{title:"Mark completed", name:"complete", icon:"check"}
                         ];
-                        entry index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")
+                        entry disabled=state.deleting.includes(entry._id) index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")

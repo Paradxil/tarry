@@ -65,10 +65,15 @@ style {
         background-color: rgba(255,255,255,0.7);
         backdrop-filter: blur(2px);
     }
+
+    .disabled {
+        opacity: 0.5 !important;
+        pointer-events: none;
+    }
 }
 
 context|{projects}, emit| from="app"
-    ui-linear-layout aligncenter class="task-wrapper"
+    ui-linear-layout aligncenter class={"task-wrapper":true, "disabled": input.disabled}
         @element fillspace
             if(input.edit)
                 ui-textbox.blended placeholder="Task Name" key="task-name" value=state.entry.name||input.text
