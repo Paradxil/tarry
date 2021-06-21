@@ -47,6 +47,8 @@ class TimeEntryDAO {
         entry.taskid = taskid;
         entry.start = start;
         entry.end = end;
+        await entry.save();
+        return entry;
     }
 }
 

@@ -11,7 +11,7 @@ class {
             entries: input.entries,
             projects: input.projects,
             editid: null,
-            deleting: []
+            disabled: []
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -58,8 +58,8 @@ class {
                     icon: "check",
                     callback: ()=>{
                         this.deleteEntry(event); 
-                        this.state.deleting.push(event.id);
-                        this.setStateDirty("deleting");
+                        this.state.disabled.push(event.id);
+                        this.setStateDirty("disabled");
                     }
                 },
                 {
@@ -84,14 +84,31 @@ class {
     }
 
     cancelEdit(event) {
-        console.log(event);
-        this.state.entries[this.state.editid] = event.entry;
-        this.setStateDirty("entries");
         this.state.editid = null;
     }
 
-    saveEntry(event) {
+    async saveEntry(event) {
+        this.state.editid = null;
+        let i = this.state.disabled.push(event.id)-1;
+        this.setStateDirty("disabled");
 
+        let entry = event.entry;
+        let response = await utils.post("/api/time/update", {
+            id: event.id,
+            name: entry.name,
+            project: entry.project,
+            start: entry.start,
+            end: entry.end
+        });
+
+        if(response.success) {
+            let newentry = response.data;
+            this.state.entries[newentry._id] = newentry;
+            this.setStateDirty("entries");
+        }
+
+        this.state.disabled.splice(i, 1);
+        this.setStateDirty("disabled");
     }
 
     editEntry(event) {
@@ -238,4 +255,4 @@ ui-container centered paddedwide
                             {title:"Edit entry", name:"edit", icon:"edit-2"},
                             entry.status==="untracked"?{title:"Mark todo", name:"todo", icon:"flag"}:{title:"Mark completed", name:"complete", icon:"check"}
                         ];
-                        entry disabled=state.deleting.includes(entry._id) index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")
+                        entry disabled=state.disabled.includes(entry._id) index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")

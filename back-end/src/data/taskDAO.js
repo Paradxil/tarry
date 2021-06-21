@@ -1,3 +1,4 @@
+const task = require('../model/task');
 const Task = require('../model/task');
 
 class TaskDAO {
@@ -42,7 +43,20 @@ class TaskDAO {
         task.name = name;
         task.userid = userid;
         task.project = project;
-        await task.save();
+
+        try {
+            await task.save();
+        }
+        catch(err) {
+            if(err.taskid !== null) { //This task already exists.
+                task = await Task.findOne({_id: err.taskid}); //Get the previously existing task.
+            }
+            else {
+                throw err;
+            }
+        }
+
+        return task;
     }
 
     async setStatus(id, status) {

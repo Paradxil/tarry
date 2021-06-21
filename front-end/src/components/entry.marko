@@ -22,7 +22,7 @@ class {
             this.state.entry.name = name;
         }
 
-        this.emit("save", {id: entry._id, entry: this.state.entry, index:this.input.index||null});
+        this.emit("save", {id: this.state.entry._id, entry: JSON.parse(JSON.stringify(this.state.entry)), index:this.input.index||null});
     }
     
     selectProject(event) {
