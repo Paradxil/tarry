@@ -42,17 +42,18 @@ class {
 ui-container centered padded
     ui-linear-layout vertical padded gutter="16px"
         @element
-            ui-text centered -- Register
+            ui-heading heading=1 centered -- Register
         @element
-            ui-form padded vertical gutter="16px"
-                @element
-                    ui-textbox placeholder="Username" id="username" value=state.username on-input("updateUsername")
-                @element
-                    ui-textbox placeholder="Password" id="password" value=state.password on-input("updatePassword") password
-                @element
-                    ui-textbox placeholder="Email" id="email" value=state.email on-input("updateEmail")
-                @element
-                    div.icon-captcha key="icon-captcha" no-update
-                @element
-                    ui-submit preventdefault on-click("register")
-                        -- Register
+            paper-modal
+                ui-form padded vertical gutter="16px"
+                    @element
+                        ui-textbox placeholder="Username" id="username" value=state.username on-input("updateUsername")
+                    @element
+                        ui-textbox placeholder="Password" id="password" value=state.password on-input("updatePassword") password
+                    @element
+                        ui-textbox placeholder="Email" id="email" value=state.email on-input("updateEmail")
+                    @element
+                        div.icon-captcha key="icon-captcha" no-update
+                    @element
+                        ui-submit preventdefault on-click("register")
+                            -- Register

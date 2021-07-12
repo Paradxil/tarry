@@ -159,7 +159,7 @@ style {
         --text-1: #495057;
         --text-2: #495057;
         --border: #dee2e6;
-        --rounded-radius: 2px;
+        --rounded-radius: 5px;
         --padding: 8px;
         --padding-narrow: 4px;
         --padding-wide: 16px;
@@ -171,6 +171,19 @@ style {
 
     .page {
         max-width: 1200px;
+    }
+
+    .ui-textbox, .ui-submit {
+        outline: none;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        padding: 15px !important;
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+    }
+
+    .ui-textbox:hover, .ui-textbox:focus {
+        border-bottom: 1px solid var(--background-2);
     }
 
     .blended {
