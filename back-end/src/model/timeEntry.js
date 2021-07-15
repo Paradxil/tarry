@@ -9,7 +9,7 @@ const timeEntrySchema = new mongoose.Schema({
     end: {type: Number, required: true}
 });
 
-timeEntrySchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid', 'taskid'], additionalAuthenticatedFields: ['userid', 'taskid']});
+timeEntrySchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: []});
 
 //Check that start < end
 timeEntrySchema.pre('validate', async function() {
