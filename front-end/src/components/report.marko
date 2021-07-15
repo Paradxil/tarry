@@ -1,1 +1,39 @@
+import utils from '../utils.js';
+
+class {
+    async onCreate(input) {
+        this.state = {
+            data: {}
+        };
+        
+        let response = await utils.post("/api/report", {
+            start: input.start||Date.now(), //Start date
+            end: input.end||Date.now(), //End date
+            projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
+            tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
+        });
+
+        if(response.success) {
+            this.state.data = response.data;
+        }
+    }
+}
+
 context|{projects}, emit| from="app"
+    ui-time milliseconds=state.data.timeTracked||0
+    ui-heading -- Tasks
+    for|taskid| in=state.data.tasks
+        $ let task = state.data.tasks[taskid];
+        ui-linear-layout
+            @element
+                ui-text -- ${task.name}
+            @element
+                ui-time milliseconds=task.timeTracked
+    ui-heading -- Projects
+    for|id| in=state.data.projects
+        $ let project = state.data.projects[id];
+        ui-linear-layout
+            @element
+                ui-text -- ${project.name}
+            @element
+                ui-time milliseconds=project.timeTracked

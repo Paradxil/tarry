@@ -29,6 +29,7 @@ const SetTaskStatusHandler = require('../api/setTaskStatusHandler');
 const UpdateTimeEntryHandler = require('../api/updateTimeEntryHandler');
 
 const Response = require("../model/response/response");
+const GenerateReportHandler = require('../api/generateReportHandler');
 
 class Server {
     constructor() {
@@ -153,6 +154,12 @@ class Server {
                     loggedin: req.isAuthenticated()
                 }
             ));
+        });
+
+        // Get paginated time entries for a user
+        this.app.post('/api/report/', this.isAuthenticated, async function (req, res) {
+            let handler = new GenerateReportHandler();
+            await handler.handle(req, res);
         });
 
         // Get all time entries for a user
