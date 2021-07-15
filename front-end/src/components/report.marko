@@ -7,8 +7,8 @@ class {
         };
         
         let response = await utils.post("/api/report", {
-            start: input.start||Date.now(), //Start date
-            end: input.end||Date.now(), //End date
+            start: input.start instanceof Date?input.start.getTime():input.start||Date.now(), //Start date
+            end: input.end instanceof Date?input.end.getTime():input.end||Date.now(), //End date
             projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
             tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
         });
