@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     username: {type: String, unique: true, required: true, lowercase: true},
     email: {type: String, unique: true, required: true, lowercase: true},
     password: {type: String, required: true},
-    schemaVersion: {type: Number, required: true, default: process.env.SCHEMA_VESRION}
+    schemaVersion: {type: Number, required: true, default: process.env.SCHEMA_VERSION}
 });
 
 userSchema.plugin(encrypt, {secret: process.env.SECRET, additionalAuthenticatedFields: ['email', 'username']});
@@ -18,6 +18,7 @@ userSchema.plugin(encrypt, {secret: process.env.SECRET, additionalAuthenticatedF
 userSchema.methods.toJSON = function () {
     var obj = this.toObject();
     delete obj.password;
+    delete obj.schemaVersion;
     return obj;
 }
 
