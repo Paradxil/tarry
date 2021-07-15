@@ -1,8 +1,65 @@
 const TimeEntry = require('../model/timeEntry');
 
 class TimeEntryDAO {
+    constructor() {
+        this.startTime = null;
+        this.endTime = null;
+        this.projectsFilter = [];
+        this.tasksFilter = [];
+    }
+
+    /**
+     * Set a time range to filter results on. 
+     * After setting a time range all entries returned from 'get' and 'getAll' queries will be inside this range.
+     * @param {*} start 
+     * @param {*} end 
+     */
+    setTimeRange(start, end) {
+        this.startTime = start;
+        this.endTime = end;
+    }
+
+    /**
+     * A list of projects to include.
+     * After setting this filter all entries returned from 'get' and 'getAll' queries will belong to one of these projects.
+     * @param {Array} projects Empty set or null for no filter.
+     */
+    setProjectsFilter(projects) {
+        this.projectsFilter = projects;
+    }
+
+    /**
+     * A list of tasks to include in results.
+     * After setting this filter all entries returned from 'get' and 'getAll' queries will belong to one of these tasks.
+     * @param {*} tasks 
+     */
+    setTasksFilter(tasks) {
+        this.tasksFilter = tasks;
+    }
+
+    /**
+     * Builds a complete query from the DAO's filters and the provided query.
+     * @param {Object} query
+     * @returns A complete query with any filters.
+     */
+    buildQuery(query) {
+        let queries = [query];
+
+        //Add range filter
+        if(this.startTime != null && this.endTime != null) {
+            queries.push({ start: { $gte: this.startTime } });
+            queries.push({ start: { $lte: this.endTime } });
+        }
+
+        //TODO: Add other filters
+
+        console.log(queries);
+
+        return {$and: queries};
+    }
+
     async get(id) {
-        return await TimeEntry.findOne({_id: id});
+        return await TimeEntry.findOne(this.buildQuery({_id: id}));
     }
 
     async remove(id) {
@@ -10,7 +67,7 @@ class TimeEntryDAO {
     }
 
     async getAll(userid) {
-        return await TimeEntry.find({userid: userid});
+        return await TimeEntry.find(this.buildQuery({userid: userid}));
     }
 
     async getAllFromTask(taskid) {
