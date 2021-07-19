@@ -53,8 +53,6 @@ class TimeEntryDAO {
 
         //TODO: Add other filters
 
-        console.log(queries);
-
         return {$and: queries};
     }
 
