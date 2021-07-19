@@ -97,8 +97,10 @@ class GenerateReportService {
             entry.status = task.status;
 
             let project = await this.projectDAO.get(task.project);
-            entry.project = project.toJSON();
-            entries[i] = entry;
+            if(project != null) {
+                entry.project = project.toJSON();
+                entries[i] = entry;
+            }
         }
 
         return entries;
