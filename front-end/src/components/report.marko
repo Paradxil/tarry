@@ -57,30 +57,27 @@ class {
         let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         let datasetMap = {};
 
-        for(let day in this.state.data.days) {
-            console.log(day);
-            let data = this.state.data.days[day];
-            let date = new Date(data.date);
+        for(let day of this.state.data.days) {
+            let date = new Date(day.date);
             this.state.chart.data.labels.push(days[date.getDay()]);
+        }
 
-            for(let projectID in data.projects) {
-                let project = data.projects[projectID];
+        for(let projectID in this.state.data.projects) {
+            let project = this.state.data.projects[projectID];
+            let color = this.hexToRgb(project.color);
 
-                if(!(projectID in datasetMap)) {
-                    datasetMap[projectID] = this.state.chart.data.datasets.length;
-                    let color = this.hexToRgb(project.color);
-                    this.state.chart.data.datasets.push({
-                        label: project.name,
-                        backgroundColor: "rgba("+color.r+", "+color.g+", "+color.b+", 0.5)",
-                        borderColor: project.color,
-                        borderWidth: 1,
-                        borderRadius: 2,
-                        data: []
-                    });
-                }
+            let data = this.state.data.days.map((day) => {return (projectID in day.projects)?this.milliToHours(day.projects[projectID].timeTracked):0});
 
-                this.state.chart.data.datasets[datasetMap[projectID]].data.push(this.milliToHours(project.timeTracked));
-            }
+            console.log(data);
+
+            this.state.chart.data.datasets.push({
+                label: project.name,
+                backgroundColor: "rgba("+color.r+", "+color.g+", "+color.b+", 0.5)",
+                borderColor: project.color,
+                borderWidth: 1,
+                borderRadius: 2,
+                data: data
+            });
         }
 
         console.log(this.state.chart.data);
