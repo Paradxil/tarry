@@ -4,9 +4,17 @@ import Chart from 'chart.js/auto';
 class {
     async onCreate(input) {
         this.state = {
-            data: {},
+            data: input.data,
             chart: null
         };
+    }
+
+    async onInput(input) {
+        this.state.data = input.data;
+
+        if(this.state.data != null) {
+            this.buildChart();
+        }
     }
 
     async onMount() {
@@ -39,23 +47,15 @@ class {
             }
         });
 
-        let response = await utils.post("/api/report", {
-            start: input.start instanceof Date?input.start.getTime():input.start||Date.now(), //Start date
-            end: input.end instanceof Date?input.end.getTime():input.end||Date.now(), //End date
-            projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
-            tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
-        });
-
-        if(response.success) {
-            this.state.data = response.data;
-
+        if(this.state.data != null) {
             this.buildChart();
         }
     }
 
     buildChart() {
         let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        let datasetMap = {};
+
+        this.state.chart.data = {};
 
         for(let day of this.state.data.days) {
             let date = new Date(day.date);
@@ -67,9 +67,7 @@ class {
             let color = this.hexToRgb(project.color);
 
             let data = this.state.data.days.map((day) => {return (projectID in day.projects)?this.milliToHours(day.projects[projectID].timeTracked):0});
-
-            console.log(data);
-
+            
             this.state.chart.data.datasets.push({
                 label: project.name,
                 backgroundColor: "rgba("+color.r+", "+color.g+", "+color.b+", 0.5)",
@@ -79,8 +77,6 @@ class {
                 data: data
             });
         }
-
-        console.log(this.state.chart.data);
 
         this.state.chart.update();
     }
@@ -114,25 +110,4 @@ style {
 }
 
 context|{projects}, emit| from="app"
-    paper-modal
-        ui-heading alignleft -- Overview
-        ui-spacer
-        canvas no-update id="chartOverview"
-    ui-time milliseconds=state.data.timeTracked||0
-    ui-heading -- Tasks
-    for|taskid| in=state.data.tasks
-        $ let task = state.data.tasks[taskid];
-        ui-linear-layout
-            @element
-                ui-text -- ${task.name}
-            @element
-                ui-time milliseconds=task.timeTracked
-    ui-heading -- Projects
-    $ let projKeys = state.data.projects!=null?Object.keys(state.data.projects).sort((a, b)=>{return (state.data.projects[b].timeTracked - state.data.projects[a].timeTracked)}):[];
-    for|id| of=projKeys
-        $ let project = state.data.projects[id];
-        ui-linear-layout
-            @element
-                ui-text -- ${project.name}
-            @element
-                ui-time milliseconds=project.timeTracked
+    canvas no-update id="chartOverview"

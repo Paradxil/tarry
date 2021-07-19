@@ -1,9 +1,57 @@
 import utils from '../utils.js';
 
+class {
+    async onCreate() {
+        this.state = {
+            data: null,
+            start: new Date(),
+            end: new Date()
+        };
+
+        this.state.start.setDate(this.state.start.getDate() - 7); //Default to the last week
+        this.generateReport();
+    }
+
+    async generateReport() {
+        let response = await utils.post("/api/report", {
+            start: this.state.start.getTime(), //Start date
+            end: this.state.end.getTime(), //End date
+            projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
+            tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
+        });
+
+        if(response.success) {
+            this.state.data = response.data;
+        }
+    }
+
+    setStartDate(event) {
+        this.state.start = event.date;
+        this.generateReport();
+    }
+
+    setEndDate(event) {
+        this.state.end = event.date;
+        this.generateReport();
+    }
+}
+
 ui-container centered paddedwide
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         @element
             ui-heading heading=1 -- Reports
             ui-spacer
         @element
-            report start=new Date(Date.now()).setDate(new Date(Date.now()).getDate()-7)
+            ui-linear-layout
+                @element centered
+                    ui-text -- From: 
+                @element
+                    ui-date-select milliseconds = state.start.getTime() showtime=false on-input("setStartDate")
+                @element centered
+                    ui-text -- To: 
+                @element
+                    ui-date-select milliseconds = state.end.getTime() showtime=false on-input("setEndDate")
+        @element
+            paper-modal
+                ui-heading -- Overview
+                graph data=state.data
