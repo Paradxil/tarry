@@ -1,11 +1,44 @@
 import utils from '../utils.js';
+import Chart from 'chart.js/auto';
 
 class {
     async onCreate(input) {
         this.state = {
-            data: {}
+            data: {},
+            chart: null
         };
-        
+    }
+
+    async onMount() {
+        let input = this.input;
+        let ctx = "chartOverview";
+        this.state.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            text: "Hours",
+                            display: true
+                        },
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback: function(value, index, values) {
+                                return value+" hrs";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         let response = await utils.post("/api/report", {
             start: input.start instanceof Date?input.start.getTime():input.start||Date.now(), //Start date
             end: input.end instanceof Date?input.end.getTime():input.end||Date.now(), //End date
@@ -15,11 +48,79 @@ class {
 
         if(response.success) {
             this.state.data = response.data;
+
+            this.buildChart();
         }
+    }
+
+    buildChart() {
+        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let datasetMap = {};
+
+        for(let day in this.state.data.days) {
+            console.log(day);
+            let data = this.state.data.days[day];
+            let date = new Date(data.date);
+            this.state.chart.data.labels.push(days[date.getDay()]);
+
+            for(let projectID in data.projects) {
+                let project = data.projects[projectID];
+
+                if(!(projectID in datasetMap)) {
+                    datasetMap[projectID] = this.state.chart.data.datasets.length;
+                    let color = this.hexToRgb(project.color);
+                    this.state.chart.data.datasets.push({
+                        label: project.name,
+                        backgroundColor: "rgba("+color.r+", "+color.g+", "+color.b+", 0.5)",
+                        borderColor: project.color,
+                        borderWidth: 1,
+                        borderRadius: 2,
+                        data: []
+                    });
+                }
+
+                this.state.chart.data.datasets[datasetMap[projectID]].data.push(this.milliToHours(project.timeTracked));
+            }
+        }
+
+        console.log(this.state.chart.data);
+
+        this.state.chart.update();
+    }
+
+    milliToHours(milli) {
+        return milli/1000/60/60;
+    }
+
+    //https://stackoverflow.com/a/5624139
+    hexToRgb(hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+}
+
+style {
+    #chartOverview {
+        width: 100%;
+        max-height: 400px !important;
     }
 }
 
 context|{projects}, emit| from="app"
+    paper-modal
+        ui-heading alignleft -- Overview
+        ui-spacer
+        canvas no-update id="chartOverview"
     ui-time milliseconds=state.data.timeTracked||0
     ui-heading -- Tasks
     for|taskid| in=state.data.tasks
@@ -30,7 +131,8 @@ context|{projects}, emit| from="app"
             @element
                 ui-time milliseconds=task.timeTracked
     ui-heading -- Projects
-    for|id| in=state.data.projects
+    $ let projKeys = state.data.projects!=null?Object.keys(state.data.projects).sort((a, b)=>{return (state.data.projects[b].timeTracked - state.data.projects[a].timeTracked)}):[];
+    for|id| of=projKeys
         $ let project = state.data.projects[id];
         ui-linear-layout
             @element

@@ -16,12 +16,21 @@ class GenerateReportService {
         let taskDAO = new TaskDAO();
         let projectDAO = new ProjectDAO();
 
+        let startDate = new Date(start);
+        startDate.setHours(0, 0, 0, 0);
+
+        let endDate = new Date(end);
+        endDate.setHours(0, 0, 0, 0);
+
+        let numDays = (end - start)/(1000 * 3600 * 24);
+
         //Set filters
         entryDAO.setTimeRange(start, end);
 
         //Get entries
         let entries = await entryDAO.getAll(userid);
 
+        //Compile entry, project, and task data.
         for(let i = 0; i < entries.length; i++) {
             let entry = entries[i].toJSON();
 
@@ -43,16 +52,49 @@ class GenerateReportService {
             timeTracked: 0,
             entries: entries,
             projects: {},
-            tasks: {}
+            tasks: {},
+            days: {}
         };
+
+        //Initialize days
+        for(let i = 0; i < numDays; i++) {
+            let tmpDate = new Date(startDate.getTime());
+            tmpDate.setDate(tmpDate.getDate() + i);
+
+            let id = tmpDate.getTime();
+            data.days[id] = {
+                    date: id,
+                    timeTracked: 0,
+                    entries: [],
+                    projects: {},
+                    tasks: {}
+            }
+        }
+
+        // Get entries by day
+        for (let i = 0; i < entries.length; i++) {
+            let entry = entries[i];
+            let curDate = new Date(entry.start);
+            curDate.setHours(0, 0, 0, 0);
+            let id = curDate.getTime();
+
+            data.days[id].timeTracked += (entry.end - entry.start);
+            data.days[id].entries.push(entry);
+        }
+
+        //Calculate daily totals
+        for(let day in data.days) {
+            let dailyTotals = this.computeTotals(data.days[day].entries);
+            data.days[day].tasks = dailyTotals.tasks;
+            data.days[day].projects = dailyTotals.projects;
+            data.days[day].timeTracked = dailyTotals.timeTracked;
+        }
 
         let totals = this.computeTotals(entries);
 
         data.timeTracked = totals.timeTracked;
         data.tasks = totals.tasks;
         data.projects = totals.projects;
-
-        console.log(data);
 
         return data;
     }
@@ -78,7 +120,14 @@ class GenerateReportService {
                 tasks[entry.taskid].timeTracked += (entry.end - entry.start);
             }
 
-            if (entry.projectid != null) { //Total per project
+            //Add a default project for entries with no project given
+            projects["No Project"] = {
+                timeTracked: 0,
+                name: "No Project",
+                color: "#aaa"
+            };
+
+            if(entry.projectid != null) { //Total per project
                 if (!(entry.projectid in projects)) {
                     projects[entry.projectid] = {
                         timeTracked: 0,
@@ -88,6 +137,9 @@ class GenerateReportService {
                 }
 
                 projects[entry.projectid].timeTracked += (entry.end - entry.start);
+            }
+            else {
+                projects["No Project"].timeTracked += (entry.end - entry.start);
             }
         }
 
