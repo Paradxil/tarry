@@ -1,0 +1,38 @@
+class {
+    onCreate(input) {
+        this.state = {
+            data: input.data
+        }
+    }
+
+    onInput(input) {
+        this.state.data = input.data;
+    }
+}
+
+style {
+    .chart-wrapper td, .chart-wrapper th {
+        padding: 10px;
+        border-collapse: collapse;
+    }
+
+    .chart-header th {
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+ui-container ...input alignleft
+    table.chart-wrapper
+        tr.chart-header.chart-row
+            th.chart-heading
+                ui-heading heading=3 -- Project
+            th.chart-heading
+                ui-heading heading=3 -- Time
+        if(state.data != null)
+            for|projectID| in=state.data.projects
+                $ let project = state.data.projects[projectID]
+                tr.chart-row
+                    td
+                        ui-text -- ${project.name==="No Project"?"Other":project.name}
+                    td
+                        ui-time milliseconds = project.timeTracked

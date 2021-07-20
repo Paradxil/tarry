@@ -51,7 +51,8 @@ ui-container centered paddedwide
                     ui-text -- To: 
                 @element
                     ui-date-select milliseconds = state.end.getTime() showtime=false on-input("setEndDate")
-        @element
+        @element alignleft
             paper-modal
-                ui-heading -- Overview
                 graph data=state.data
+                ui-spacer space='25px'
+                chart data=state.data
