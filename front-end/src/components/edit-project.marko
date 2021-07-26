@@ -1,0 +1,74 @@
+import utils from '../utils.js';
+
+class {
+    onCreate(input) {
+        this.state = {
+            project: input.project||{}
+        };
+    }
+    onInput(input) {
+        this.state.project = input.project||{};
+    }
+    setColor(event) {
+        this.state.project.color = event.color;
+    }
+
+    setName(event) {
+        this.state.project.name = event.value;
+    }
+    setWage(evet) {
+        this.state.project.wage = parseInt(event.value);
+    }
+    async saveProject() {
+        let response = await utils.post('/api/project', this.state.project);
+
+        if(response.success) {
+            this.state.projects.push(response.data.project);
+            this.setStateDirty("projects");
+            this.state.addProject = false;
+        }
+    }
+}
+
+style {
+    .project-page-title {
+        font-size: 20px;
+    }
+}
+
+$ let colors = [[
+    '#ff8787',
+    '#f783ac',
+    '#da77f2',
+    '#9775fa',
+    '#748ffc',
+    '#4dabf7'
+],
+
+[    
+    '#3bc9db',
+    '#38d9a9',
+    '#69db7c',
+    '#a9e34b',
+    '#ffd43b',
+    '#ffa94d'
+]]
+
+ui-textbox.blended.project-page-title fullwidth placeholder="Project Name" value=state.project.name on-input('setName')
+ui-linear-layout vertical accent paddedwide rounded fillspace fullwidth
+    @element
+        ui-heading heading=3 alignleft -- Color
+    @element
+        ui-linear-layout aligncenter
+            @element
+                ui-color-select rounded paddedwide title="Choose Project Icon" on-input('setColor') color=state.project.color colors=colors
+    @element
+        ui-spacer
+        ui-heading heading=3 alignleft -- Billing
+    @element
+        ui-linear-layout aligncenter
+            @element
+                ui-textbox placeholder="Hourly Wage" value=state.project.wage on-input('setWage')
+    @element
+        ui-spacer
+        ui-button text="Save Project" rounded centered on-click("saveProject")
