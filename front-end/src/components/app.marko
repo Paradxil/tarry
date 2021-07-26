@@ -222,9 +222,75 @@ style {
         max-width: 500px;
     }
 
+    .wiggle:hover > * {
+        animation-name: wiggle;
+        animation-duration: 0.75s;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
+    .wiggle-right:hover > * {
+        animation-name: wiggleright;
+        animation-duration: 0.75s;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
+    .animation-popup:hover > * {
+        animation-name: popup;
+        animation-duration: 0.75s;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
+    .animation-popright:hover > * {
+        animation-name: popright;
+        animation-duration: 0.75s;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
+    .animation-slideinout:hover > * {
+        animation-name: slideoutin;
+        animation-duration: 0.75s;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+    }
+
     @keyframes fadeup {
         0%   {opacity: 0; transform: translateY(10px);}
         100% {opacity: 1; transform: translateY(0px);}
+    }
+
+    @keyframes popup {
+        0%   {transform: translateY(0px);}
+        40%   {transform: translateY(20%);}
+        100% {transform: translateY(10%);}
+    }
+
+    @keyframes popright {
+        0%   {transform: translateX(0px);}
+        40%   {transform: translateX(20%);}
+        100% {transform: translateX(10%);}
+    }
+
+    @keyframes wiggle {
+        0% {transform: rotate(0deg);}
+        50% {transform: rotate(-40deg);}
+        100% {transform: rotate(-20deg);}
+    }
+
+    @keyframes wiggleright {
+        0% {transform: rotate(0deg);}
+        50% {transform: rotate(50deg);}
+        100% {transform: rotate(30deg);}
+    }
+
+    @keyframes slideoutin {
+        0% {transform: translateY(0px); opacity: 1;}
+        49% {transform: translateY(30%); opacity: 0;}
+        50% {transform: translateY(-30%); opacity: 0;}
+        100% {transform: translateY(0%); opacity: 1;}
     }
 }
 
@@ -260,24 +326,24 @@ ui-linear-layout vertical fillspace aligncenter
             @element fillspace
             if(state.loggedin)
                 @element
-                    ui-button rounded outlined filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
+                    ui-button.wiggle-right rounded outlined filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
                 @element
-                    ui-button rounded outlined filled=state.page==='todo' icon="list" on-click("changePage", 'todo') title="Todo"
+                    ui-button.animation-popup rounded outlined filled=state.page==='todo' icon="list" on-click("changePage", 'todo') title="Todo"
                 @element
-                    ui-button rounded outlined filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
+                    ui-button.animation-popup rounded outlined filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
                 @element
-                    ui-button rounded outlined filled=state.page==='invoice' icon="file" on-click("changePage", 'invoice') title="Invoice"
+                    ui-button.animation-slideinout rounded outlined filled=state.page==='invoice' icon="file" on-click("changePage", 'invoice') title="Invoice"
                 @element
-                    ui-button rounded outlined filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
+                    ui-button.animation-popup rounded outlined filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
                 @element
-                    ui-button rounded outlined filled=state.page==='settings' icon="settings" on-click("changePage", 'settings') title="Settings"
+                    ui-button.wiggle rounded outlined filled=state.page==='settings' icon="settings" on-click("changePage", 'settings') title="Settings"
                 @element
-                    ui-button rounded outlined icon="log-out" on-click('logoutUser') title="Logout"
+                    ui-button.animation-popright rounded outlined icon="log-out" on-click('logoutUser') title="Logout"
             else
                 @element
-                    ui-button rounded outlined filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
+                    ui-button.animation-popup rounded outlined filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
-                    ui-button rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
+                    ui-button.animation-popup rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class=state.page!=='index'?"page":"" fullwidth fillspace
         context user=state.user entries=state.entries projects=state.projectsMap
             <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") on-confirm("pushConfirmation") user=state.user entries=state.entries projects=state.projectsMap/>
