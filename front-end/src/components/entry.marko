@@ -70,6 +70,10 @@ style {
         opacity: 0.5 !important;
         pointer-events: none;
     }
+
+    .project-name {
+        font-size: 13px;
+    }
 }
 
 context|{projects}, emit| from="app"
@@ -82,14 +86,14 @@ context|{projects}, emit| from="app"
         if(state.entry.project)
             $ let project = projects[state.entry.project]||{};
             @element
-                ui-linear-layout accent rounded theme={'--accent-1': project.color} aligncenter
+                ui-linear-layout aligncenter
                     @element
-                        ui-text alignleft padded -- ${project.name||null}
+                        ui-text.project-name style={color: project.color} alignleft padded -- ${project.name||null}
                     if(input.edit)
                         @element
                             ui-button rounded icon="delete" on-click("removeProject")
         if(input.edit && !state.entry.project)
-            @element
+            @element fillspace
                 $ let options = Object.values(projects).map((item)=>{return {text: item.name, value: item._id}});
                 ui-select id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Add a project"
         @element
