@@ -5,6 +5,10 @@ class {
         this.state = {
             project: input.project||{}
         };
+
+        if(this.state.project._id != null) {
+            this.state.project.projectid = this.state.project._id;
+        }
     }
     onInput(input) {
         this.state.project = input.project||{};
