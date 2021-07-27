@@ -18,7 +18,7 @@ const DeleteTaskHandler = require('../api/deleteTaskHandler');
 const StartTaskHandler = require('../api/startTaskHandler');
 const StopTaskHandler = require('../api/stopTaskHandler');
 const GetActiveTaskHandler = require('../api/getActiveTaskHandler');
-const AddProjectHandler = require('../api/addProjectHandler');
+const SaveProjectHandler = require('../api/saveProjectHandler');
 const DeleteProjectHandler = require('../api/deleteProjectHandler');
 const AllProjectsHandler = require('../api/allProjectsHandler');
 const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
@@ -241,9 +241,9 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Add a project
+        // Add/update a project
         this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
-            let handler = new AddProjectHandler(req, res);
+            let handler = new SaveProjectHandler(req, res);
             await handler.handle(req, res);
         });
 
