@@ -1,0 +1,49 @@
+import utils from '../utils.js';
+
+class {
+    async onCreate(input) {
+        this.state = {
+            editing: false,
+            name: "",
+            template: [],
+            tab: "all"
+        };
+
+        this.userid = input.user?input.user._id||null:null;
+
+        if(this.userid == null) {
+            this.emit('logout');
+            return;
+        }
+    }
+    createInvoice() {
+        this.state.editing = true;
+    }
+    downloadPDF(data) {
+        window.print();
+    }
+    changeTab(tab) {
+        this.state.tab = tab;
+    }
+}
+
+if(state.editing)
+    invoice edit=true
+else
+    ui-container centered paddedwide
+        ui-linear-layout vertical fillspace fullwidth gutter="8px"
+            @element
+                ui-heading heading=1 -- Invoices
+                ui-spacer
+            @element
+                ui-button rounded icon="plus" text="New Invoice" on-click("createInvoice")
+            @element
+                ui-linear-layout
+                    @element
+                        ui-button filled=state.tab=='all' text="All" rounded on-click("changeTab", "all")
+                    @element
+                        ui-button filled=state.tab=='scheduled' text="Scheduled" rounded on-click("changeTab", "scheduled")
+                    @element
+                        ui-button filled=state.tab=='drafts' text="Drafts" rounded on-click("changeTab", "drafts")
+                    @element
+                        ui-button filled=state.tab=='sent' text="Sent" rounded on-click("changeTab", "sent")

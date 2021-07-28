@@ -4,7 +4,7 @@ import Login from "<login>"
 import Register from "<register>"
 import Tracker from "<tracker>"
 import Projects from "<projects>"
-import Invoice from "<invoice>"
+import Invoices from "<invoices>"
 import Todo from "<todo>"
 import Reports from "<reports>"
 
@@ -13,7 +13,7 @@ import utils from '../utils.js'
 class {
     async onCreate() {
         this.state = {
-            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoice": Invoice, "todo": Todo, "index": Index, "reports": Reports},
+            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoices": Invoices, "todo": Todo, "index": Index, "reports": Reports},
             page: "index",
             user: null,
             loggedin: false,
@@ -332,7 +332,7 @@ ui-linear-layout vertical fillspace aligncenter
                 @element
                     ui-button.animation-popup rounded outlined filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
                 @element
-                    ui-button.animation-slideinout rounded outlined filled=state.page==='invoice' icon="file" on-click("changePage", 'invoice') title="Invoice"
+                    ui-button.animation-slideinout rounded outlined filled=state.page==='invoices' icon="file" on-click("changePage", 'invoices') title="Invoice"
                 @element
                     ui-button.animation-popup rounded outlined filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
                 @element

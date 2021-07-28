@@ -5,81 +5,84 @@ class {
         this.state = {
             editing: false,
             name: "",
-            template: []
+            template: [],
+            invoice: {
+                name: "Hunter Stratton",
+                num: 0,
+                start: Date.now(),
+                end: Date.now(),
+                address: {
+                    street: "13313 Cottonwood Creek",
+                    city: "Kennewick",
+                    state: "WA",
+                    zip: "99338"
+                },
+                contact: {
+                    phone: "(509) 405-2595",
+                    email: "hstratton16@gmail.com"
+                }
+            }
         };
 
-        this.userid = input.user?input.user._id||null:null;
-
-        if(this.userid == null) {
-            this.emit('logout');
-            return;
-        }
-    }
-    async createInvoice() {
-        this.state.editing = true;
-    }
-    downloadPDF(data) {
-        window.print();
+        this.state.invoice.start = new Date(Date.now());
+        this.state.invoice.start.setDate(this.state.invoice.start.getDate() - 7);
+        this.state.invoice.start = this.state.invoice.start.getTime();
     }
 }
 
 style {
+    .invoice-heading, .invoice-address {
+        font-weight: 100;
+    }
+
+    .invoice-wrapper {
+        width: 8.5in;
+        height: 11in;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .invoice-wrapper > * {
+        flex: 1;
+        padding: 30px 50px;
+    }
+
     @media print {
-        .block-editor {
+        .invoice-wrapper {
             position: absolute;
             top: 0px;
             left: 0px;
-            width: 100%;
-            min-height: 100%;
+            width: 8.5in;
+            height: 11in;
             background-color: var(--background-1);
         }
     }
 }
 
-block-editor-config blocks={
-    "Header": {
-        "tag": "<ui-heading>",
-        "icon": "type",
-        "attributes": {
-            "heading": {"name": "Heading","type": "select", "options": [{"name": "H1", "value":1}, {"name": "H2", "value":2}, {"name": "H3", "value":3}, {"name": "H4", "value":4}, {"name": "H5", "value":5}]},
-            "alignright": {"name": "Align Right", "type": "boolean"}
-        }
-    },
-    "Text": {
-        "tag": "<ui-text>",
-        "icon": "align-left"
-    },
-    "Icon": {
-        "tag": "<ui-icon>",
-        "icon": "heart",
-        "attributes": {
-            "icon": {"name": "Icon", "type": "text"}
-        }
-    }
-}
-
-if(!state.editing)
-    ui-container centered paddedwide
-        ui-linear-layout vertical fillspace fullwidth gutter="8px"
-            @element
-                ui-heading heading=1 -- Invoice
-                ui-spacer
-            @element
-                ui-button rounded icon="plus" text="New Invoice" on-click("createInvoice")
-else
-    ui-container centered paddedwide fillspace
-        ui-textbox.blended placeholder="Invoice name"
-        ui-spacer
-        $ let config = {
-            actions: {
-                download: {
-                    text: "Download PDF",
-                    icon: "download"
-                },
-                save: {
-                    text: "Save",
-                    icon: "save"
-                }
-            }
-        }
-        block-editor data=state.template config=config on-download("downloadPDF")
+paper-modal.invoice-wrapper
+    ui-linear-layout vertical fillspace
+        @element
+            ui-linear-layout
+                @element fillspace
+                    ui-heading heading=1 -- ${state.invoice.name}
+                @element
+                    ui-heading.invoice-heading heading=1 -- Invoice #${state.invoice.num}
+        @element
+            ui-linear-layout aligncenter
+                @element
+                    ui-heading heading=3 -- Date:
+                @element
+                    ui-date time=false milliseconds=state.invoice.start
+                @element
+                    p -- -
+                @element
+                    ui-date time=false milliseconds=state.invoice.end
+        @element
+            ui-spacer space="50px"
+        @element
+            ui-heading heading=2 -- Bill To
+            ui-text.invoice-address -- ${state.invoice.address.street}
+            ui-text.invoice-address -- ${state.invoice.address.city} ${state.invoice.address.state}, ${state.invoice.address.zip}
+            ui-text.invoice-address -- ${state.invoice.contact.phone}
+            ui-text.invoice-address -- ${state.invoice.contact.email}
+            
