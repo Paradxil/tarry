@@ -66,7 +66,7 @@ class {
             let project = this.state.data.projects[projectID];
             let color = this.hexToRgb(project.color);
 
-            let data = this.state.data.days.map((day) => {return (projectID in day.projects)?this.milliToHours(day.projects[projectID].timeTracked):0});
+            let data = this.state.data.days.map((day) => {return (projectID in day.projects)?day.projects[projectID].hoursTracked:0});
             
             this.state.chart.data.datasets.push({
                 label: project.name,
@@ -79,10 +79,6 @@ class {
         }
 
         this.state.chart.update();
-    }
-
-    milliToHours(milli) {
-        return milli/1000/60/60;
     }
 
     //https://stackoverflow.com/a/5624139
