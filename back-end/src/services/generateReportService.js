@@ -7,6 +7,7 @@ class GenerateReportService {
         this.entryDAO = new TimeEntryDAO();
         this.taskDAO = new TaskDAO();
         this.projectDAO = new ProjectDAO();
+        this.projectsFilter = [];
     }
 
     /**
@@ -18,6 +19,8 @@ class GenerateReportService {
      * @param {Array} tasksFilter Tasks to include in the report. Empty set or null for all.
      */
     async generateReport(userid, start, end, projectsFilter, tasksFilter) {
+        this.projectsFilter = projectsFilter;
+
         let startDate = new Date(start);
         startDate.setHours(0, 0, 0, 0);
 
@@ -30,6 +33,7 @@ class GenerateReportService {
             start: start,
             end: end,
             timeTracked: 0,
+            hoursTracked: 0,
             entries: [],
             projects: {},
             tasks: {},
@@ -49,9 +53,11 @@ class GenerateReportService {
             data.days.push({
                 date: curDate.getTime(),
                 timeTracked: dailyTotals.timeTracked,
+                hoursTracked: dailyTotals.hoursTracked,
                 entries: entries,
                 projects: dailyTotals.projects,
-                tasks: dailyTotals.tasks
+                tasks: dailyTotals.tasks,
+                earnings: dailyTotals.earnings
             });
 
             //Add entries to the list of all entries
@@ -62,8 +68,10 @@ class GenerateReportService {
         let totals = this.computeTotals(data.entries);
 
         data.timeTracked = totals.timeTracked;
+        data.hoursTracked = totals.hoursTracked;
         data.tasks = totals.tasks;
         data.projects = totals.projects;
+        data.earnings = totals.earnings;
 
         return data;
     }
@@ -85,6 +93,7 @@ class GenerateReportService {
 
         //Get entries
         let entries = await this.entryDAO.getAll(userid);
+        let newEntries = [];
 
         //Compile entry, project, and task data.
         for (let i = 0; i < entries.length; i++) {
@@ -96,28 +105,39 @@ class GenerateReportService {
             entry.projectid = task.project;
             entry.status = task.status;
 
+            //Filter out entries that have projects not included in the filter
+            if(this.projectsFilter != null && this.projectsFilter.length > 0 && !this.projectsFilter.includes(entry.projectid)) {
+                continue;
+            }
+
             let project = await this.projectDAO.get(task.project);
             if(project != null) {
                 entry.project = project.toJSON();
-                entries[i] = entry;
+                newEntries.push(entry);
             }
         }
 
-        return entries;
+        return newEntries;
     }
 
     computeTotals(entries) {
         let timeTracked = 0;
+        let hoursTracked = 0;
         let tasks = {};
         let projects = {};
+        let earnings = 0;
 
         for (let entry of entries) {
             timeTracked += (entry.end - entry.start); //Overall total
+            earnings += this.milliToHour(entry.end - entry.start) * entry.project.wage; //Overall earnings
+            hoursTracked += this.milliToHour(entry.end - entry.start);
 
             if (entry.taskid != null) { //Total per task
                 if (!(entry.taskid in tasks)) {
                     tasks[entry.taskid] = {
                         timeTracked: 0, 
+                        hoursTracked: 0,
+                        earnings: 0,
                         name: entry.name,
                         status: entry.status,
                         id: entry.taskid
@@ -125,11 +145,14 @@ class GenerateReportService {
                 }
 
                 tasks[entry.taskid].timeTracked += (entry.end - entry.start);
+                tasks[entry.taskid].hoursTracked += this.milliToHour(entry.end - entry.start);
+                tasks[entry.taskid].earnings += this.milliToHour(entry.end - entry.start) * entry.project.wage;
             }
 
             //Add a default project for entries with no project given
             projects["No Project"] = {
                 timeTracked: 0,
+                hoursTracked: 0,
                 name: "No Project",
                 color: "#aaa"
             };
@@ -138,19 +161,35 @@ class GenerateReportService {
                 if (!(entry.projectid in projects)) {
                     projects[entry.projectid] = {
                         timeTracked: 0,
+                        hoursTracked: 0,
+                        earnings: 0,
+                        entries: [],
+                        tasks: {},
                         name: entry.project.name,
-                        color: entry.project.color
+                        color: entry.project.color,
+                        wage: entry.project.wage
                     };
                 }
 
+                projects[entry.projectid].tasks[entry.task._id] = entry.task;
+                projects[entry.projectid].entries.push(entry);
+
                 projects[entry.projectid].timeTracked += (entry.end - entry.start);
+                projects[entry.projectid].hoursTracked += this.milliToHour(entry.end - entry.start);
+                projects[entry.projectid].earnings += this.milliToHour(entry.end - entry.start) * entry.project.wage;
             }
             else {
                 projects["No Project"].timeTracked += (entry.end - entry.start);
+                projects["No Project"].hoursTracked += this.milliToHour(entry.end - entry.start);
+                projects["No Project"].earnings = 0; //TODO: Implement a default wage setting
             }
         }
 
-        return {timeTracked: timeTracked, tasks: tasks, projects: projects};
+        return {timeTracked: timeTracked, tasks: tasks, projects: projects, earnings: earnings, hoursTracked: hoursTracked};
+    }
+
+    milliToHour(milliseconds) {
+        return milliseconds/1000/60/60;
     }
 }
 
