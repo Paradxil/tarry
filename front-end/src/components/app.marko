@@ -68,7 +68,7 @@ class {
             this.state.entries = response.data;
         }
 
-        response = await utils.get("/api/project/all/"+this.state.user._id);
+        response = await utils.get("/api/project/all/");
 
         if(response.success) {
             this.state.projects = response.data;
@@ -157,7 +157,7 @@ style {
         --accent-1: #fff;
         --accent-2: #ffa8a8;
         --text-1: #495057;
-        --text-2: #495057;
+        --text-2: #fff;
         --border: #dee2e6;
         --rounded-radius: 5px;
         --padding: 8px;
@@ -318,9 +318,9 @@ if(state.confirmations.length > 0)
                         @element
                             ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)
 
-ui-linear-layout vertical fillspace aligncenter
+ui-linear-layout fillspace aligncenter vertical
     @element fullwidth
-        ui-linear-layout padded aligncenter gutter="4px"
+        ui-linear-layout padded aligncenter gutter="4px" fillspace
             @element
                 ui-button rounded text="Time Tracker" filled=state.page==='index' on-click("changePage", 'index') title="Home"
             @element fillspace

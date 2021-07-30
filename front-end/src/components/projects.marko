@@ -18,7 +18,7 @@ class {
             return;
         }
 
-        let response = await utils.get("/api/project/all/"+this.userid);
+        let response = await utils.get("/api/project/all/");
 
         if(response.success) {
             this.state.projects = response.data;
