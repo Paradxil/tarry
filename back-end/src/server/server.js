@@ -30,6 +30,8 @@ const UpdateTimeEntryHandler = require('../api/updateTimeEntryHandler');
 
 const Response = require("../model/response/response");
 const GenerateReportHandler = require('../api/generateReportHandler');
+const AllInvoiceHandler = require('../api/allInvoiceHandler');
+const AddInvoiceHandler = require('../api/addInvoiceHandler');
 
 class Server {
     constructor() {
@@ -253,11 +255,24 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Get all projects for a user
-        this.app.get('/api/project/all/:userid', this.isAuthenticated, async function(req, res) {
+        // Get all projects for the current user
+        this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
             let handler = new AllProjectsHandler(req, res);
             await handler.handle(req, res);
         });
+
+        // Get all invoices for the current user
+        this.app.get('/api/invoice/all/', this.isAuthenticated, async function (req, res) {
+            let handler = new AllInvoiceHandler();
+            await handler.handle(req, res);
+        });
+
+        // Add invoice for the user
+        this.app.post('/api/invoice/', this.isAuthenticated, async function (req, res) {
+            let handler = new AddInvoiceHandler();
+            await handler.handle(req, res);
+        });
+
     }
 
     initLoginHandler() {
