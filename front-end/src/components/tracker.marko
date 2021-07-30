@@ -11,7 +11,8 @@ class {
             entries: input.entries,
             projects: input.projects,
             editid: null,
-            disabled: []
+            disabled: [],
+            inputType: "timer"
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -37,6 +38,10 @@ class {
             this.state.name = task.name;
             this.state.project = task.project;
         }
+    }
+
+    changeInputType(type) {
+        this.state.inputType = type;
     }
 
     onInput(input) {
@@ -207,37 +212,58 @@ ui-container centered paddedwide
             ui-heading heading=1 -- Time Tracker
             ui-spacer
         @element fillspace fullwidth
-            ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined
-                @element fillspace
-                    if(!state.tracking)
-                        ui-textbox.blended key="task-name" placeholder="Task Name"
-                    else
-                        ui-linear-layout aligncenter
-                            @element fillspace
-                                ui-text alignleft -- ${state.name}
-                            if(state.project)
-                                $ let project = state.projects[state.project]||{};
-                                @element
-                                    ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
-                            @element
-                                ui-spacer
-                            @element
-                                ui-time alignright showseconds=true milliseconds=(state.now - state.startTime)
-                if(!state.tracking)
-                    if(state.project)
-                        $ let project = state.projects[state.project];
-                        @element
-                            ui-linear-layout accent rounded theme={'--accent-1': project.color} aligncenter
-                                @element
-                                    ui-text alignleft padded -- ${project.name||null}
-                                @element
-                                    ui-button rounded icon="delete" on-click("removeProject")
-                    @element
-                        if(!state.tracking)
-                            $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
-                            ui-select id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Add a project"
+            ui-linear-layout
                 @element
-                    ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
+                    ui-button filled=state.inputType=="timer" icon="watch" rounded title="Timer input" on-click("changeInputType", "timer")
+                @element
+                    ui-button filled=state.inputType=="manual" icon="plus" rounded title="Manual input" on-click("changeInputType", "manual")
+            ui-spacer space="5px"
+            if(state.inputType === "timer")
+                ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined
+                    @element fillspace
+                        if(!state.tracking)
+                            ui-textbox.blended key="task-name" placeholder="Task Name"
+                        else
+                            ui-linear-layout aligncenter
+                                @element fillspace
+                                    ui-text alignleft -- ${state.name}
+                                if(state.project)
+                                    $ let project = state.projects[state.project]||{};
+                                    @element
+                                        ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
+                                @element
+                                    ui-spacer
+                                @element
+                                    ui-time alignright showseconds=true milliseconds=(state.now - state.startTime)
+                    if(!state.tracking)
+                        if(state.project)
+                            $ let project = state.projects[state.project];
+                            @element
+                                ui-linear-layout accent rounded theme={'--accent-1': project.color} aligncenter
+                                    @element
+                                        ui-text alignleft padded -- ${project.name||null}
+                                    @element
+                                        ui-button rounded icon="delete" on-click("removeProject")
+                        @element
+                            if(!state.tracking)
+                                $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
+                                ui-select id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Add a project"
+                    @element
+                        ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
+            else-if(state.inputType === "manual")
+                ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outline
+                    @element fillspace
+                        ui-textbox.blended key="task-name" placeholder="Task Name"
+                    @element
+                        $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
+                        ui-select id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Add a project"
+                    @element
+                        ui-date-select milliseconds=Date.now()
+                    @element
+                        ui-date-select milliseconds=Date.now()
+                    @element
+                        ui-button text="Add Entry" rounded trailingicon="plus"
+                    
         @element fillspace
             ui-linear-layout vertical gutter="8px"
                 for|entry, index| of=state.entries
