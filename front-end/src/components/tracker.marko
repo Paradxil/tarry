@@ -206,11 +206,107 @@ class {
     }
 }
 
-ui-container centered paddedwide
+style {
+    .stealthy {
+        background-color: unset !important;
+        border: none !important;
+    }
+
+    .page-background {
+        z-index: -1;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100vw;
+        height: 100vh;
+        background-image: linear-gradient(45deg, #faa2c1, var(--background-2));
+    }
+
+    .page-content-wrapper > div {
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15%);
+        padding: var(--padding-wide);
+        background-color: var(--background-1);
+        border-top-left-radius: var(--rounded-radius);
+        border-top-right-radius: var(--rounded-radius);
+    }
+
+    .timer-header-wrapper, .page-content-wrapper {
+        padding: 50px 100px !important;
+        max-width: 1200px;
+    }
+
+    .timer-header-wrapper {
+        font-size: 35px;
+        font-weight: 100 !important;
+        color: white !important;
+    }
+
+    .timer-header-wrapper input {
+        color: white !important;
+        border-radius: 0px !important;
+    }
+
+    .timer-header-wrapper input:focus {
+        background-color: rgba(0,0,0,0.1) !important;
+    }
+
+    .timer-header-wrapper input:hover {
+        background-color: rgba(0,0,0,0.1) !important;
+    }
+
+    .timer-header-wrapper .ui-text {
+        font-weight: 100 !important;
+    }
+
+    .manual-input-wrapper {
+        flex: 1;
+        font-size: 100px;
+        place-content: center;
+        align-items: flex-end;
+    }
+
+    .manual-input-button {
+        cursor: pointer;
+    }
+
+    .manual-input-button:hover {
+        background-color: rgba(0,0,0,0.1) !important;
+    }
+
+    .task-name::placeholder {
+        color: #f1f1f1;
+    }
+
+    .project-select {
+        border: none;
+        outline: none;
+        background-color: unset;
+        color: white;
+        cursor: pointer;
+    }
+
+    .timer {
+        font-size: 124px;
+    }
+}
+
+div.page-background
+
+ui-linear-layout.timer-header-wrapper fullwidth vertical
+    @element.timer-wrapper
+        ui-linear-layout fullwidth
+            @element
+                ui-time.timer showseconds=true milliseconds=state.startTime==null?0:(state.now - state.startTime)
+            @element.manual-input-wrapper
+                ui-icon.manual-input-button icon="play" title="Start tracker"
+    @element.task-name-wrapper
+        ui-textbox.task-name.stealthy key="task-name" placeholder="Task name..."
+    @element.project-select-wrapper
+        $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
+        ui-select.project-select icon="plus" id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Project"
+
+ui-container.page-content-wrapper centered paddedwide
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
-        @element fillspace
-            ui-heading heading=1 -- Time Tracker
-            ui-spacer
         @element fillspace fullwidth
             ui-linear-layout
                 @element
@@ -251,7 +347,7 @@ ui-container centered paddedwide
                     @element
                         ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
             else-if(state.inputType === "manual")
-                ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outline
+                ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined
                     @element fillspace
                         ui-textbox.blended key="task-name" placeholder="Task Name"
                     @element
@@ -262,7 +358,7 @@ ui-container centered paddedwide
                     @element
                         ui-date-select milliseconds=Date.now()
                     @element
-                        ui-button text="Add Entry" rounded trailingicon="plus"
+                        ui-button text="Add Entry" rounded trailingicon="plus" on-click("submitTimeEntry")
                     
         @element fillspace
             ui-linear-layout vertical gutter="8px"
