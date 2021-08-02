@@ -17,6 +17,7 @@ class {
             page: "index",
             user: null,
             loggedin: false,
+            collapsed: false,
             entries: [],
             projects: [],
             projectsMap: {},
@@ -89,7 +90,7 @@ class {
         this.changePage("login");
     }
 
-    async logoutUser(event) {
+    async logoutUser() {
         let response = await utils.post("/api/logout");
 
         if(response.success) {
@@ -140,6 +141,20 @@ class {
         this.closeConfirmation();
         return action.callback?action.callback():console.log("No callback provided.");
     }
+
+    sidebarItemClick(event) {
+        console.log(event);
+        if(event.item.page != null) {
+            this.changePage(event.item.page);
+        }
+        else if(event.item.action != null && event.item.action === "logout") {
+            this.logoutUser();
+        }
+        else {
+            this.state.collapsed = !this.state.collapsed;
+            console.log("toggled");
+        }
+    }
 }
 
 style {
@@ -152,7 +167,7 @@ style {
         --text-1: #444;
         --text-2: #fff;
         */
-        --background-1: #f8f9fa;
+        --background-1: #f1f3f5;
         --background-2: #ffa8a8;
         --accent-1: #fff;
         --accent-2: #ffa8a8;
@@ -169,8 +184,50 @@ style {
         --font-size-h1: 2.5em;
     }
 
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 100;
+    }
+
     .page {
-        max-width: 1200px;
+    }
+
+    .site-title {
+        font-size: 24px;
+        padding-bottom: 20px;
+    }
+
+    .ui-sidebar .ui-icon {
+        --feather-icon-stroke-width: 1px;
+        font-size: 28px;
+    }
+
+    .ui-sidebar {
+        min-width: unset !important;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .ui-sidebar .ui-linear-layout-child {
+        overflow-y: clip;
+    }
+
+    .ui-sidebar .ui-linear-layout-child.filled .ui-list-item {
+        box-shadow: 0px 0px 5px var(--accent-2);
+    }
+
+    .ui-sidebar .ui-button:hover {
+        background-color: #868e96;
+    }
+
+    .ui-sidebar .ui-list-item:hover {
+        box-shadow: 0px 0px 5px #868e96 !important;
+    }
+
+    .ui-sidebar .ui-button {
+        padding: var(--padding-wide) var(--padding-wide);
+    }
+
+    .ui-sidebar .ui-button:not(.site-title) .ui-text {
+        padding-left: var(--padding-wide);
     }
 
     .ui-textbox, .ui-submit {
@@ -318,28 +375,24 @@ if(state.confirmations.length > 0)
                         @element
                             ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)
 
+if(state.loggedin)
+    ui-sidebar collapsed=state.collapsed on-itemclick("sidebarItemClick")
+        @item.site-title icon="menu" text="Time Tracker"
+        @item icon="user" text=state.user?state.user.username||"loading...":"loading..." page="account"
+        @item text="Tracker" icon="clock" page="tracker" filled=state.page==="tracker"
+        @item text="Todo" icon="list" page="todo" filled=state.page==="todo"
+        @item text="Projects" icon="clipboard" page="projects" filled=state.page==="projects"
+        @item text="Invoice" icon="file" page="invoices" filled=state.page==="invoices"
+        @item text="Reports" icon="bar-chart-2" page="reports" filled=state.page==="reports"
+        @item text="Settings" icon="settings" page="settings" filled=state.page==="settings"
+        @item text="Log Out" icon="log-out" action="logout"
 ui-linear-layout fillspace aligncenter vertical
-    @element fullwidth
-        ui-linear-layout padded aligncenter gutter="4px" fillspace
-            @element
-                ui-button rounded text="Time Tracker" filled=state.page==='index' on-click("changePage", 'index') title="Home"
-            @element fillspace
-            if(state.loggedin)
+    if(!state.loggedin)
+        @element fullwidth
+            ui-linear-layout padded aligncenter gutter="4px" fillspace
                 @element
-                    ui-button.wiggle-right rounded outlined filled=state.page==='tracker' icon="clock" on-click("changePage", 'tracker') title="Time tracker"
-                @element
-                    ui-button.animation-popup rounded outlined filled=state.page==='todo' icon="list" on-click("changePage", 'todo') title="Todo"
-                @element
-                    ui-button.animation-popup rounded outlined filled=state.page==='projects' icon="clipboard" on-click("changePage", 'projects') title="Projects"
-                @element
-                    ui-button.animation-slideinout rounded outlined filled=state.page==='invoices' icon="file" on-click("changePage", 'invoices') title="Invoice"
-                @element
-                    ui-button.animation-popup rounded outlined filled=state.page==='reports' icon="bar-chart-2" on-click("changePage", 'reports') title="Reports"
-                @element
-                    ui-button.wiggle rounded outlined filled=state.page==='settings' icon="settings" on-click("changePage", 'settings') title="Settings"
-                @element
-                    ui-button.animation-popright rounded outlined icon="log-out" on-click('logoutUser') title="Logout"
-            else
+                    ui-button rounded text="Time Tracker" filled=state.page==='index' on-click("changePage", 'index') title="Home"
+                @element fillspace
                 @element
                     ui-button.animation-popup rounded outlined filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
