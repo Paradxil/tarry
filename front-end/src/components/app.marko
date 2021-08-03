@@ -7,13 +7,14 @@ import Projects from "<projects>"
 import Invoices from "<invoices>"
 import Todo from "<todo>"
 import Reports from "<reports>"
+import Invoice from "<invoice>"
 
 import utils from '../utils.js'
 
 class {
     async onCreate() {
         this.state = {
-            pages: {"login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoices": Invoices, "todo": Todo, "index": Index, "reports": Reports},
+            pages: {"invoice": Invoice, "login": Login, "register" :Register, "settings": Settings, "tracker": Tracker, 'projects': Projects, "invoices": Invoices, "todo": Todo, "index": Index, "reports": Reports},
             page: "index",
             user: null,
             loggedin: false,
@@ -29,25 +30,24 @@ class {
     async onMount() {
         window.setInterval(this.checkStatus.bind(this), 1000 * 60);
 
+        let currentPage = window.location.pathname||null;
+        currentPage = currentPage.split('/')[1]||null;
+
+        if(currentPage !== null && currentPage.length === 0) {
+            currentPage = null;
+        }
+
+        this.changePage(currentPage||"index");
+
         let response = await utils.get("/api/user");
 
         if(response.success) {
             this.state.loggedin = true;
             this.state.user = response.data;
 
-            let currentPage = window.location.pathname||null;
-            currentPage = currentPage.split('/')[1]||null;
-
-            if(currentPage !== null && currentPage.length === 0) {
-                currentPage = null;
-            }
-
             this.getData();
 
             this.changePage(currentPage||"tracker");
-        }
-        else {
-            this.changePage("index");
         }
     }
 
@@ -61,7 +61,7 @@ class {
     async getData() {
         let response = await utils.post("/api/time/", {
             userid: this.state.user._id,
-            max: 100,
+            max: 1000,
             last: null
         });
 
@@ -104,7 +104,7 @@ class {
 
         this.emit('changetitle', page + " - Time Tracker")
 
-        window.history.replaceState({}, page, "/" + page);
+        window.history.replaceState({}, page, "/" + page + "/" + document.location.search);
     }
 
     async checkStatus() {
@@ -158,6 +158,10 @@ class {
 }
 
 style {
+    html {
+    -webkit-print-color-adjust: exact;
+    }
+
     :root {
         /*
         --background-1: #f8f4f1;
@@ -168,9 +172,9 @@ style {
         --text-2: #fff;
         */
         --background-1: #f1f3f5;
-        --background-2: #ffa8a8;
+        --background-2: #74c0fc; /*#ffa8a8;*/
         --accent-1: #fff;
-        --accent-2: #ffa8a8;
+        --accent-2: #74c0fc; /*#ffa8a8;*/
         --text-1: #495057;
         --text-2: #fff;
         --border: #dee2e6;
