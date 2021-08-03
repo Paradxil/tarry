@@ -207,6 +207,10 @@ class {
 }
 
 style {
+    ::selection {
+        background-color: rgba(255, 255, 255, 0.25);
+    }
+
     .stealthy {
         background-color: unset !important;
         border: none !important;
@@ -219,7 +223,7 @@ style {
         left: 0px;
         width: 100vw;
         height: 100vh;
-        background-image: linear-gradient(45deg, #faa2c1, var(--background-2));
+        background-image: linear-gradient(45deg, #66d9e8 /*#faa2c1*/, var(--background-2));
     }
 
     .page-content-wrapper > div {
