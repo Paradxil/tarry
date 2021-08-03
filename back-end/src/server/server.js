@@ -31,7 +31,9 @@ const UpdateTimeEntryHandler = require('../api/updateTimeEntryHandler');
 const Response = require("../model/response/response");
 const GenerateReportHandler = require('../api/generateReportHandler');
 const AllInvoiceHandler = require('../api/allInvoiceHandler');
-const AddInvoiceHandler = require('../api/addInvoiceHandler');
+const SaveInvoiceHandler = require('../api/saveInvoiceHandler');
+const GenerateInvoicePDFHandler = require('../api/generateInvoicePDFHandler');
+const GetInvoiceHandler = require('../api/getInvoiceHandler');
 
 class Server {
     constructor() {
@@ -65,7 +67,7 @@ class Server {
         this.app.use(bodyParser.urlencoded({ extended: false }))
         
         // parse application/json
-        this.app.use(bodyParser.json())
+        this.app.use(bodyParser.json({ limit: '50mb', extended: true }))
     }
 
     useSessions() {
@@ -267,9 +269,19 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Add invoice for the user
+        this.app.get('/api/invoice/:id', async function (req, res) {
+            let handler = new GetInvoiceHandler();
+            await handler.handle(req, res);
+        });
+
+        // Add/update invoice for the user
         this.app.post('/api/invoice/', this.isAuthenticated, async function (req, res) {
-            let handler = new AddInvoiceHandler();
+            let handler = new SaveInvoiceHandler();
+            await handler.handle(req, res);
+        });
+
+        this.app.get('/api/invoice/pdf/:id', this.isAuthenticated, async function(req, res) {
+            let handler = new GenerateInvoicePDFHandler();
             await handler.handle(req, res);
         });
 

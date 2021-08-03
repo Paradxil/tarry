@@ -6,7 +6,10 @@ class {
             editing: false,
             name: "",
             template: [],
-            tab: "all"
+            tab: "all",
+            invoices: [],
+            editingInvoice: null,
+            invoiceID: null
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -14,6 +17,14 @@ class {
         if(this.userid == null) {
             this.emit('logout');
             return;
+        }
+
+        let response = await utils.get("/api/invoice/all/");
+
+        if(response.success) {
+            this.state.invoices = response.data;
+            console.log(this.state.invoices);
+            this.setStateDirty("invoices");
         }
     }
     createInvoice() {
@@ -25,10 +36,16 @@ class {
     changeTab(tab) {
         this.state.tab = tab;
     }
+    editInvoice(invoice) {
+        this.state.invoiceID = invoice._id;
+        this.state.editing = true;
+        this.state.editingInvoice = invoice;
+    }
 }
 
+div.page-background
 if(state.editing)
-    invoice edit=true
+    invoice invoiceid=state.invoiceID invoicedata=state.editingInvoice edit=true userid=input.user._id
 else
     ui-container centered paddedwide
         ui-linear-layout vertical fillspace fullwidth gutter="8px"
@@ -47,3 +64,17 @@ else
                         ui-button filled=state.tab=='drafts' text="Drafts" rounded on-click("changeTab", "drafts")
                     @element
                         ui-button filled=state.tab=='sent' text="Sent" rounded on-click("changeTab", "sent")
+            @element
+                ui-linear-layout
+                    for|invoice| of=state.invoices 
+                        @element.invoice padded accent rounded
+                            ui-linear-layout vertical on-click("editInvoice", invoice)
+                                @element
+                                    ui-heading heading=3 -- ${invoice.id}
+                                @element
+                                    ui-heading heading=3 -- ${invoice.billto.name}
+                                @element
+                                    ui-text -- ${invoice.billto.company}
+                                @element
+                                    ui-date milliseconds=invoice.start
+                                    ui-date milliseconds=invoice.end

@@ -1,20 +1,25 @@
 import utils from '../utils.js';
+import papermodal from '<paper-modal>'
 
 class {
     async onCreate(input) {
+        let params = new URLSearchParams(document.location.search.substring(1));
+
         this.state = {
             editing: input.edit!=null?input.edit:false,
             name: "",
             template: [],
-            viewPreview: false,
+            viewPreview: input.edit!=null?!input.edit:true,
             editableControls: "false",
             projects: [],
             filteredProjects: [],
-            invoice: {
+            invoiceid: input.invoiceid||params.get("id")||null,
+            invoice: input.invoicedata||{
                 id: "",
+                userid: input.userid,
                 start: Date.now(),
                 end: Date.now(),
-                notes: "",
+                message: "",
                 data: {},
                 includedProjects: [],
                 billfrom: {
@@ -48,14 +53,27 @@ class {
             }
         };
 
-        this.state.invoice.start = new Date(Date.now());
-        this.state.invoice.start.setDate(this.state.invoice.start.getDate() - 7);
-        this.state.invoice.start = this.state.invoice.start.getTime();
-
-        this.state.editableControls = this.state.editing.toString();
+        if(input.invoicedata == null && this.state.invoiceid != null) {
+            await this.loadInvoice();
+        }
+        else if(input.invoicedata === null) {
+            this.state.invoice.start = new Date(Date.now());
+            this.state.invoice.start.setDate(this.state.invoice.start.getDate() - 7);
+            this.state.invoice.start = this.state.invoice.start.getTime();
+            this.loadData();
+        }
 
         this.loadProjects();
-        this.loadData();
+        
+        this.state.editableControls = this.state.editing.toString();
+    }
+
+    async loadInvoice() {
+        let response = await utils.get("/api/invoice/" + this.state.invoiceid);
+
+        if(response.success) {
+            this.state.invoice = response.data;
+        }
     }
 
     async loadProjects() {
@@ -142,6 +160,24 @@ class {
         }
     }
 
+    async saveInvoice(event) {
+        let response = await utils.post("/api/invoice", {id: this.state.invoiceid, invoice: this.state.invoice});
+
+        if(response.success) {
+            this.state.invoiceid = response.data._id;
+            console.log(response.data);
+        }
+    }
+
+    async downloadInvoice(event) {
+        let response = await utils.axios.get("/api/invoice/pdf/" + this.state.invoiceid, {responseType: 'arraybuffer'});
+        const blob = new Blob([response.data], {type: 'application/pdf'});
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'invoice.pdf';
+        link.click();
+    }
+
     togglePreview(value) {
         this.state.viewPreview = !this.state.viewPreview;
     }
@@ -207,6 +243,17 @@ style {
         display: none !important;
     }
 
+    .invoice-footer {
+        background-image: linear-gradient(45deg, #66d9e8, var(--accent-2));
+        padding: 16px;
+        margin-left: -50px;
+        margin-bottom: -30px;
+        width: calc(100% + 100px);
+        color: white;
+        place-content: center;
+        align-items: center;
+    }
+
     [contenteditable="true"] {
         display: inline-flex;
         word-break: break-word;
@@ -232,6 +279,10 @@ style {
         opacity: 0.75;
     }
 
+    .invoice-controls-wrapper {
+        padding: 50px;
+    }
+
     @media print {
         .invoice-wrapper {
             position: absolute;
@@ -239,17 +290,19 @@ style {
             left: 0px;
             width: 8.5in;
             height: 11in;
-            background-color: var(--background-1);
+            background-color: white;
         }
     }
 }
 
-ui-linear-layout
-    @element
-        paper-modal.invoice-wrapper class={"preview": state.viewPreview}
+if(state.editing)
+    div.page-background
+ui-linear-layout.invoice-controls-wrapper
+    @element.invoice-wrapper
+        ${state.editing ? papermodal : 'div'} class={"preview": state.viewPreview, "invoice-wrapper": true}
             ui-linear-layout vertical fillspace
                 @element 
-                    ui-linear-layout no-update
+                    ui-linear-layout
                         @element fillspace
                             ui-heading contenteditable=state.editableControls placeholder="Name" name="billfrom.name" heading=1 -- ${state.invoice.billfrom.name}
                             ui-heading.invoice-heading contenteditable=state.editableControls name="billfrom.company" placeholder="Company Name" heading=2 -- ${state.invoice.billfrom.company}
@@ -283,29 +336,29 @@ ui-linear-layout
                 @element
                     ui-spacer space="20px"
                 @element
-                    ui-linear-layout no-update
+                    ui-linear-layout
                         @element fillspace
                             ui-heading.invoice-heading heading=2 -- Bill To
                             ui-container.invoice-address
-                                ui-text contenteditable="true" placeholder="Name" -- ${state.invoice.billto.name}
-                                ui-text contenteditable="true" placeholder="Company Name" -- ${state.invoice.billto.company}
-                                ui-text contenteditable="true" placeholder="Street" -- ${state.invoice.billto.address.street}
+                                ui-text contenteditable="true" name="billto.name" placeholder="Name" -- ${state.invoice.billto.name}
+                                ui-text contenteditable="true" name="billto.company" placeholder="Company Name" -- ${state.invoice.billto.company}
+                                ui-text contenteditable="true" name="billto.address.street" placeholder="Street" -- ${state.invoice.billto.address.street}
                                 ui-linear-layout
                                     @element
-                                        ui-text contenteditable="true" placeholder="City" -- ${state.invoice.billto.address.city}
+                                        ui-text contenteditable="true" name="billto.address.city" placeholder="City" -- ${state.invoice.billto.address.city}
                                     @element
-                                        ui-text contenteditable="true" placeholder="State" -- ${state.invoice.billto.address.state}
+                                        ui-text contenteditable="true" name="billto.address.state" placeholder="State" -- ${state.invoice.billto.address.state}
                                     if(!state.editableControls)
                                         @element
                                             ui-text -- ,
                                     @element
-                                        ui-text contenteditable="true" placeholder="Zipcode" -- ${state.invoice.billto.address.zip}
-                                ui-text contenteditable="true" placeholder="Phone" -- ${state.invoice.billto.contact.phone}
-                                ui-text contenteditable="true" placeholder="Email" -- ${state.invoice.billto.contact.email}
+                                        ui-text contenteditable="true" name="billto.address.zip" placeholder="Zipcode" -- ${state.invoice.billto.address.zip}
+                                ui-text contenteditable="true" name="billto.contact.phone" placeholder="Phone" -- ${state.invoice.billto.contact.phone}
+                                ui-text contenteditable="true" name="billto.contact.email" placeholder="Email" -- ${state.invoice.billto.contact.email}
                         @element.notes-wrapper
                             if((state.invoice.notes != null && state.invoice.notes.length > 0) || state.editing)
                                 ui-heading.invoice-heading heading=3 -- Notes:
-                            ui-text contenteditable=state.editableControls name="notes" placeholder="Notes" -- ${state.invoice.notes}
+                            ui-text contenteditable=state.editableControls name="notes" name="message" placeholder="Notes" -- ${state.invoice.message}
                 @element
                     ui-spacer space="20px"
                 @element
@@ -348,9 +401,17 @@ ui-linear-layout
                                     @element.invoice-row-rate fillspace alignright
                                     @element.invoice-row-tota fillspace alignright
                                         ui-text --  ${parseFloat(state.invoice.data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+            ui-element fillspace
+            ui-linear-layout.invoice-footer vertical
+                @element
+                    ui-text -- Thank you for your business!
     if(state.editing)
         @element.settings-sidebar
             ui-linear-layout vertical
+                @element
+                    ui-button icon="save" text="Save" accent rounded on-click("saveInvoice")
+                @element
+                    ui-button icon="download" text="Download PDF" accent rounded on-click("downloadInvoice")
                 @element
                     ui-heading -- Settings
                 @element

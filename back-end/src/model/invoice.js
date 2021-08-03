@@ -3,6 +3,7 @@ var encrypt = require('mongoose-encryption');
 
 // Create a scheme for invoices
 const invoiceSchema = new mongoose.Schema({
+    id: String,
     userid: {type: String, required: true},
     start: {type: Number, required: true}, //Number of days to include in invoice. Ex: 7 would be an invoice for the last week.
     end: {type: Number, required: true},
