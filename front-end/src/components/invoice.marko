@@ -244,7 +244,7 @@ style {
     }
 
     .invoice-footer {
-        background-image: linear-gradient(45deg, #66d9e8, var(--accent-2));
+        background-image: linear-gradient(45deg, var(--tertiary), var(--secondary));
         padding: 16px;
         margin-left: -50px;
         margin-bottom: -30px;
@@ -362,7 +362,7 @@ ui-linear-layout.invoice-controls-wrapper
                 @element
                     ui-spacer space="20px"
                 @element
-                    ui-linear-layout.invoice-chart-header filled padded rounded
+                    ui-linear-layout.invoice-chart-header secondary padded rounded
                         @element.invoice-expanded-column
                             ui-heading.invoice-heading heading=3 -- Description
                         @element fillspace alignright
