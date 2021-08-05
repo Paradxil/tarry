@@ -12,7 +12,9 @@ class {
             projects: input.projects,
             editid: null,
             disabled: [],
-            inputType: "timer"
+            inputType: "timer",
+            data: {},
+            tasklist: []
         };
 
         this.userid = input.user?input.user._id||null:null;
@@ -37,6 +39,23 @@ class {
             this.state.startTime = task.start;
             this.state.name = task.name;
             this.state.project = task.project;
+
+            console.log(this.state.projects);
+
+            this.getComponent("task-name").state.value = task.name;
+            this.getComponent("task-name").getComponent("comboboxinput").state.value = task.name;
+        }
+
+        response = await utils.post("/api/report", {
+            start: Date.now() - (1000*60*60*24*30), //Start date
+            end: Date.now(), //End date
+            projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
+            tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
+        });
+
+        if(response.success) {
+            this.state.data = response.data;
+            this.state.tasklist = Object.values(response.data.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};})
         }
     }
 
@@ -147,6 +166,8 @@ class {
         if(!this.state.tracking) {
             this.state.project = project;
             this.getComponent("task-name").state.value = name;
+            this.getComponent("task-name").getComponent("comboboxinput").state.value = name;
+            this.getComponent("task-project").getComponent("comboboxinput").state.value = this.state.projects[project].name;
             this.startTracker(event);
         }
     }
@@ -187,6 +208,8 @@ class {
             this.setStateDirty("entries");
             this.state.tracking = false;
             this.state.project = null;
+            this.getComponent("task-name").getComponent("comboboxinput").state.value = "";
+            this.getComponent("task-project").getComponent("comboboxinput").state.value = "";
         }
         else {
             console.log("Error stopping task!");
@@ -194,11 +217,13 @@ class {
     }
 
     selectProject(event) {
-        if(event.value.length === 0) {
+        if(event.option == null && event.option.value == null && event.option.projectid == null) {
             return;
         }
 
-        this.state.project = event.value;
+        this.getComponent("task-project").getComponent("comboboxinput").state.value = event.option.project||event.option.name;
+
+        this.state.project = event.option.projectid||event.option.value;
     }
 
     removeProject() {
@@ -214,16 +239,6 @@ style {
     .stealthy {
         background-color: unset !important;
         border: none !important;
-    }
-
-    .page-background {
-        z-index: -1;
-        position: fixed;
-        top: 0px;
-        left: 0px;
-        width: 100vw;
-        height: 100vh;
-        background-image: linear-gradient(45deg, #66d9e8 /*#faa2c1*/, var(--background-2));
     }
 
     .page-content-wrapper > div {
@@ -277,7 +292,7 @@ style {
         background-color: rgba(0,0,0,0.1) !important;
     }
 
-    .task-name::placeholder {
+    .task-name::placeholder, .project-select::placeholder {
         color: #f1f1f1;
     }
 
@@ -286,7 +301,6 @@ style {
         outline: none;
         background-color: unset;
         color: white;
-        cursor: pointer;
     }
 
     .timer {
@@ -294,20 +308,25 @@ style {
     }
 }
 
-div.page-background
-
+page-background
 ui-linear-layout.timer-header-wrapper fullwidth vertical
     @element.timer-wrapper
         ui-linear-layout fullwidth
             @element
-                ui-time.timer showseconds=true milliseconds=state.startTime==null?0:(state.now - state.startTime)
+                ui-time.timer showseconds=true milliseconds=state.tracking?(state.now - state.startTime):0
             @element.manual-input-wrapper
-                ui-icon.manual-input-button icon="play" title="Start tracker"
+                ui-button.manual-input-button icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
     @element.task-name-wrapper
-        ui-textbox.task-name.stealthy key="task-name" placeholder="Task name..."
+        ui-combobox.task-name.stealthy key="task-name" placeholder="Task name..." options=state.tasklist value=state.name||"" on-select("selectProject")
+            @option|{option}|
+                ui-linear-layout fillspace aligncenter
+                    @element fillspace
+                        ui-text -- ${option.value}
+                    @element
+                        ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
     @element.project-select-wrapper
-        $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
-        ui-select.project-select icon="plus" id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Project"
+        $ let options = Object.values(state.projects).map((item)=>{return {name: item.name, search: item.name, value: item._id}});
+        ui-combobox.project-select.stealthy placeholder="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
 
 ui-container.page-content-wrapper centered paddedwide
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
@@ -318,51 +337,6 @@ ui-container.page-content-wrapper centered paddedwide
                 @element
                     ui-button filled=state.inputType=="manual" icon="plus" rounded title="Manual input" on-click("changeInputType", "manual")
             ui-spacer space="5px"
-            if(state.inputType === "timer")
-                ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined
-                    @element fillspace
-                        if(!state.tracking)
-                            ui-textbox.blended key="task-name" placeholder="Task Name"
-                        else
-                            ui-linear-layout aligncenter
-                                @element fillspace
-                                    ui-text alignleft -- ${state.name}
-                                if(state.project)
-                                    $ let project = state.projects[state.project]||{};
-                                    @element
-                                        ui-text.project-tag alignleft accent rounded padded theme={'--font-size': '0.75em', '--accent-1': project.color} -- ${project.name||null}
-                                @element
-                                    ui-spacer
-                                @element
-                                    ui-time alignright showseconds=true milliseconds=(state.now - state.startTime)
-                    if(!state.tracking)
-                        if(state.project)
-                            $ let project = state.projects[state.project];
-                            @element
-                                ui-linear-layout accent rounded theme={'--accent-1': project.color} aligncenter
-                                    @element
-                                        ui-text alignleft padded -- ${project.name||null}
-                                    @element
-                                        ui-button rounded icon="delete" on-click("removeProject")
-                        @element
-                            if(!state.tracking)
-                                $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
-                                ui-select id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Add a project"
-                    @element
-                        ui-button trailingicon=state.tracking?"pause":"play" text=state.tracking?"STOP":"START" on-click(state.tracking?"stopTracker":"startTracker") rounded accent
-            else-if(state.inputType === "manual")
-                ui-linear-layout fillspace fullwidth accent paddedwide rounded aligncenter outlined
-                    @element fillspace
-                        ui-textbox.blended key="task-name" placeholder="Task Name"
-                    @element
-                        $ let options = Object.values(state.projects).map((item)=>{return {text: item.name, value: item._id}});
-                        ui-select id="project-select" includeblank options=options key='task-project' on-input('selectProject') default="Add a project"
-                    @element
-                        ui-date-select milliseconds=Date.now()
-                    @element
-                        ui-date-select milliseconds=Date.now()
-                    @element
-                        ui-button text="Add Entry" rounded trailingicon="plus" on-click("submitTimeEntry")
                     
         @element fillspace
             ui-linear-layout vertical gutter="8px"
@@ -374,7 +348,7 @@ ui-container.page-content-wrapper centered paddedwide
                                 @element fillspace
                                     ui-heading alignleft heading=3
                                         ui-date milliseconds=entry.start time=false
-                    @element paddedwide alignleft key=entry._id rounded outlined accent
+                    @element paddedwide alignleft key=entry._id rounded outlined filled
                         $ const controls = [{title:"Billable", name:"billable", icon:"dollar-sign"}, {title:"Continue task", name:"continue", icon:"play"}];
                         $ const overlaycontrols = [
                             {title:"Delete entry", name:"delete", icon:"trash"}, 
