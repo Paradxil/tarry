@@ -138,6 +138,7 @@ class GenerateReportService {
                         timeTracked: 0, 
                         hoursTracked: 0,
                         earnings: 0,
+                        project: entry.project,
                         name: entry.name,
                         status: entry.status,
                         id: entry.taskid
