@@ -171,19 +171,21 @@ style {
         --text-1: #444;
         --text-2: #fff;
         */
-        --background-1: #f1f3f5;
-        --background-2: #74c0fc; /*#ffa8a8;*/
+        --content-width: 1200px;
+        --primary: #fff;
+        --primary-dark: #f1f3f5;
+        --secondary: #74c0fc; /*#ffa8a8;*/
         --accent-1: #fff;
-        --accent-2: #74c0fc; /*#ffa8a8;*/
-        --text-1: #495057;
-        --text-2: #fff;
+        --tertiary: #66d9e8; /*#ffa8a8;*/
+        --text-dark: #495057;
+        --text-light: #fff;
         --border: #dee2e6;
         --rounded-radius: 5px;
         --padding: 8px;
         --padding-narrow: 4px;
         --padding-wide: 16px;
         --text-font: 'Montserrat', sans-serif;
-        --button-font: 'Dosis', sans-serif;
+        --button-font: 'Montserrat', sans-serif;
         --header-font: 'Montserrat', sans-serif;
         --font-size-h1: 2.5em;
     }
@@ -214,8 +216,8 @@ style {
         overflow-y: clip;
     }
 
-    .ui-sidebar .ui-linear-layout-child.filled .ui-list-item {
-        box-shadow: 0px 0px 5px var(--accent-2);
+    .ui-sidebar .ui-linear-layout-child.accent .ui-list-item {
+        box-shadow: 0px 0px 5px var(--secondary);
     }
 
     .ui-sidebar .ui-button:hover {
@@ -244,7 +246,7 @@ style {
     }
 
     .ui-textbox:hover, .ui-textbox:focus {
-        border-bottom: 1px solid var(--background-2);
+        border-bottom: 1px solid var(--primary-light);
     }
 
     .blended {
@@ -359,7 +361,7 @@ ui-linear-layout.notifications-wrapper vertical
     for|notification| of=state.notifications
         @element class="notification" key=notification.id
             ui-card rounded accent raised
-                @header title=notification.title heading=3 filled padded
+                @header title=notification.title heading=3 accent padded
                 ui-text padded -- ${notification.message}
 
 if(state.confirmations.length > 0)
@@ -367,7 +369,7 @@ if(state.confirmations.length > 0)
     ui-linear-layout.confirmation-wrapper vertical centered
         @element class="confirmation-dialogue"
             ui-card rounded accent raised
-                @header filled padded
+                @header accent padded
                     ui-linear-layout fillspace
                         @element fillspace placecenter
                             ui-heading heading=3 alignleft -- ${confirmation.title}
@@ -383,24 +385,24 @@ if(state.loggedin)
     ui-sidebar collapsed=state.collapsed on-itemclick("sidebarItemClick")
         @item.site-title icon="menu" text="Time Tracker"
         @item icon="user" text=state.user?state.user.username||"loading...":"loading..." page="account"
-        @item text="Tracker" icon="clock" page="tracker" filled=state.page==="tracker"
-        @item text="Todo" icon="list" page="todo" filled=state.page==="todo"
-        @item text="Projects" icon="clipboard" page="projects" filled=state.page==="projects"
-        @item text="Invoice" icon="file" page="invoices" filled=state.page==="invoices"
-        @item text="Reports" icon="bar-chart-2" page="reports" filled=state.page==="reports"
-        @item text="Settings" icon="settings" page="settings" filled=state.page==="settings"
+        @item text="Tracker" icon="clock" page="tracker" accent=state.page==="tracker"
+        @item text="Todo" icon="list" page="todo" accent=state.page==="todo"
+        @item text="Projects" icon="clipboard" page="projects" accent=state.page==="projects"
+        @item text="Invoice" icon="file" page="invoices" accent=state.page==="invoices"
+        @item text="Reports" icon="bar-chart-2" page="reports" accent=state.page==="reports"
+        @item text="Settings" icon="settings" page="settings" accent=state.page==="settings"
         @item text="Log Out" icon="log-out" action="logout"
 ui-linear-layout fillspace aligncenter vertical
     if(!state.loggedin)
         @element fullwidth
             ui-linear-layout padded aligncenter gutter="4px" fillspace
                 @element
-                    ui-button rounded text="Time Tracker" filled=state.page==='index' on-click("changePage", 'index') title="Home"
+                    ui-button rounded text="Time Tracker" accent=state.page==='index' on-click("changePage", 'index') title="Home"
                 @element fillspace
                 @element
-                    ui-button.animation-popup rounded outlined filled=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
+                    ui-button.animation-popup rounded outlined accent=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
-                    ui-button.animation-popup rounded outlined filled=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
+                    ui-button.animation-popup rounded outlined accent=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
     @element class=state.page!=='index'?"page":"" fullwidth fillspace
         context user=state.user entries=state.entries projects=state.projectsMap
             <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") on-confirm("pushConfirmation") user=state.user entries=state.entries projects=state.projectsMap/>
