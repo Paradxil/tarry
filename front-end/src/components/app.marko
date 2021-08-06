@@ -382,7 +382,7 @@ if(state.confirmations.length > 0)
                             ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)
 
 if(state.loggedin)
-    ui-sidebar collapsed=state.collapsed on-itemclick("sidebarItemClick")
+    ui-sidebar collapsed=state.collapsed on-itemclick("sidebarItemClick") overlay=window.innerWidth<600||screen.width<600
         @item.site-title icon="menu" text="Time Tracker"
         @item icon="user" text=state.user?state.user.username||"loading...":"loading..." page="account"
         @item text="Tracker" icon="clock" page="tracker" accent=state.page==="tracker"

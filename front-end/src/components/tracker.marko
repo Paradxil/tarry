@@ -135,7 +135,7 @@ class {
         let response = await utils.post("/api/time/update", {
             id: event.id,
             name: entry.name,
-            project: entry.project,
+            project: entry.project._id,
             start: entry.start,
             end: entry.end
         });
@@ -177,7 +177,7 @@ class {
     async continueTask(event) {
         let entry = event.entry;
         let name = entry.name;
-        let project = entry.project;
+        let project = entry.project._id;
         if(!this.state.tracking) {
             this.state.project = project;
             this.getComponent("task-name").state.value = name;
@@ -219,8 +219,8 @@ class {
         });
 
         if(response.success) {
-            this.state.entries.splice(0, 0, response.data);
-            this.setStateDirty("entries");
+            this.state.data.days[0].entries.splice(0, 0, response.data);
+            this.setStateDirty("data");
             this.state.tracking = false;
             this.state.project = null;
             this.getComponent("task-name").getComponent("comboboxinput").state.value = "";
@@ -264,7 +264,7 @@ style {
     }
 
     .timer-header-wrapper, .page-content-wrapper {
-        padding: 50px 100px !important;
+        /*padding: 50px 100px !important;*/
         max-width: 1200px;
     }
 
@@ -293,7 +293,7 @@ style {
 
     .manual-input-wrapper {
         flex: 1;
-        font-size: 100px;
+        font-size: min(100px, 15vw);
         place-content: center;
         align-items: flex-end;
     }
@@ -317,7 +317,7 @@ style {
     }
 
     .timer {
-        font-size: 124px;
+        font-size: min(124px, 15vw);
     }
 
     .daily-entries {
@@ -339,7 +339,7 @@ style {
 }
 
 page-background
-ui-linear-layout.timer-header-wrapper light fullwidth vertical
+ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
     @element.timer-wrapper
         ui-linear-layout fullwidth
             @element
@@ -372,7 +372,7 @@ ui-container.page-content-wrapper centered paddedwide
                             @element
                                 ui-text style={color: task.project.color} -- ${task.project.name}
                             @element
-                                ui-button icon="play" rounded title="Start task" on-click("continueTask", {entry: {name: task.name, project: task.project._id}})
+                                ui-button icon="play" rounded title="Start task" on-click("continueTask", {entry: {name: task.name, project: task.project}})
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         /*@element fillspace fullwidth
             ui-linear-layout
@@ -397,7 +397,7 @@ ui-container.page-content-wrapper centered paddedwide
                                             ui-heading heading=2 -- ${day.hoursTracked.toFixed(2)}hrs
                                 @element
                                     ui-linear-layout.daily-entries vertical filled rounded raised gutter="0"
-                                        for|entry| of=day.entries
+                                        for|entry| of=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
                                             @element paddedwide alignleft key=entry._id
                                                 $ const controls = [{title:"Billable", name:"billable", icon:"dollar-sign"}, {title:"Continue task", name:"continue", icon:"play"}];
                                                 $ const overlaycontrols = [

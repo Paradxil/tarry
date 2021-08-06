@@ -77,14 +77,13 @@ style {
 }
 
 context|{projects}, emit| from="app"
-    ui-linear-layout aligncenter class={"task-wrapper":true, "disabled": input.disabled}
+    ui-linear-layout wrap aligncenter class={"task-wrapper":true, "disabled": input.disabled}
         @element fillspace
             if(input.edit)
                 ui-textbox.blended placeholder="Task Name" key="task-name" value=state.entry.name||input.text
             else
                 ui-text -- ${state.entry.name||input.text}
         if(state.entry.project)
-            $ let project = projects[state.entry.project]||{};
             @element
                 ui-linear-layout aligncenter
                     @element
