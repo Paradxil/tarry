@@ -12,6 +12,7 @@ style {
 
     .setting-wrapper {
         align-items: center;
+        padding: var(--padding);
     }
 
     .setting-name {
@@ -25,21 +26,27 @@ page-background
 ui-linear-layout.settings-content-wrapper vertical paddedwide
     @element paddedwide
         ui-heading heading=1 light -- Settings
-    @element filled rounded paddedwide
-        ui-linear-layout.setting-wrapper
-            @element fillspace
-                ui-text.setting-name -- Color
+    @element paddedwide
+        ui-linear-layout vertical
             @element
-                ui-color-select colors=themeColors padded on-input("changeSetting", "secondary")
-    @element filled rounded paddedwide
-        ui-linear-layout.setting-wrapper
-            @element fillspace
-                ui-text.setting-name -- Accent Color
-            @element
-                ui-color-select colors=themeColors padded on-input("changeSetting", "tertiary")
-    @element filled rounded paddedwide
-        ui-linear-layout.setting-wrapper
-            @element fillspace
-                ui-text.setting-name -- Font Color
-            @element
-                ui-color-select colors=["#fff", "#495057", "#212529"] padded on-input("changeSetting", "text-light")
+                ui-heading light -- Appearance 
+            @element padded rounded filled raised
+                ui-linear-layout vertical
+                    @element
+                        ui-linear-layout.setting-wrapper
+                            @element fillspace
+                                ui-text.setting-name -- Color
+                            @element
+                                ui-color-select colors=themeColors padded on-input("changeSetting", "secondary")
+                    @element
+                        ui-linear-layout.setting-wrapper
+                            @element fillspace
+                                ui-text.setting-name -- Accent Color
+                            @element
+                                ui-color-select colors=themeColors padded on-input("changeSetting", "tertiary")
+                    @element
+                        ui-linear-layout.setting-wrapper
+                            @element fillspace
+                                ui-text.setting-name -- Font Color
+                            @element
+                                ui-color-select colors=["#fff", "#495057", "#212529"] padded on-input("changeSetting", "text-light")
