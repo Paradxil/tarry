@@ -62,7 +62,7 @@ style {
         right: 100%;
         padding: var(--padding);
         opacity: 0;
-        background-color: rgba(255,255,255,0.7);
+        background-color: inherit;
         backdrop-filter: blur(2px);
     }
 
@@ -88,7 +88,7 @@ context|{projects}, emit| from="app"
             @element
                 ui-linear-layout aligncenter
                     @element
-                        ui-text.project-name style={color: project.color} alignleft padded -- ${project.name||null}
+                        ui-text.project-name style={color: state.entry.project.color} alignleft padded -- ${state.entry.project.name||null}
                     if(input.edit)
                         @element
                             ui-button rounded icon="delete" on-click("removeProject")
