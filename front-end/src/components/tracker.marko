@@ -14,6 +14,8 @@ class {
             disabled: [],
             inputType: "timer",
             data: {},
+            weeklyReport: {},
+            frequentTasks: [],
             tasklist: []
         };
 
@@ -55,7 +57,20 @@ class {
 
         if(response.success) {
             this.state.data = response.data;
+            this.state.data.days = this.state.data.days.reverse();
             this.state.tasklist = Object.values(response.data.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};})
+        }
+
+        response = await utils.post("/api/report", {
+            start: Date.now() - (1000 * 60 * 60 * 24 * 7),
+            end: Date.now(),
+            projects: [],
+            tasks: []
+        });
+
+        if(response.success) {
+            this.state.weeklyReport = response.data;
+            this.state.frequentTasks = Object.values(response.data.tasks).sort((el1, el2) => {return el1.hoursTracked < el2.hoursTracked});
         }
     }
 
@@ -244,7 +259,6 @@ style {
     .page-content-wrapper > div {
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15%);
         padding: var(--padding-wide);
-        background-color: var(--background-1);
         border-top-left-radius: var(--rounded-radius);
         border-top-right-radius: var(--rounded-radius);
     }
@@ -300,16 +314,32 @@ style {
         border: none;
         outline: none;
         background-color: unset;
-        color: white;
     }
 
     .timer {
         font-size: 124px;
     }
+
+    .daily-entries {
+        opacity: 1;
+        overflow: hidden;
+        animation-name: slidein;
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+
+    .daily-entries > *:nth-child(even) {
+        background-color: var(--primary-dark);
+    }
+    
+    @keyframes slidein {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
 }
 
 page-background
-ui-linear-layout.timer-header-wrapper fullwidth vertical
+ui-linear-layout.timer-header-wrapper light fullwidth vertical
     @element.timer-wrapper
         ui-linear-layout fullwidth
             @element
@@ -329,30 +359,53 @@ ui-linear-layout.timer-header-wrapper fullwidth vertical
         ui-combobox.project-select.stealthy placeholder="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
 
 ui-container.page-content-wrapper centered paddedwide
+    ui-linear-layout vertical fillspace fullwidth
+        @element padded
+            ui-heading alignleft light -- Jump back in
+        @element
+            ui-linear-layout.daily-entries vertical gutter="0p" raised rounded filled
+                for|task| of=state.frequentTasks
+                    @element padded fillspace
+                        ui-linear-layout padded aligncenter
+                            @element fillspace
+                                ui-text alignleft -- ${task.name}
+                            @element
+                                ui-text style={color: task.project.color} -- ${task.project.name}
+                            @element
+                                ui-button icon="play" rounded title="Start task" on-click("continueTask", {entry: {name: task.name, project: task.project._id}})
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
-        @element fillspace fullwidth
+        /*@element fillspace fullwidth
             ui-linear-layout
                 @element
                     ui-button filled=state.inputType=="timer" icon="watch" rounded title="Timer input" on-click("changeInputType", "timer")
                 @element
                     ui-button filled=state.inputType=="manual" icon="plus" rounded title="Manual input" on-click("changeInputType", "manual")
-            ui-spacer space="5px"
+            ui-spacer space="5px"*/
                     
         @element fillspace
-            ui-linear-layout vertical gutter="8px"
-                for|entry, index| of=state.entries
-                    if((index>0 && new Date(state.entries[index-1].start).getDate() !== new Date(entry.start).getDate()) || index === 0)
-                        @element padded key=entry._id+"header"
-                            ui-spacer
-                            ui-linear-layout aligncenter
-                                @element fillspace
-                                    ui-heading alignleft heading=3
-                                        ui-date milliseconds=entry.start time=false
-                    @element paddedwide alignleft key=entry._id rounded outlined filled
-                        $ const controls = [{title:"Billable", name:"billable", icon:"dollar-sign"}, {title:"Continue task", name:"continue", icon:"play"}];
-                        $ const overlaycontrols = [
-                            {title:"Delete entry", name:"delete", icon:"trash"}, 
-                            {title:"Edit entry", name:"edit", icon:"edit-2"},
-                            entry.status==="untracked"?{title:"Mark todo", name:"todo", icon:"flag"}:{title:"Mark completed", name:"complete", icon:"check"}
-                        ];
-                        entry disabled=state.disabled.includes(entry._id) index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")
+            ui-linear-layout vertical gutter="16px"
+                for|day, index| of=state.data.days||[]
+                    if(day.entries.length > 0)
+                        @element
+                            ui-linear-layout vertical
+                                @element padded key=entry._id+"header"
+                                    ui-linear-layout aligncenter light
+                                        @element fillspace
+                                            ui-heading heading=2 alignleft 
+                                                ui-date milliseconds=day.date time=false
+                                        @element
+                                            ui-heading heading=2 -- ${day.hoursTracked.toFixed(2)}hrs
+                                @element
+                                    ui-linear-layout.daily-entries vertical filled rounded raised gutter="0"
+                                        for|entry| of=day.entries
+                                            @element paddedwide alignleft key=entry._id
+                                                $ const controls = [{title:"Billable", name:"billable", icon:"dollar-sign"}, {title:"Continue task", name:"continue", icon:"play"}];
+                                                $ const overlaycontrols = [
+                                                    {title:"Delete entry", name:"delete", icon:"trash"}, 
+                                                    {title:"Edit entry", name:"edit", icon:"edit-2"},
+                                                    entry.status==="untracked"?{title:"Mark todo", name:"todo", icon:"flag"}:{title:"Mark completed", name:"complete", icon:"check"}
+                                                ];
+                                                entry disabled=state.disabled.includes(entry._id) index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")
+                if(state.data == null || state.data.days == null)
+                    @element fillspace
+                        loading-spinner
