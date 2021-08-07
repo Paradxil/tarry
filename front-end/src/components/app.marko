@@ -19,6 +19,8 @@ class {
             user: null,
             loggedin: false,
             collapsed: false,
+            pageLoading: false,
+            ismobile: false,
             entries: [],
             projects: [],
             projectsMap: {},
@@ -28,7 +30,14 @@ class {
     }
 
     async onMount() {
-        window.setInterval(this.checkStatus.bind(this), 1000 * 60);
+        window.setInterval(this.checkStatus.bind(this), 1000 * 60); //Todo: remove this and save when the user will be logged out as a cookie.
+
+        window.addEventListener("resize", this.onScreenResize.bind(this));
+        this.state.ismobile = window.innerWidth<600||screen.width<600;
+
+        if(this.state.ismobile) {
+            this.state.collapsed = true;
+        }
 
         let currentPage = window.location.pathname||null;
         currentPage = currentPage.split('/')[1]||null;
@@ -49,6 +58,10 @@ class {
 
             this.changePage(currentPage||"tracker");
         }
+    }
+
+    onScreenResize(event) {
+        this.state.ismobile = window.innerWidth<600||screen.width<600;
     }
 
     login(event) {
@@ -99,6 +112,7 @@ class {
     }
 
     changePage(page) {
+        //this.state.pageLoading = true;
         this.state.page = page;
         this.setStateDirty("page");
 
@@ -143,7 +157,6 @@ class {
     }
 
     sidebarItemClick(event) {
-        console.log(event);
         if(event.item.page != null) {
             this.changePage(event.item.page);
         }
@@ -152,8 +165,19 @@ class {
         }
         else {
             this.state.collapsed = !this.state.collapsed;
-            console.log("toggled");
         }
+
+        if(this.state.ismobile) {
+            this.state.collapsed = true;
+        }
+    }
+
+    toggleSidebar() {
+        this.state.collapsed = !this.state.collapsed;
+    }
+
+    pageLoaded() {
+        this.state.pageLoading = false;
     }
 }
 
@@ -197,9 +221,54 @@ style {
     .page {
     }
 
+    .page-wrapper {
+        position: relative;
+    }
+
+    .page-loading {
+        padding: 0px !important;
+        max-height: 0px;
+        overflow: hidden;
+    }
+
+    .loading-overlay {
+        position: absolute;
+        padding-top: 40vh;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 500;
+        display: flex;
+        place-content: center;
+        background-image: linear-gradient(45deg, var(--tertiary), var(--secondary));
+    }
+
     .site-title {
         font-size: 24px;
         padding-bottom: 20px;
+    }
+
+    .top-bar {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        font-size: 28px;
+        z-index: 400;
+        text-transform: capitalize;
+    }
+
+    .top-bar .ui-icon {
+        --feather-icon-stroke-width: 1px;
+    }
+
+    .top-bar .ui-heading {
+        font-weight: 100;
+    }
+
+    .page-footer {
+        max-width: var(--content-width);
     }
 
     .ui-sidebar .ui-icon {
@@ -208,6 +277,7 @@ style {
     }
 
     .ui-sidebar {
+        margin-right: calc(var(--padding-wide) * 2);
         min-width: unset !important;
         box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
     }
@@ -381,9 +451,17 @@ if(state.confirmations.length > 0)
                         @element
                             ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)
 
+if(state.ismobile)
+    ui-linear-layout.top-bar filled aligncenter padded raised
+        @element
+            ui-button icon="menu" rounded on-click("toggleSidebar")
+        @element fillspace centered
+            ui-heading -- ${state.page}
+        @element
+            ui-button rounded icon="user" on-click("changePage", "account")
 if(state.loggedin)
-    ui-sidebar collapsed=state.collapsed on-itemclick("sidebarItemClick") overlay=window.innerWidth<600||screen.width<600
-        @item.site-title icon="menu" text="Time Tracker"
+    ui-sidebar collapsed=state.ismobile?false:state.collapsed hidden=state.ismobile?state.collapsed:false on-itemclick("sidebarItemClick") overlay=state.ismobile
+        @item.site-title icon=state.ismobile?"chevron-left":"menu" text="Time Tracker"
         @item icon="user" text=state.user?state.user.username||"loading...":"loading..." page="account"
         @item text="Tracker" icon="clock" page="tracker" accent=state.page==="tracker"
         @item text="Todo" icon="list" page="todo" accent=state.page==="todo"
@@ -392,7 +470,11 @@ if(state.loggedin)
         @item text="Reports" icon="bar-chart-2" page="reports" accent=state.page==="reports"
         @item text="Settings" icon="settings" page="settings" accent=state.page==="settings"
         @item text="Log Out" icon="log-out" action="logout"
-ui-linear-layout fillspace aligncenter vertical
+ui-linear-layout.page-wrapper fillspace vertical
+    if(state.pageLoading)
+        @element
+            div.loading-overlay
+                loading-spinner
     if(!state.loggedin)
         @element fullwidth
             ui-linear-layout padded aligncenter gutter="4px" fillspace
@@ -403,6 +485,13 @@ ui-linear-layout fillspace aligncenter vertical
                     ui-button.animation-popup rounded outlined accent=state.page==='login' icon="log-in" on-click('changePage', 'login') title="Login"
                 @element
                     ui-button.animation-popup rounded outlined accent=state.page==='register' icon="user-plus" on-click("changePage", 'register') title="Register"
-    @element class=state.page!=='index'?"page":"" fullwidth fillspace
+    @element class={'page': state.page!=='index', 'page-loading': state.pageLoading} fullwidth fillspace
+        page-background
         context user=state.user entries=state.entries projects=state.projectsMap
-            <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-push("pushNotification") on-confirm("pushConfirmation") user=state.user entries=state.entries projects=state.projectsMap/>
+            <${state.pages[state.page]} key=state.page on-login("login") on-logout("logout") on-pageloaded("pageLoaded") on-push("pushNotification") on-confirm("pushConfirmation") user=state.user entries=state.entries projects=state.projectsMap/>
+    @element.page-footer fullwidth alignleft paddedwide
+        ui-linear-layout fillspace filled rounded paddedwide raised aligncenter
+            @element fillspace alignleft
+                ui-text -- Copyright 2021 Hunter Stratton
+            @element alignright
+                ui-button href="https://github.com/Paradxil/time-tracker" rounded icon="github"
