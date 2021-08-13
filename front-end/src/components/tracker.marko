@@ -16,13 +16,16 @@ class {
             data: {},
             weeklyReport: {},
             frequentTasks: [],
-            tasklist: []
+            tasklist: [],
+            loadingData: false
         };
+
+        this.firstDate = Date.now() - (1000*60*60*24*30);
 
         this.userid = input.user?input.user._id||null:null;
 
         if(this.userid !== null) {
-            this.getData();
+            await this.getData();
         }
         else {
             this.emit('logout');
@@ -32,7 +35,16 @@ class {
         window.setInterval(()=>this.state.now = Date.now(), 500);
     }
 
+    onMount() {
+        window.onscroll = this.loadMoreData.bind(this);
+    }
+
+    onUpdate() {
+        this.state.loadingData = false;
+    }
+
     async getData() {
+        this.state.loadingData = true;
         let response = await utils.get("/api/task/active/");
 
         if(response.success) {
@@ -42,14 +54,12 @@ class {
             this.state.name = task.name;
             this.state.project = task.project;
 
-            console.log(this.state.projects);
-
             this.getComponent("task-name").state.value = task.name;
             this.getComponent("task-name").getComponent("comboboxinput").state.value = task.name;
         }
 
         response = await utils.post("/api/report", {
-            start: Date.now() - (1000*60*60*24*30), //Start date
+            start: this.firstDate, //Start date
             end: Date.now(), //End date
             projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
             tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
@@ -71,6 +81,35 @@ class {
         if(response.success) {
             this.state.weeklyReport = response.data;
             this.state.frequentTasks = Object.values(response.data.tasks).sort((el1, el2) => {return el1.hoursTracked < el2.hoursTracked});
+        }
+
+        this.state.loadingData = false;
+        this.update();
+    }
+
+    async loadMoreData(event) {
+        if (document.documentElement.scrollTop > document.getElementById("entries-wrapper").clientHeight - 350 && !this.state.loadingData) {
+            this.state.loadingData = true;
+
+            let last = this.firstDate - (1000 * 60 * 60 * 24);
+            this.firstDate -= (1000 * 60 * 60 * 24 * 7);
+            
+            let response = await utils.post("/api/report", {
+                start: this.firstDate, //Start date
+                end: last, //End date
+                projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
+                tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
+            });
+
+            if(response.success) {
+                console.log(response.data);
+                console.log("YAY");
+                this.state.data.days = this.state.data.days.concat(response.data.days.reverse());
+                this.state.tasklist = this.state.tasklist.concat(Object.values(response.data.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};}));
+            }
+
+            this.setStateDirty("data");
+            this.setStateDirty("tasklist");
         }
     }
 
@@ -117,8 +156,8 @@ class {
 
         if(response.success) {
             let index = event.index;
-            this.state.entries.splice(index, 1);
-            this.setStateDirty("entries");
+            this.state.data.days[event.dayIndex].entries.splice(index, 1);
+            this.setStateDirty("data");
         }
     }
 
@@ -207,7 +246,6 @@ class {
         });
 
         if(!response.success) {
-            console.log("Error starting tracking.");
             this.state.tracking = false;
         }
     }
@@ -256,12 +294,12 @@ style {
         border: none !important;
     }
 
-    .page-content-wrapper > div {
+    /*.page-content-wrapper > div {
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15%);
-        padding: var(--padding-wide);
+        /*padding: var(--padding-wide);
         border-top-left-radius: var(--rounded-radius);
         border-top-right-radius: var(--rounded-radius);
-    }
+    }*/
 
     .timer-header-wrapper, .page-content-wrapper {
         /*padding: 50px 100px !important;*/
@@ -272,11 +310,12 @@ style {
         font-size: 35px;
         font-weight: 100 !important;
         color: white !important;
+        padding-top: 75px !important;
+        padding-bottom: 100px !important;
     }
 
     .timer-header-wrapper input {
-        color: white !important;
-        border-radius: 0px !important;
+        color: var(--text-light) !important;
     }
 
     .timer-header-wrapper input:focus {
@@ -338,16 +377,15 @@ style {
     }
 }
 
-page-background
 ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
     @element.timer-wrapper
         ui-linear-layout fullwidth
             @element
                 ui-time.timer showseconds=true milliseconds=state.tracking?(state.now - state.startTime):0
             @element.manual-input-wrapper
-                ui-button.manual-input-button icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
+                ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
     @element.task-name-wrapper
-        ui-combobox.task-name.stealthy key="task-name" placeholder="Task name..." options=state.tasklist value=state.name||"" on-select("selectProject")
+        ui-combobox.task-name.stealthy rounded key="task-name" placeholder="Task name..." options=state.tasklist value=state.name||"" on-select("selectProject")
             @option|{option}|
                 ui-linear-layout fillspace aligncenter
                     @element fillspace
@@ -356,7 +394,7 @@ ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
                         ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
     @element.project-select-wrapper
         $ let options = Object.values(state.projects).map((item)=>{return {name: item.name, search: item.name, value: item._id}});
-        ui-combobox.project-select.stealthy placeholder="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
+        ui-combobox.project-select.stealthy rounded placeholder="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
 
 ui-container.page-content-wrapper centered paddedwide
     ui-linear-layout vertical fillspace fullwidth
@@ -373,6 +411,7 @@ ui-container.page-content-wrapper centered paddedwide
                                 ui-text style={color: task.project.color} -- ${task.project.name}
                             @element
                                 ui-button icon="play" rounded title="Start task" on-click("continueTask", {entry: {name: task.name, project: task.project}})
+    ui-spacer
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         /*@element fillspace fullwidth
             ui-linear-layout
@@ -383,8 +422,8 @@ ui-container.page-content-wrapper centered paddedwide
             ui-spacer space="5px"*/
                     
         @element fillspace
-            ui-linear-layout vertical gutter="16px"
-                for|day, index| of=state.data.days||[]
+            ui-linear-layout vertical gutter="16px" id="entries-wrapper"
+                for|day, d_index| of=state.data.days||[]
                     if(day.entries.length > 0)
                         @element
                             ui-linear-layout vertical
@@ -397,7 +436,7 @@ ui-container.page-content-wrapper centered paddedwide
                                             ui-heading heading=2 -- ${day.hoursTracked.toFixed(2)}hrs
                                 @element
                                     ui-linear-layout.daily-entries vertical filled rounded raised gutter="0"
-                                        for|entry| of=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
+                                        for|entry, index| of=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
                                             @element paddedwide alignleft key=entry._id
                                                 $ const controls = [{title:"Billable", name:"billable", icon:"dollar-sign"}, {title:"Continue task", name:"continue", icon:"play"}];
                                                 $ const overlaycontrols = [
@@ -405,7 +444,5 @@ ui-container.page-content-wrapper centered paddedwide
                                                     {title:"Edit entry", name:"edit", icon:"edit-2"},
                                                     entry.status==="untracked"?{title:"Mark todo", name:"todo", icon:"flag"}:{title:"Mark completed", name:"complete", icon:"check"}
                                                 ];
-                                                entry disabled=state.disabled.includes(entry._id) index=index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")
-                if(state.data == null || state.data.days == null)
-                    @element fillspace
-                        loading-spinner
+                                                entry disabled=state.disabled.includes(entry._id) index=index day=d_index key="entry_"+entry._id edit=(state.editid===entry._id) entry=entry controls=controls overlaycontrols=overlaycontrols on-delete("confirmDeleteEntry") on-continue("continueTask") on-todo("markTaskTodo") on-edit("editEntry") on-cancel("cancelEdit") on-save("saveEntry")
+            
