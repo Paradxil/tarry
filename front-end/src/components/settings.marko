@@ -6,8 +6,7 @@ class {
 
 style {
     .settings-content-wrapper {
-        max-width: 800px;
-        margin-left: 2%;
+        max-width: var(--content-width);
     }
 
     .setting-wrapper {
@@ -23,7 +22,7 @@ style {
 $ let themeColors = ["#adb5bd", "#ffa8a8", "#faa2c1", "#e599f7", "#b197fc", "#91a7ff", "#74c0fc", "#66d9e8", "#63e6be", "#8ce99a", "#c0eb75", "#ffe066", "#ffc078"];
 
 page-background
-ui-linear-layout.settings-content-wrapper vertical paddedwide
+ui-linear-layout.settings-content-wrapper vertical
     @element paddedwide
         ui-heading heading=1 light -- Settings
     @element paddedwide
@@ -37,7 +36,7 @@ ui-linear-layout.settings-content-wrapper vertical paddedwide
                             @element fillspace
                                 ui-text.setting-name -- Color
                             @element
-                                ui-color-select colors=themeColors padded on-input("changeSetting", "secondary")
+                                ui-color-select popup colors=themeColors padded on-input("changeSetting", "secondary")
                     @element
                         ui-linear-layout.setting-wrapper
                             @element fillspace
