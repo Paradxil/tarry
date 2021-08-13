@@ -31,6 +31,7 @@ class ProjectDAO {
         project.color = color;
         project.wage = wage;
         await project.save();
+        return project;
     }
 }
 
