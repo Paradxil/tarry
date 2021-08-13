@@ -3,7 +3,8 @@ import utils from '../utils.js';
 class {
     onCreate(input) {
         this.state = {
-            project: input.project||{}
+            project: input.project||{},
+            projects: input.projects
         };
 
         if(this.state.project._id != null) {
@@ -27,9 +28,8 @@ class {
         let response = await utils.post('/api/project', this.state.project);
 
         if(response.success) {
-            this.state.projects.push(response.data.project);
+            this.state.projects[response.data.project._id] = response.data.project;
             this.setStateDirty("projects");
-            this.state.addProject = false;
         }
     }
 }
@@ -40,26 +40,23 @@ style {
     }
 }
 
-$ let colors = [[
+$ let colors = [
     '#ff8787',
     '#f783ac',
     '#da77f2',
     '#9775fa',
     '#748ffc',
-    '#4dabf7'
-],
-
-[    
+    '#4dabf7',
     '#3bc9db',
     '#38d9a9',
     '#69db7c',
     '#a9e34b',
     '#ffd43b',
     '#ffa94d'
-]]
+]
 
-ui-textbox.blended.project-page-title fullwidth placeholder="Project Name" value=state.project.name on-input('setName')
-ui-linear-layout vertical accent paddedwide rounded fillspace fullwidth
+ui-textbox.blended.project-page-title light fullwidth placeholder="Project Name" value=state.project.name on-input('setName')
+ui-linear-layout vertical filled paddedwide rounded fillspace fullwidth
     @element
         ui-heading heading=3 alignleft -- Color
     @element
