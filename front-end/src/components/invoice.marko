@@ -22,6 +22,7 @@ class {
                 message: "",
                 data: {},
                 includedProjects: [],
+                expenses: [],
                 billfrom: {
                     name: "",
                     company: "",
@@ -181,6 +182,26 @@ class {
     togglePreview(value) {
         this.state.viewPreview = !this.state.viewPreview;
     }
+
+    addExpense() {
+        this.state.invoice.expenses.push({name: "", amount: 0});
+        this.setStateDirty("invoice");
+    }
+
+    removeExpense(index) {
+        this.state.invoice.expenses.splice(index, 1);
+        this.setStateDirty("invoice");
+    }
+
+    setExpenseName(index, event) {
+        this.state.invoice.expenses[index].name = event.value;
+        this.setStateDirty("invoice");
+    }
+
+    setExpenseAmount(index, event) {
+        this.state.invoice.expenses[index].amount = parseFloat(event.value);
+        this.setStateDirty("invoice");
+    }
 }
 
 style {
@@ -213,6 +234,10 @@ style {
         flex: 1;
     }
 
+    .invoice-row {
+        background-color: var(--primary-dark);
+    }
+
     .invoice-tasks-summary {
         font-size: 12px;
         margin-top: 0px !important;
@@ -223,6 +248,19 @@ style {
         margin-left: 50px;
         width: 300px;
         place-content: flex-end;
+    }
+
+    .subtotal-wrapper, .expense-wrapper {
+        place-content: flex-end;
+        align-items: center;
+    }
+
+    .subtotal-heading, .expense-name {
+        font-size: 14px !important;
+    }
+
+    .subtotal-amount, .expense-amount {
+        font-size: 18px;
     }
 
     .settings-sidebar {
@@ -376,7 +414,7 @@ ui-linear-layout.invoice-controls-wrapper
                         for|projectid| in=state.invoice.data.projects
                             $ let project = state.invoice.data.projects[projectid];
                             if(project.earnings > 0)
-                                @element.invoice-row padded
+                                @element.invoice-row padded rounded
                                     ui-linear-layout
                                         @element.invoice-expanded-column.invoice-row-description
                                             ui-linear-layout vertical
@@ -390,17 +428,29 @@ ui-linear-layout.invoice-controls-wrapper
                                             ui-text -- ${parseFloat(project.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
                                         @element.invoice-row-tota fillspace alignright
                                             ui-text --  ${parseFloat(project.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
-                        @element.invoice-row.invoice-totals padded
+                    ui-linear-layout.invoice-totals-wrapper vertical
+                        @element
                             if(state.invoice.data.hoursTracked)
-                                ui-linear-layout
-                                    @element fillspace
-                                    @element fillspace
-                                        ui-heading.invoice-heading heading=3 -- Totals:
-                                    @element.invoice-row-time fillspace alignright
-                                        ui-text -- ${state.invoice.data.hoursTracked.toFixed(2)}
-                                    @element.invoice-row-rate fillspace alignright
-                                    @element.invoice-row-tota fillspace alignright
-                                        ui-text --  ${parseFloat(state.invoice.data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                                ui-linear-layout.subtotal-wrapper
+                                    @element fillspace padded alignright
+                                        ui-heading.subtotal-heading heading=3 -- Subtotal
+                                    @element alignright padded placecenter
+                                        ui-heading.subtotal-amount heading=3 --  ${parseFloat(state.invoice.data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                        $ let expensesTotal = 0;
+                        for|expense| of=state.invoice.expenses||[]
+                            $ expensesTotal += expense.amount;
+                            @element
+                                ui-linear-layout.expense-wrapper
+                                    @element fillspace padded alignright
+                                        ui-text.expense-name -- ${expense.name}
+                                    @element alignright padded placecenter
+                                        ui-text.expense-amount -- ${expense.amount.toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                        @element
+                            ui-linear-layout
+                                @element padded fillspace alignright
+                                    ui-heading heading=2 -- Total
+                                @element alignright padded
+                                    ui-heading heading=2 -- ${parseFloat(state.invoice.data.earnings+expensesTotal||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
             ui-element fillspace
             ui-linear-layout.invoice-footer vertical
                 @element
@@ -428,3 +478,17 @@ ui-linear-layout.invoice-controls-wrapper
                         for|project| of=state.projects
                             @element
                                 ui-button on-click("filterProject", project._id) theme={'--background-2': project.color, '--border': project.color} trailingicon="delete" text=project.name rounded outlined filled=!state.filteredProjects.includes(project._id)
+                @element
+                    ui-heading heading=3 -- Additional Costs
+                    ui-linear-layout vertical
+                        for|expense, index| of=state.invoice.expenses  
+                            @element
+                                ui-linear-layout
+                                    @element
+                                        ui-textbox value=expense.name on-input("setExpenseName", index)
+                                    @element
+                                        ui-textbox value=expense.amount on-input("setExpenseAmount", index)
+                                    @element
+                                        ui-button icon="x" on-click("removeExpense", index) rounded outlined
+                        @element
+                            ui-button on-click("addExpense") icon="plus" text="Add Expense" rounded outlined
