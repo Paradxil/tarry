@@ -90,12 +90,9 @@ class {
 
 ui-container centered paddedwide
     if(state.editProjectIndex!==null)
-        edit-project project=state.projects[state.editProjectIndex]
+        edit-project project=state.projects[state.editProjectIndex] projects=input.projects
     else
         ui-linear-layout vertical fillspace fullwidth gutter="8px"
-            @element
-                ui-heading heading=1 -- Projects
-                ui-spacer
             @element
                 ui-button text="New Project" rounded icon=state.addProject?"minus":"plus" on-click("toggleProject")
             @element hidden=!state.addProject
@@ -120,9 +117,9 @@ ui-container centered paddedwide
                         ui-button text="Create Project" rounded centered on-click("addProject")
             for|project, index| of=state.projects
                 @element
-                    ui-linear-layout accent rounded padded aligncenter
+                    ui-linear-layout filled rounded padded aligncenter
                         @element
-                            ui-element accent padded rounded theme={'--accent-1': project.color}
+                            ui-element filled padded rounded theme={'--primary': project.color}
                         @element fillspace alignleft
                             ui-heading heading=3 -- ${project.name}
                         @element
