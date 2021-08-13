@@ -2,12 +2,14 @@ class {
     onCreate(input) {
         this.state = {
             entry: input.entry||{},
+            index: input.index,
+            day: input.day,
             original: JSON.parse(JSON.stringify(input.entry))
         }
     }
 
     onAction(type, id, entry) {
-        this.emit(type, {id: id, entry: entry, index:this.input.index||null});
+        this.emit(type, {id: id, entry: entry, dayIndex: this.state.day, index: this.state.index});
     }
 
     onCancel() {
@@ -22,7 +24,7 @@ class {
             this.state.entry.name = name;
         }
 
-        this.emit("save", {id: this.state.entry._id, entry: JSON.parse(JSON.stringify(this.state.entry)), index:this.input.index||null});
+        this.emit("save", {id: this.state.entry._id, entry: JSON.parse(JSON.stringify(this.state.entry)), dayIndex:this.input.day||null, index:this.input.index||null});
     }
     
     selectProject(event) {
