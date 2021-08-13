@@ -425,6 +425,16 @@ style {
         50% {transform: translateY(-30%); opacity: 0;}
         100% {transform: translateY(0%); opacity: 1;}
     }
+
+    @media screen and (max-width: 600px) {
+        .page {
+            padding-top: 60px;
+        }
+
+        .ui-linear-layout {
+            max-width: 100%;
+        }
+    }
 }
 
 ui-linear-layout.notifications-wrapper vertical
