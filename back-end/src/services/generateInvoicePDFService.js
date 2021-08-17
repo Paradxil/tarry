@@ -16,7 +16,7 @@ class GenerateInvoicePDFService {
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
-        await page.goto('http://192.168.68.106:3000/invoice/?id='+invoiceid, { waitUntil: 'networkidle0' });
+        await page.goto('http:/192.168.68.104:3000/invoice/?id='+invoiceid, { waitUntil: 'networkidle0' });
         await page.addStyleTag({ content: 'body { background-color: white !important;}' });
         const pdf = await page.pdf({ format: 'Letter' });
 

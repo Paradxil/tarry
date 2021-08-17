@@ -10,6 +10,10 @@ const invoiceSchema = new mongoose.Schema({
     projects: {type: Array, required: true}, //Which projects to include in the invoice
     data: {type: Object, required: true}, //If not a template this field is required. Stores the report data for the invoice at time of creation. This way invoice data will not change even if old tasks are deleted etc.
     message: String,
+    expenses: [{
+        name: String,
+        amount: Number
+    }], //Stores additional costs or expenses to add to the invoice.
     billfrom: {
         name: String,
         company: String,

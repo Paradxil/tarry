@@ -5,6 +5,7 @@
     "@marko/build": "^4.2.1",
     "@marko/serve": "^4.2.1",
     "axios": "^0.21.1",
+    "chart.js": "^3.4.1",
     "feather-marko": "^0.0.3",
     "marko": "^5.10.3",
     "marko-block-editor": "file:../../marko-block-editor",

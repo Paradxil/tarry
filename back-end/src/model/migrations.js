@@ -23,7 +23,7 @@ class Migrations {
             let user = await userDAO.getUserById(userid);
             user.schemaVersion = 1;
             await user.save();
-        },
+        }/*,
         1: async function (userid) { //Remove encryption from timeEntries
             console.log("RUNNING MIGRATION 1");
 
@@ -44,8 +44,8 @@ class Migrations {
                 let e = await timeEntryDAO.get(entry._id);
                 console.log(entry);
                 console.log(e);
-                e.end = entry.end;
-                e.start = entry.start;
+                e.end = entry.end||e.end;
+                e.start = entry.start||e.start;
                 await e.save();
             }
 
@@ -53,7 +53,7 @@ class Migrations {
             let user = await userDAO.getUserById(userid);
             user.schemaVersion = 2;
             await user.save();
-        }
+        }*/
     }
 
     static ShouldMigrate(version) {

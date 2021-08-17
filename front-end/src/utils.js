@@ -1,8 +1,10 @@
 const axios = require('axios').create({
-    baseURL: 'http://localhost:8081',
+    baseURL: 'http://localhost:8083',
     headers: {"Access-Control-Allow-Origin": "*"},
     withCredentials: true
 });
+
+module.exports.axios = axios;
 
 module.exports.loggedIn = false;
 

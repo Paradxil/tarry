@@ -1,0 +1,7 @@
+class {
+    emitEvent(name, event) {
+        this.emit(name, {event: event, bind: this.input.bind});
+    }
+}
+
+<?{input.renderBody||"div"} on-input('emitEvent', 'input') on-value('emitEvent', 'value') bind=input.bind>

@@ -410,24 +410,42 @@ ui-linear-layout.invoice-controls-wrapper
                         @element fillspace alignright
                             ui-heading.invoice-heading heading=3 -- Total
                 @element
-                    ui-linear-layout vertical
-                        for|projectid| in=state.invoice.data.projects
-                            $ let project = state.invoice.data.projects[projectid];
-                            if(project.earnings > 0)
-                                @element.invoice-row padded rounded
-                                    ui-linear-layout
-                                        @element.invoice-expanded-column.invoice-row-description
-                                            ui-linear-layout vertical
-                                                @element
-                                                    ui-text -- ${project.name}
-                                                @element.invoice-tasks-summary
-                                                    ui-text -- ${Object.values(project.tasks).map((el) => {return el.name}).join(', ')}
-                                        @element.invoice-row-time fillspace alignright
-                                            ui-text -- ${project.hoursTracked.toFixed(2)}
-                                        @element.invoice-row-rate fillspace alignright
-                                            ui-text -- ${parseFloat(project.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
-                                        @element.invoice-row-tota fillspace alignright
-                                            ui-text --  ${parseFloat(project.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                    if(state.invoice.data.projects != null && state.invoice.data.projects.length > 1)
+                        ui-linear-layout vertical
+                            for|projectid| in=state.invoice.data.projects
+                                $ let project = state.invoice.data.projects[projectid];
+                                if(project.earnings > 0)
+                                    @element.invoice-row padded rounded
+                                        ui-linear-layout
+                                            @element.invoice-expanded-column.invoice-row-description
+                                                ui-linear-layout vertical
+                                                    @element
+                                                        ui-text -- ${project.name}
+                                                    @element.invoice-tasks-summary
+                                                        ui-text -- ${Object.values(project.tasks).map((el) => {return el.name}).join(', ')}
+                                            @element.invoice-row-time fillspace alignright
+                                                ui-text -- ${project.hoursTracked.toFixed(2)}
+                                            @element.invoice-row-rate fillspace alignright
+                                                ui-text -- ${parseFloat(project.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                                            @element.invoice-row-tota fillspace alignright
+                                                ui-text --  ${parseFloat(project.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                    else
+                        ui-linear-layout vertical
+                            for|taskid| in=state.invoice.data.tasks
+                                $ let task = state.invoice.data.tasks[taskid];
+                                if(task.earnings > 0)
+                                    @element.invoice-row padded rounded
+                                        ui-linear-layout
+                                            @element.invoice-expanded-column.invoice-row-description
+                                                ui-linear-layout vertical
+                                                    @element
+                                                        ui-text -- ${task.name}
+                                            @element.invoice-row-time fillspace alignright
+                                                ui-text -- ${task.hoursTracked.toFixed(2)}
+                                            @element.invoice-row-rate fillspace alignright
+                                                ui-text -- ${parseFloat(task.project.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                                            @element.invoice-row-tota fillspace alignright
+                                                ui-text --  ${parseFloat(task.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
                     ui-linear-layout.invoice-totals-wrapper vertical
                         @element
                             if(state.invoice.data.hoursTracked)
