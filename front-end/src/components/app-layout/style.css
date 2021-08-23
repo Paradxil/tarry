@@ -1,0 +1,45 @@
+:root {
+    --content-width: 1200px;
+    --primary: #fff;
+    --primary-dark: #f1f3f5;
+    --secondary: #74c0fc;
+    --accent-1: #fff;
+    --tertiary: #66d9e8;
+    --text-dark: #495057;
+    --text-light: #fff;
+    --border: #dee2e6;
+    --rounded-radius: 5px;
+    --padding: 8px;
+    --padding-narrow: 4px;
+    --padding-wide: 16px;
+    --text-font: 'Montserrat', sans-serif;
+    --button-font: 'Montserrat', sans-serif;
+    --header-font: 'Montserrat', sans-serif;
+    --font-size-h1: 2.5em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 100;
+}
+
+.ui-textbox, .ui-submit {
+    outline: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 15px !important;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.ui-textbox:hover, .ui-textbox:focus {
+    border-bottom: 1px solid var(--primary-light);
+}
+
+.blended {
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    font-family: var(--text-font);
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    border-radius: 0px;
+}
