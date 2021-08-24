@@ -1,5 +1,6 @@
 template title=input.title||null
     page-background
+    app-sidebar currentpage=input.currentpage||input.title||null
     ui-linear-layout centered fillspace fullwidth
         @element fillspace
             <${input.renderBody}/>
