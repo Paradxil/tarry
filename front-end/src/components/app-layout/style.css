@@ -1,21 +1,27 @@
 :root {
-    --content-width: 1200px;
-    --primary: #fff;
-    --primary-dark: #f1f3f5;
-    --secondary: #74c0fc;
-    --accent-1: #fff;
-    --tertiary: #66d9e8;
-    --text-dark: #495057;
-    --text-light: #fff;
-    --border: #dee2e6;
-    --rounded-radius: 5px;
-    --padding: 8px;
-    --padding-narrow: 4px;
-    --padding-wide: 16px;
-    --text-font: 'Montserrat', sans-serif;
-    --button-font: 'Montserrat', sans-serif;
-    --header-font: 'Montserrat', sans-serif;
-    --font-size-h1: 2.5em;
+    --content-width: 1200px !important;
+    --primary: #fff !important;
+    --primary-dark: #f1f3f5 !important;
+    --secondary: #74c0fc !important;
+    --accent-1: #fff !important;
+    --tertiary: #66d9e8 !important;
+    --text-dark: #495057 !important;
+    --text-light: #fff !important;
+    --border: #dee2e6 !important;
+    --rounded-radius: 5px !important;
+    --padding: 8px !important;
+    --padding-narrow: 4px !important;
+    --padding-wide: 16px !important;
+    --text-font: 'Montserrat', sans-serif !important;
+    --button-font: 'Montserrat', sans-serif !important;
+    --header-font: 'Montserrat', sans-serif !important;
+    --font-size-h1: 2.5em !important;
+}
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
 }
 
 h1, h2, h3, h4, h5, h6 {
