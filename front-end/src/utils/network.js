@@ -1,5 +1,5 @@
 const axios = require('axios').create({
-    baseURL: 'http://localhost:8083',
+    baseURL: 'http://localhost:8081', //TODO: Configure this with environment variables
     headers: { "Access-Control-Allow-Origin": "*" },
     withCredentials: true
 });
