@@ -1,0 +1,8 @@
+{
+    "en" : {
+        "register": "Register",
+        "password": "Password",
+        "username": "Username",
+        "email": "Email"
+    }
+}

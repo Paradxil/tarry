@@ -1,0 +1,11 @@
+{
+    "en": {
+        "tracker": "Tracker",
+        "todo": "Todo",
+        "projects": "Projects",
+        "invoice": "Invoice",
+        "reports": "Reports",
+        "settings": "Settings",
+        "logout": "Log Out"
+    }
+}
