@@ -1,0 +1,62 @@
+import network from '../../utils/network.js';
+import {Localize} from "../../utils/localization.js";
+
+class {
+    onCreate() {
+        this.state = {
+            username: "",
+            password: "",
+            email: ""
+        }
+    }
+
+    onMount() {
+        window.loadCaptcha();
+    }
+
+    async register(event) {
+        let response = await network.post('/api/register', {
+            username: this.state.username,
+            password: this.state.password,
+            email: this.state.email,
+            captchaid: window.getCaptchaID()
+        });
+
+        if(response.success) {
+            window.location.replace("/tracker");
+        }
+    }
+
+    updatePassword(event) {
+        this.state.password = event.value;
+    }
+
+    updateUsername(event) {
+        this.state.username = event.value;
+    }
+
+    updateEmail(event) {
+        this.state.email = event.value;
+    }
+}
+
+$ const L = Localize(r.strings.register);
+app-layout title=L.register
+    ui-container centered padded
+        ui-linear-layout vertical padded gutter="16px"
+            @element
+                ui-heading heading=1 centered -- ${L.register}
+            @element
+                paper-modal
+                    ui-form padded vertical gutter="16px"
+                        @element
+                            ui-textbox placeholder=L.username id="username" value=state.username on-input("updateUsername")
+                        @element
+                            ui-textbox placeholder=L.password id="password" value=state.password on-input("updatePassword") password
+                        @element
+                            ui-textbox placeholder=L.email id="email" value=state.email on-input("updateEmail")
+                        @element
+                            div.icon-captcha key="icon-captcha" no-update
+                        @element
+                            ui-submit preventdefault on-click("register")
+                                -- ${L.register}
