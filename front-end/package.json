@@ -21,11 +21,6 @@
       ]
     ]
   },
-  "browser": {
-    "fs": false,
-    "path": false,
-    "os": false
-  },
   "name": "front-end",
   "version": "0.0.1",
   "main": "index.js",
