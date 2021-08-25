@@ -1,10 +1,12 @@
 import ServerProxy from "../../../../utils/serverproxy.js";
 import {niceDate, dateInPast, now} from "../../../../utils/dateutils.js";
+import {emit} from "../../../../utils/events.js";
 
 class {
     onCreate() {
         this.state = {
-            data: {}
+            data: {},
+            disabled: []
         };
 
         ServerProxy.generateReport(dateInPast(30), now(), [], [], (report) => {
@@ -14,7 +16,7 @@ class {
     }
 
     confirmDeleteEntry(entry, index, dayIndex) {
-        this.emit("confirm", {
+        emit("confirm", {
             title:"Delete Entry?", 
             message:"Are you sure you want to delete the entry for '" + entry.name + "' on " + new Date(entry.start).toDateString() + "? This cannot be undone.",
             actions: [
@@ -37,13 +39,10 @@ class {
     }
 
     async deleteEntry(entry, index, dayIndex) {
-        let id = entry._id;
-        let response = await utils.delete("/api/time/"+id);
-        if(response.success) {
-            let index = index;
+        ServerProxy.deleteEntry(entry._id, ()=>{
             this.state.data.days[dayIndex].entries.splice(index, 1);
             this.setStateDirty("data");
-        }
+        });
     }
 
     cancelEdit(event) {
@@ -117,4 +116,4 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                                 ui-time milliseconds=data.end-data.start
                             @element
                                 $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
-                                controls controls=controls on-continue("continueTask", data) on-delete("confirmDeleteEntry", data._id, index, dayIndex)
+                                controls controls=controls on-continue("continueTask", data) on-delete("confirmDeleteEntry", data, index, dayIndex)
