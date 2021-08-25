@@ -5,7 +5,7 @@ class StartTaskHandler {
     async handle(req, res) {
         let service = new StartTaskService();
 
-        let userid = req.body.userid||null;
+        let userid = req.user._id||null;
         let name = req.body.name||null;
         let project = req.body.project||null;
 
