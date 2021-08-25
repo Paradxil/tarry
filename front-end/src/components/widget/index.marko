@@ -1,0 +1,9 @@
+ui-linear-layout vertical fillspace fullwidth
+    @element padded light
+        ui-linear-layout
+            @element fillspace
+                ui-heading alignleft -- ${input.title}
+            @element
+                ui-heading alignright -- ${input.subtitle}
+    @element filled rounded raised padded=input.nopadding?false:true
+        <${input.renderBody}/>
