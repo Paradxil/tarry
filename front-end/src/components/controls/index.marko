@@ -1,6 +1,7 @@
 class {
     onClick(name) {
         this.emit("controlclick", {name: name});
+        this.emit(name.toLowerCase());
     }
 }
 
