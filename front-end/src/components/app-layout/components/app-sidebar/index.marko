@@ -33,6 +33,10 @@ class {
             this.changePage("login");
         }
     }
+
+    toggle() {
+        this.state.collapsed = !this.state.collapsed;
+    }
 }
 
 $ const L = Localize(r.strings.sidebar);

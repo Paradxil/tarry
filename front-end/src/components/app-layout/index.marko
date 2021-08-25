@@ -1,8 +1,35 @@
+class {
+    onCreate() {
+        this.state = {
+            ismobile: false
+        };
+
+        this.sidebarComponent = null;
+    }
+
+    onMount() {
+        this.sidebarComponent = this.getComponent("sidebar");
+
+        window.addEventListener("resize", this.onScreenResize.bind(this));
+        this.state.ismobile = window.innerWidth<600||screen.width<600;
+    }
+
+    onScreenResize(event) {
+        this.state.ismobile = window.innerWidth<600||screen.width<600;
+    }
+
+    toggleSidebar() {
+        this.sidebarComponent.toggle();
+    }
+}
+
 template title=input.title||null
     page-background
     confirmation-dialogue
     notification-popups
-    app-sidebar currentpage=input.currentpage||input.title||null
+    if(state.ismobile)
+        topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar")
+    app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
     ui-linear-layout.page-wrapper fillspace fullwidth paddedwide
         @element fillspace
-            <${input.renderBody}/>
+            <${input.renderBody} ismobile=state.ismobile/>
