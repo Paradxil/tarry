@@ -1,0 +1,92 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+import {dateInPast, now} from "../../../../utils/dateutils.js";
+
+class {
+    onCreate() {
+        this.state = {
+            tracking: false,
+            project: null,
+            name: null,
+            startTime: now(),
+            task: null,
+            projects: [],
+            tasklist: [],
+            now: now()
+        };
+
+        ServerProxy.getActiveTask((task) => {
+            this.state.task = task;
+            this.state.name = task.name;
+            this.state.project = task.project;
+            this.state.startTime = task.start;
+            this.state.tracking = true;
+        });
+
+        ServerProxy.getProjects((projects) => this.state.projects=projects);
+
+        ServerProxy.generateReport(dateInPast(30), now(), [], [], (report) => {
+            this.state.tasklist = Object.values(report.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};})
+        });
+    }
+
+    onMount() {
+        window.setInterval(()=>this.state.now = now(), 500);
+    }
+
+    async startTracker(event) {
+        this.state.name = this.getComponent("task-name").state.value;
+
+        if(this.state.name === null || this.state.name.length === 0) {
+            this.emit("push", {title: "Warning", message:"Unable to start tracker, no task name given."})
+            return;
+        }
+
+        this.state.startTime = Date.now();
+
+        ServerProxy.startTask(this.state.name, this.state.startTime, this.state.project, ()=>{
+            this.state.tracking = true;
+        });
+    }
+
+    async stopTracker(event) {
+        ServerProxy.stopActiveTask(Date.now(), (entry)=>{
+            //this.state.data.days[0].entries.splice(0, 0, entry);
+            //this.setStateDirty("data");
+            this.state.tracking = false;
+            this.state.project = null;
+            this.getComponent("task-name").getComponent("comboboxinput").state.value = "";
+            this.getComponent("task-project").getComponent("comboboxinput").state.value = "";
+        });
+    }
+
+    selectProject(event) {
+        if(event.option == null && event.option.value == null && event.option.projectid == null) {
+            return;
+        }
+        this.getComponent("task-project").getComponent("comboboxinput").state.value = event.option.project||event.option.name;
+        this.state.project = event.option.projectid||event.option.value;
+    }
+
+    removeProject() {
+        this.state.project = null;
+    }
+}
+
+ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
+    @element.timer-wrapper
+        ui-linear-layout fullwidth
+            @element
+                ui-time.timer showseconds=true milliseconds=state.tracking?(state.now - state.startTime):0
+            @element.manual-input-wrapper
+                ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
+    @element.task-name-wrapper
+        ui-combobox.task-name.stealthy rounded key="task-name" placeholder="Task name..." options=state.tasklist value=state.name||"" on-select("selectProject")
+            @option|{option}|
+                ui-linear-layout fillspace aligncenter
+                    @element fillspace
+                        ui-text -- ${option.value}
+                    @element
+                        ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
+    @element.project-select-wrapper
+        $ let options = state.projects.map((item)=>{return {name: item.name, search: item.name, value: item._id}});
+        ui-combobox.project-select.stealthy rounded placeholder="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
