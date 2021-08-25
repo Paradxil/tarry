@@ -81,14 +81,14 @@ class ServerProxy {
 
     async saveProject(project, cb) {
         let response = await network.post('/api/project', project);
-        if(response.success) {
+        if(response.success && cb) {
             cb(response.data.project);
         }
     }
 
     async getProject(id, cb) {
         let response = await network.get('/api/project/'+id);
-        if(response.success) {
+        if(response.success && cb) {
             cb(response.data);
         }
     }
