@@ -1,5 +1,5 @@
 :root {
-    --content-width: 1200px !important;
+    --content-width: 1000px !important;
     --primary: #fff !important;
     --primary-dark: #f1f3f5 !important;
     --secondary: #74c0fc !important;
@@ -30,6 +30,10 @@
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 100;
+}
+
+.page-wrapper {
+    max-width: var(--content-width);
 }
 
 .ui-textbox, .ui-submit {
