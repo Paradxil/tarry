@@ -1,7 +1,7 @@
 import network from "./network.js";
 
 class ServerProxy {
-    async loadActiveTask(cb) {
+    async getActiveTask(cb) {
         let response = await network.get("/api/task/active/");
         let task = null;
 
@@ -11,7 +11,7 @@ class ServerProxy {
         }
     }
 
-    async loadProjects(cb) {
+    async getProjects(cb) {
         let response = await network.get("/api/project/all/");
         let projectsMap = {};
         let projects = [];
@@ -39,6 +39,29 @@ class ServerProxy {
         if(response.success) {
             report = response.data;
             cb(report);
+        }
+    }
+
+    async stopActiveTask(endTime, cb) {
+        let response = await network.post("/api/stop", {
+            end: endTime
+        });
+
+        if(response.success) {
+            let newEntry = response.data;
+            cb(newEntry);
+        }
+    }
+
+    async startTask(name, startTime, project, cb) {
+        let response = await network.post("/api/start", {
+            name: name,
+            start: startTime,
+            project: project
+        });
+
+        if(response.success) {
+            cb();
         }
     }
 }
