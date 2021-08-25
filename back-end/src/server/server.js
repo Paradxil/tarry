@@ -34,6 +34,7 @@ const AllInvoiceHandler = require('../api/allInvoiceHandler');
 const SaveInvoiceHandler = require('../api/saveInvoiceHandler');
 const GenerateInvoicePDFHandler = require('../api/generateInvoicePDFHandler');
 const GetInvoiceHandler = require('../api/getInvoiceHandler');
+const GetProjectHandler = require('../api/getProjectHandler');
 
 class Server {
     constructor() {
@@ -245,6 +246,18 @@ class Server {
             await handler.handle(req, res);
         });
 
+        // Get all projects for the current user
+        this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
+            let handler = new AllProjectsHandler(req, res);
+            await handler.handle(req, res);
+        });
+
+        //Get a project
+        this.app.get('/api/project/:id', this.isAuthenticated, async function(req, res) {
+            let handler = new GetProjectHandler(req, res);
+            await handler.handle(req, res);
+        });
+
         // Add/update a project
         this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
             let handler = new SaveProjectHandler(req, res);
@@ -254,12 +267,6 @@ class Server {
         // Delete a project
         this.app.delete('/api/project/:id', this.isAuthenticated, async function(req, res) {
             let handler = new DeleteProjectHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get all projects for the current user
-        this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
-            let handler = new AllProjectsHandler(req, res);
             await handler.handle(req, res);
         });
 
