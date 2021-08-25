@@ -1,0 +1,10 @@
+class {
+    onClick(name) {
+        this.emit("controlclick", {name: name});
+    }
+}
+
+ui-linear-layout
+    for|control| of=input.controls||[]
+        @element
+            ui-button rounded title=control.name icon=control.icon||null on-click("onClick", control.name)
