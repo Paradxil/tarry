@@ -12,10 +12,10 @@ class SaveProjectHandler {
         let updateService = new UpdateProjectService();
 
         let name = req.body.name||null;
-        let userid = req.body.userid||null;
+        let userid = req.user._id||null;
         let color = req.body.color||null;
         let wage = req.body.wage||0;
-        let projectid = req.body.projectid||null
+        let projectid = req.body.projectid||req.body._id||null
 
         if(name === null || userid === null || color === null || wage === null) {
             res.send(Response.InvalidRequest("Invalid request body."));
