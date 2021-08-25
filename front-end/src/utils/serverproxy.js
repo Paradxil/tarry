@@ -71,6 +71,27 @@ class ServerProxy {
             cb();
         }
     }
+
+    async deleteProject(id, cb) {
+        let response = await network.delete('/api/project/' + id);
+        if(response.success) {
+            cb();
+        }
+    }
+
+    async saveProject(project, cb) {
+        let response = await network.post('/api/project', project);
+        if(response.success) {
+            cb(response.data.project);
+        }
+    }
+
+    async getProject(id, cb) {
+        let response = await network.get('/api/project/'+id);
+        if(response.success) {
+            cb(response.data);
+        }
+    }
 }
 
 export default new ServerProxy();
