@@ -24,7 +24,7 @@ class {
     }
 
     changePage(page) {
-        window.location.replace("/"+page);
+        window.location.assign("/"+page);
     }
 
     async logoutUser() {
@@ -48,5 +48,5 @@ ui-sidebar collapsed=input.ismobile?false:state.collapsed hidden=input.ismobile?
     @item text=L.projects icon="clipboard" page="projects" accent=input.currentpage==="projects"
     @item text=L.invoice icon="file" page="invoices" accent=input.currentpage==="invoices"
     @item text=L.reports icon="bar-chart-2" page="reports" accent=input.currentpage==="reports"
-    @item text=L.settings icon="settings" page="settings" accent=input.currentpage==="settings"
+    @item text=L.settings icon="settings" page="settings" accent=input.currentpage==="settings" disabled
     @item text=L.logout icon="log-out" action="logout"

@@ -37,9 +37,6 @@ class EventHandler {
 }
 
 const _EventHandler = new EventHandler();
-
 export default _EventHandler;
-
 export const emit = _EventHandler.emit.bind(_EventHandler);
-
 export const listen = _EventHandler.listen.bind(_EventHandler);
