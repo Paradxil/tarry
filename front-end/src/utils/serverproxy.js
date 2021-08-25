@@ -64,6 +64,13 @@ class ServerProxy {
             cb();
         }
     }
+
+    async deleteEntry(id, cb) {
+        let response = await network.delete("/api/time/"+id);
+        if(response.success) {
+            cb();
+        }
+    }
 }
 
 export default new ServerProxy();
