@@ -1,0 +1,36 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+import {niceDate, dateInPast, now} from "../../../../utils/dateutils.js";
+
+class {
+    onCreate() {
+        this.state = {
+            data: {}
+        };
+
+        ServerProxy.generateReport(dateInPast(30), now(), [], [], (report) => {
+            this.state.data = report;
+            this.setStateDirty("data");
+        });
+    }
+}
+
+ui-linear-layout vertical gutter="16px" id="entries-wrapper"
+    for|day| of=state.data.days||[]
+        if(day.entries.length > 0)
+            @element
+                listwidget title=niceDate(day.date) subtitle=day.hoursTracked.toFixed(2)+"hrs" items=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
+                    @item|{data}|
+                        ui-linear-layout aligncenter
+                            @element fillspace
+                                ui-text -- ${data.name}
+                            @element
+                                project project=data.project
+                            @element
+                                ui-date date=false milliseconds=data.start
+                            @element
+                                ui-date date=false milliseconds=data.end
+                            @element
+                                ui-time milliseconds=data.end-data.start
+                            @element
+                                $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
+                                controls controls=controls 
