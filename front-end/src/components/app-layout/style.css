@@ -18,6 +18,10 @@
     --font-size-h1: 2.5em !important;
 }
 
+::selection {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
 * {
     margin: 0px;
     padding: 0px;
