@@ -1,5 +1,6 @@
 import ServerProxy from "../../../../utils/serverproxy.js";
 import {dateInPast, now} from "../../../../utils/dateutils.js";
+import {emit} from "../../../../utils/events.js";
 
 class {
     onCreate() {
@@ -67,7 +68,7 @@ class {
         this.state.name = this.taskNameComponent.getValue();
 
         if(this.state.name === null || this.state.name.length === 0) {
-            this.emit("push", {title: "Warning", message:"Unable to start tracker, no task name given."})
+            emit("push", {title: "Warning", message:"Unable to start tracker, no task name given."})
             return;
         }
 
