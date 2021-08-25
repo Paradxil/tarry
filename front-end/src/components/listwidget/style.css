@@ -1,0 +1,7 @@
+.listwidget {
+    overflow: hidden;
+}
+
+.listwidget > *:nth-child(even) {
+    background-color: var(--primary-dark);
+}
