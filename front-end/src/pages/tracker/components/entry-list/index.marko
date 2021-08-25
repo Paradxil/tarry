@@ -12,14 +12,98 @@ class {
             this.setStateDirty("data");
         });
     }
+
+    confirmDeleteEntry(entry, index, dayIndex) {
+        this.emit("confirm", {
+            title:"Delete Entry?", 
+            message:"Are you sure you want to delete the entry for '" + entry.name + "' on " + new Date(entry.start).toDateString() + "? This cannot be undone.",
+            actions: [
+                {
+                    text: "Yes",
+                    icon: "check",
+                    callback: ()=>{
+                        this.deleteEntry(entry, index, dayIndex); 
+                        this.state.disabled.push(entry._id);
+                        this.setStateDirty("disabled");
+                    }
+                },
+                {
+                    text: "Cancel",
+                    icon: "x",
+                    callback: function() {}
+                }
+            ]}
+        );
+    }
+
+    async deleteEntry(entry, index, dayIndex) {
+        let id = entry._id;
+        let response = await utils.delete("/api/time/"+id);
+        if(response.success) {
+            let index = index;
+            this.state.data.days[dayIndex].entries.splice(index, 1);
+            this.setStateDirty("data");
+        }
+    }
+
+    cancelEdit(event) {
+        this.state.editid = null;
+    }
+
+    async saveEntry(event) {
+        this.state.editid = null;
+        let i = this.state.disabled.push(event.id)-1;
+        this.setStateDirty("disabled");
+        let entry = event.entry;
+        let response = await utils.post("/api/time/update", {
+            id: event.id,
+            name: entry.name,
+            project: entry.project._id,
+            start: entry.start,
+            end: entry.end
+        });
+        if(response.success) {
+            let newentry = response.data;
+            this.state.entries[newentry._id] = newentry;
+            this.setStateDirty("entries");
+        }
+        this.state.disabled.splice(i, 1);
+        this.setStateDirty("disabled");
+    }
+
+    editEntry(event) {
+        this.state.editid = event.id;
+    }
+
+    async markTaskTodo(event) {
+        let id = event.entry.taskid;
+        let index = event.index;
+        let response = await utils.post("/api/task/status", {
+            userid: this.userid,
+            taskid: id,
+            status: "todo"
+        });
+        if(response.success) {
+            for(let entry of this.input.entries) {
+                if(entry.taskid === id) {
+                    entry.status = "todo";
+                }
+            }
+            this.state.entries = this.input.entries;
+        }
+    }
+
+    async continueTask(entry) {
+        this.emit("continuetask", {name: entry.name, project: entry.project});
+    }
 }
 
 ui-linear-layout vertical gutter="16px" id="entries-wrapper"
-    for|day| of=state.data.days||[]
+    for|day, dayIndex| of=state.data.days||[]
         if(day.entries.length > 0)
             @element
                 listwidget title=niceDate(day.date) subtitle=day.hoursTracked.toFixed(2)+"hrs" items=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
-                    @item|{data}|
+                    @item|{data, index}| // Data here is a timeEntry from the items list.
                         ui-linear-layout aligncenter
                             @element fillspace
                                 ui-text -- ${data.name}
@@ -33,4 +117,4 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                                 ui-time milliseconds=data.end-data.start
                             @element
                                 $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
-                                controls controls=controls 
+                                controls controls=controls on-continue("continueTask", data) on-delete("confirmDeleteEntry", data._id, index, dayIndex)

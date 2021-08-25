@@ -5,7 +5,7 @@ class {
     onCreate() {
         this.state = {
             tracking: false,
-            project: null,
+            projectID: null,
             name: null,
             startTime: now(),
             task: null,
@@ -14,27 +14,57 @@ class {
             now: now()
         };
 
-        ServerProxy.getActiveTask((task) => {
-            this.state.task = task;
-            this.state.name = task.name;
-            this.state.project = task.project;
-            this.state.startTime = task.start;
-            this.state.tracking = true;
-        });
+        this.taskNameComponent = null;
+        this.taskProjectComponent = null;
 
         ServerProxy.getProjects((projects) => this.state.projects=projects);
 
         ServerProxy.generateReport(dateInPast(30), now(), [], [], (report) => {
-            this.state.tasklist = Object.values(report.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};})
+            this.state.tasklist = Object.values(report.tasks).map((el) => {
+                return {
+                    search: el.name + " " + el.project.name, 
+                    value: el.name, project: el.project.name, 
+                    color: el.project.color, 
+                    projectid: el.project._id};
+                });
         });
     }
 
     onMount() {
+        this.taskNameComponent = this.getComponent("task-name");
+        this.taskProjectComponent = this.getComponent("task-project");
+
+        // Perform this request onMount becuase we need to update a component's value.
+        // Components are not available until the onMount event is called.
+        ServerProxy.getActiveTask((task) => {
+            this.state.task = task;
+            this.state.name = task.name;
+            this.state.projectID = task.project._id;
+            this.state.startTime = task.start;
+            this.state.tracking = true;
+
+            this.taskNameComponent.setValue(task.name);
+            this.taskProjectComponent.setValue(task.project.name);
+        });
+
         window.setInterval(()=>this.state.now = now(), 500);
     }
 
+    continueTask(name, project) {
+        this.state.name = name;
+        this.state.startTime = Date.now();
+        this.state.projectID = project._id;
+
+        this.taskNameComponent.setValue(name);
+        this.taskProjectComponent.setValue(project.name);
+
+        ServerProxy.startTask(this.state.name, this.state.startTime, this.state.projectID, ()=>{
+            this.state.tracking = true;
+        });
+    }
+
     async startTracker(event) {
-        this.state.name = this.getComponent("task-name").state.value;
+        this.state.name = this.taskNameComponent.getValue();
 
         if(this.state.name === null || this.state.name.length === 0) {
             this.emit("push", {title: "Warning", message:"Unable to start tracker, no task name given."})
@@ -43,7 +73,7 @@ class {
 
         this.state.startTime = Date.now();
 
-        ServerProxy.startTask(this.state.name, this.state.startTime, this.state.project, ()=>{
+        ServerProxy.startTask(this.state.name, this.state.startTime, this.state.projectID, ()=>{
             this.state.tracking = true;
         });
     }
@@ -53,9 +83,9 @@ class {
             //this.state.data.days[0].entries.splice(0, 0, entry);
             //this.setStateDirty("data");
             this.state.tracking = false;
-            this.state.project = null;
-            this.getComponent("task-name").getComponent("comboboxinput").state.value = "";
-            this.getComponent("task-project").getComponent("comboboxinput").state.value = "";
+            this.state.projectID = null;
+            this.taskNameComponent.setValue("");
+            this.taskProjectComponent.setValue("");
         });
     }
 
@@ -63,12 +93,13 @@ class {
         if(event.option == null && event.option.value == null && event.option.projectid == null) {
             return;
         }
-        this.getComponent("task-project").getComponent("comboboxinput").state.value = event.option.project||event.option.name;
-        this.state.project = event.option.projectid||event.option.value;
+
+        this.taskProjectComponent.setValue(event.option.project||event.option.name);
+        this.state.projectID = event.option.projectid||event.option.value;
     }
 
     removeProject() {
-        this.state.project = null;
+        this.state.projectID = null;
     }
 }
 

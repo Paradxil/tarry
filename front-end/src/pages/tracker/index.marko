@@ -1,3 +1,17 @@
+class {
+    onCreate() {
+        this.activeTaskComponent = null;
+    }
+
+    onMount() {
+        this.activeTaskComponent = this.getComponent("active-task");
+    }
+
+    continueTask(event) {
+        this.activeTaskComponent.continueTask(event.name, event.project);
+    }
+}
+
 app-layout title="Time Tracker" currentpage="tracker"
-    active-task-header
-    entry-list
+    active-task-header key="active-task"
+    entry-list on-continuetask("continueTask")
