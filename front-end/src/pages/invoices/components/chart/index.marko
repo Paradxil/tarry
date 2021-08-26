@@ -1,0 +1,70 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+import {dateInPast, now} from "../../../../utils/dateutils.js";
+
+class {
+    onCreate(input) {
+        this.includedProjects = input.includedprojects||[];
+        this.includedTasks = [];
+        this.start = input.start||dateInPast(7);
+        this.end = input.end||now();
+
+        this.state = {
+            data: null
+        };
+
+        this.loadData();
+    }
+
+    onInput(input) {
+        this.includedProjects = input.includedprojects||[];
+        this.start = input.start||dateInPast(7);
+        this.end = input.end||now();
+
+        this.loadData();
+    }
+
+    loadData() {
+        ServerProxy.generateReport(this.start, this.end, this.includedProjects, this.includedTasks, (report) => {
+            this.state.data = report;
+            this.setStateDirty("data");
+        });
+    }
+}
+
+style {
+    .chart-wrapper td, .chart-wrapper th {
+        padding: 10px;
+        border-collapse: collapse;
+    }
+    .chart-header th {
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+ui-container ...input alignleft
+    table.chart-wrapper
+        tr.chart-header.chart-row
+            th.chart-heading colspan="2"
+                ui-heading heading=3 -- Project
+            th.chart-heading
+                ui-heading heading=3 -- Time
+            th.chart-heading
+                ui-heading heading=3 -- Earnings
+        if(state.data != null)
+            for|projectID| in=state.data.projects
+                $ let project = state.data.projects[projectID]
+                tr.chart-row
+                    td colspan="2"
+                        ui-text -- ${project.name==="No Project"?"Other":project.name}
+                    td
+                        ui-text -- ${project.hoursTracked.toFixed(2)}
+                    td 
+                        ui-text -- ${parseFloat(project.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})} <!--//TODO: Add settings for currency and locality.-->
+            tr.chart-row
+                td
+                td
+                    ui-text -- Total:
+                td
+                    ui-text -- ${state.data.hoursTracked.toFixed(2)}
+                td
+                    ui-text -- ${parseFloat(state.data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})} 
