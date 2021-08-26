@@ -8,4 +8,4 @@ class {
 ui-linear-layout
     for|control| of=input.controls||[]
         @element
-            ui-button rounded title=control.name icon=control.icon||null on-click("onClick", control.name)
+            ui-button rounded title=control.title||control.name icon=control.icon||null on-click("onClick", control.name)
