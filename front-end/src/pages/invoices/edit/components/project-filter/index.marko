@@ -1,0 +1,47 @@
+import ServerProxy from "../../../../../utils/serverproxy.js";
+
+class {
+    onCreate(input) {
+        this.state = {
+            projects: [],
+            projectsMap: {},
+            selected: input.selectedprojects||[] // A list of selected projects
+        };
+
+        this.comboboxControl = null;
+
+        ServerProxy.getProjects((projects, projectsMap) => {
+            this.state.projects = projects;
+            this.state.projectsMap = projectsMap;
+        });
+    }
+
+    onMount() {
+        this.comboboxControl = this.getComponent("combobox");
+    }
+
+    selectProject() {
+        if(!this.state.selected.includes(this.comboboxControl.getValue())) {
+            this.state.selected.push(this.comboboxControl.getValue());
+            this.setStateDirty('selected');
+        }
+
+        this.comboboxControl.setValue("");
+    }
+
+    removeProject(index) {
+        this.state.selected.splice(index, 1);
+        this.setStateDirty('selected');
+    }
+}
+
+div.project-filter
+    $ let options = state.projects.map((item)=>{return {name: item.name, color: item.color, search: item.name, value: item._id}});
+    ui-combobox options=options label="Projects" on-select("selectProject") key="combobox"
+        @option|{option}|
+            project project=option
+    ui-spacer
+    ui-linear-layout wrap
+        for|project, index| of=state.selected
+            @element
+                ui-button secondary rounded text=state.projectsMap[project].name trailingicon="delete" on-click("removeProject", index)
