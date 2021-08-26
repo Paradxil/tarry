@@ -1,3 +1,68 @@
+import ServerProxy from "../../../utils/serverproxy.js";
+import {dateInPast, now} from "../../../utils/dateutils.js";
+
+class {
+    onCreate() {
+        this.state = {
+            selectedProjects: [],
+            start: dateInPast(7),
+            end: now(),
+            expenses: []
+        };
+
+        this.expenseNameComponent = null;
+        this.expenseAmountComponent = null;
+    }
+
+    onMount() {
+        this.expenseNameComponent = this.getComponent("expense-name");
+        this.expenseAmountComponent = this.getComponent("expense-amount");
+    }
+
+    onUpdate() {
+        // For some reason I have to reassign these variables on update.
+        // I think this is due to an issue with the 'key' property and 
+        // how MarkoJS handles updating items in a for loop.
+        // These variables no longer reference the correct object after
+        // adding a new expense and rerendering the expense list.
+        this.expenseNameComponent = this.getComponent("expense-name");
+        this.expenseAmountComponent = this.getComponent("expense-amount");
+    }
+
+    updateSelectedProjects(event) {
+        this.state.selectedProjects = event.selected;
+        this.setStateDirty("selectedProjects");
+    }
+
+    addExpense() {
+        let amt = parseInt(this.expenseAmountComponent.getValue());
+        if(isNaN(amt)) {
+            amt = 0;
+        }
+
+        let name = this.expenseNameComponent.getValue();
+
+        if(name == null || name.length === 0) {
+            return;
+        }
+
+        this.state.expenses.push({
+            name: name,
+            amount: amt
+        });
+
+        this.expenseAmountComponent.setValue("");
+        this.expenseNameComponent.setValue("");
+
+        this.setStateDirty("expenses");
+    }
+
+    removeExpense(index) {
+        this.state.expenses.splice(index, 1);
+        this.setStateDirty("expenses");
+    }
+}
+
 style {
     .ui-textbox, .ui-date-select-wrapper {
         border: none !important;
@@ -19,26 +84,62 @@ style {
 }
 
 app-layout currentpage="invoices"
-    widget title="Edit Invoice"
-        ui-linear-layout vertical padded
-            @element
-                ui-heading -- Billing
-            @element
-                ui-linear-layout
-                    @element fillspace
-                        ui-textbox label="Invoice ID"
+    ui-linear-layout vertical gutter="16px"
+        @element
+            widget title="Edit Invoice"
+                @subtitle
+                    controls [
+                        controls = [
+                            {
+                                name: "save",
+                                title: "Save",
+                                icon: "save"
+                            },
+                            {
+                                name: "preview",
+                                title: "View preview",
+                                icon: "eye"
+                            }
+                        ]
+                    ]
+                ui-linear-layout vertical padded
                     @element
-                        ui-date-select label="From" rounded showtime=false milliseconds=Date.now()
+                        ui-linear-layout wrap
+                            @element fillspace
+                                ui-textbox label="Invoice ID"
+                            @element
+                                ui-date-select label="From" rounded showtime=false milliseconds=Date.now()
+                            @element
+                                ui-date-select label="To" rounded showtime=false milliseconds=Date.now()
                     @element
-                        ui-date-select label="To" rounded showtime=false milliseconds=Date.now()
-            @element
-                ui-combobox label="Bill From"
-            @element
-                ui-combobox label="Bill To"
-            @element
-                ui-spacer
-                ui-heading -- Filters
-            @element
-                project-filter
-            @element
-                chart
+                        ui-combobox label="Bill From"
+                    @element
+                        ui-combobox label="Bill To"
+        @element
+            widget title="Filters"
+                ui-linear-layout vertical padded
+                    @element
+                        project-filter on-input("updateSelectedProjects")
+        @element
+            listwidget title="Expenses" items=state.expenses
+                @last key="add-expense"
+                    ui-linear-layout fillspace fullwidth aligncenter key='last'
+                        @element fillspace
+                            ui-textbox label="Name" key="expense-name"
+                        @element
+                            ui-textbox label="Amount" key="expense-amount"
+                        @element
+                            ui-button rounded icon="save" title="Save Expense" on-click("addExpense")
+                @item|{data, index}|
+                    ui-linear-layout aligncenter
+                        @element fillspace
+                            ui-text -- ${data.name}
+                        @element fillspace
+                            ui-text -- ${data.amount}
+                        @element
+                            ui-button icon="delete" title="Remove expense" rounded on-click("removeExpense", index)
+        @element
+            widget title="Hours"
+                ui-linear-layout vertical padded
+                    @element
+                        invoice-time-chart includedprojects=state.selectedProjects start=state.start end=state.end expenses=state.expenses
