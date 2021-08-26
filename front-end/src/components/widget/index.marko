@@ -2,7 +2,10 @@ ui-linear-layout vertical fillspace fullwidth
     @element padded light
         ui-linear-layout aligncenter
             @element fillspace
-                ui-heading alignleft -- ${input.title}
+                if(input.title&&input.title.renderBody)
+                    <${input.title.renderBody}/>
+                else
+                    ui-heading alignleft -- ${input.title}
             @element
                 if(input.subtitle&&input.subtitle.renderBody)
                     <${input.subtitle.renderBody}/>
