@@ -1,0 +1,68 @@
+import {colors} from "../../../utils/theme.js";
+import ServerProxy from "../../../utils/serverproxy.js";
+
+class {
+    onCreate(input) {
+        this.state = {
+            project: {}
+        }
+
+        this.colorComponent = null;
+        this.nameComponent = null;
+        this.wageComponent = null;
+    }
+
+    onMount() {
+        this.nameComponent = this.getComponent("name");
+        this.wageComponent = this.getComponent("wage");
+        this.colorComponent = this.getComponent("color");
+
+        if(this.input.params && this.input.params.id != null) {
+            ServerProxy.getProject(this.input.params.id, (project)=>{
+                this.state.project = project;
+                this.setStateDirty("project");
+
+                this.nameComponent.setValue(project.name);
+                this.wageComponent.setValue(project.wage);
+                this.colorComponent.setValue(project.color);
+            });
+        }
+    } 
+
+    setColor(event) {
+        this.state.project.color = event.color;
+    }
+
+    setName(event) {
+        this.state.project.name = event.value;
+    }
+
+    setWage(evet) {
+        this.state.project.wage = parseInt(event.value);
+    }
+
+    async saveProject() {
+        ServerProxy.saveProject(this.state.project);
+    }
+    
+}
+
+app-layout title="Edit Project" currentpage="projects"
+    ui-textbox.blended.project-page-title light fullwidth placeholder="Project Name" on-input('setName') key="name"
+    ui-linear-layout vertical filled paddedwide rounded fillspace fullwidth
+        @element
+            ui-heading heading=3 alignleft -- Color
+        @element
+            ui-linear-layout aligncenter
+                @element
+                    ui-color-select rounded paddedwide title="Choose Project Icon" on-input('setColor') colors=colors key="color"
+        @element
+            ui-spacer
+            ui-heading heading=3 alignleft -- Billing
+        @element
+            ui-linear-layout aligncenter
+                @element
+                    ui-textbox placeholder="Hourly Wage" on-input('setWage') key="wage"
+        @element
+            ui-spacer
+            ui-button text="Save Project" rounded centered on-click("saveProject")
