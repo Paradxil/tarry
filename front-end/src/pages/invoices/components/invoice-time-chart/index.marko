@@ -1,0 +1,128 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+import {dateInPast, now} from "../../../../utils/dateutils.js";
+
+class {
+    onCreate(input) {
+        this.includedProjects = input.includedprojects||[];
+        this.includedTasks = [];
+        this.start = input.start||dateInPast(7);
+        this.end = input.end||now();
+
+        this.state = {
+            data: null,
+            expenses: input.expenses||[]
+        };
+
+        this.loadData();
+    }
+
+    onInput(input) {
+        this.includedProjects = input.includedprojects||[];
+        this.start = input.start||dateInPast(7);
+        this.end = input.end||now();
+
+        this.loadData();
+    }
+
+    loadData() {
+        ServerProxy.generateReport(this.start, this.end, this.includedProjects, this.includedTasks, (report) => {
+            this.state.data = report;
+            this.setStateDirty("data");
+        });
+    }
+}
+
+style {
+    .invoice-heading {
+        font-weight: 100;
+    }
+
+    .invoice-expanded-column {
+        flex: 2;
+    }
+
+    .invoice-column {
+        flex: 1;
+    }
+
+    .invoice-row {
+        background-color: var(--primary-dark);
+    }
+
+    .invoice-tasks-summary {
+        font-size: 12px;
+        margin-top: 0px !important;
+        font-style: italic !important;
+    }
+
+    .subtotal-wrapper, .expense-wrapper {
+        place-content: flex-end;
+        align-items: center;
+    }
+
+    .subtotal-heading, .expense-name {
+        font-size: 14px !important;
+    }
+
+    .subtotal-amount, .expense-amount {
+        font-size: 18px;
+    }
+}
+
+ui-linear-layout.invoice-chart vertical
+    @element
+        ui-linear-layout.invoice-chart-header secondary padded rounded
+            @element.invoice-expanded-column
+                ui-heading.invoice-heading heading=3 -- Description
+            @element fillspace alignright
+                ui-heading.invoice-heading heading=3 -- Hours
+            @element fillspace alignright
+                ui-heading.invoice-heading heading=3 -- Rate
+            @element fillspace alignright
+                ui-heading.invoice-heading heading=3 -- Total
+    if(state.data == null)
+        @element
+            ui-text -- No time entries found for the selected date range and filters.
+    else
+        @element
+            ui-linear-layout vertical
+                for|projectid| in=state.data.projects
+                    $ let project = state.data.projects[projectid];
+                    if(project.earnings > 0)
+                        @element.invoice-row padded rounded
+                            ui-linear-layout
+                                @element.invoice-expanded-column.invoice-row-description
+                                    ui-linear-layout vertical
+                                        @element
+                                            ui-text -- ${project.name}
+                                        @element.invoice-tasks-summary
+                                            ui-text -- ${Object.values(project.tasks).map((el) => {return el.name}).join(', ')}
+                                @element.invoice-row-time fillspace alignright
+                                    ui-text -- ${project.hoursTracked.toFixed(2)}
+                                @element.invoice-row-rate fillspace alignright
+                                    ui-text -- ${parseFloat(project.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                                @element.invoice-row-tota fillspace alignright
+                                    ui-text --  ${parseFloat(project.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                                    ui-linear-layout.invoice-totals-wrapper vertical
+        @element
+            if(state.data.hoursTracked)
+                ui-linear-layout.subtotal-wrapper
+                    @element fillspace padded alignright
+                        ui-heading.subtotal-heading heading=3 -- Subtotal
+                    @element alignright padded placecenter
+                        ui-heading.subtotal-amount heading=3 --  ${parseFloat(state.data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+        $ let expensesTotal = 0;
+        for|expense| of=state.expenses||[]
+            $ expensesTotal += expense.amount;
+            @element
+                ui-linear-layout.expense-wrapper
+                    @element fillspace padded alignright
+                        ui-text.expense-name -- ${expense.name}
+                    @element alignright padded placecenter
+                        ui-text.expense-amount -- ${expense.amount.toLocaleString('en-US', {style: "currency", currency: "USD"})}
+        @element
+            ui-linear-layout
+                @element padded fillspace alignright
+                    ui-heading heading=2 -- Total
+                @element alignright padded
+                    ui-heading heading=2 -- ${parseFloat(state.data.earnings+expensesTotal||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
