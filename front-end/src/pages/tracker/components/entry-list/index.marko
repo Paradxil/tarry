@@ -103,7 +103,7 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
             @element
                 listwidget title=niceDate(day.date) subtitle=day.hoursTracked.toFixed(2)+"hrs" items=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
                     @item|{data, index}| // Data here is a timeEntry from the items list.
-                        ui-linear-layout aligncenter
+                        ui-linear-layout aligncenter wrap
                             @element fillspace
                                 ui-text -- ${data.name}
                             @element
