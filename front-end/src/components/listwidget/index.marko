@@ -3,4 +3,6 @@ widget title=input.title||null subtitle=input.subtitle||null nopadding
         for|item, index| of=input.items
             @element paddedwide fillspace alignleft placecenter
                 <${input.item.renderBody} data=item index=index/>
-
+        if(input.last)
+            @element paddedwide fillspace alignleft placecenter
+                <${input.last.renderBody}/>
