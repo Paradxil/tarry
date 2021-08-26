@@ -8,6 +8,12 @@ class {
         };
     }
 
+    onInput(input) {
+        if(input.ismobile) {
+            this.state.collapsed = true;
+        }
+    }
+
     sidebarItemClick(event) {
         if(event.item.page != null) {
             this.changePage(event.item.page);
