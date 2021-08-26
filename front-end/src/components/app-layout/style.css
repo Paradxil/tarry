@@ -7,7 +7,7 @@
     --tertiary: #66d9e8 !important;
     --text-dark: #495057 !important;
     --text-light: #fff !important;
-    --border: #dee2e6 !important;
+    --border: #ced4da !important;
     --rounded-radius: 5px !important;
     --padding: 8px !important;
     --padding-narrow: 4px !important;
@@ -19,7 +19,8 @@
 }
 
 ::selection {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: var(--secondary);
+    color: var(--text-light);
 }
 
 * {
@@ -34,19 +35,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .page-wrapper {
     max-width: var(--content-width);
-}
-
-.ui-textbox, .ui-submit {
-    outline: none;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    padding: 15px !important;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-}
-
-.ui-textbox:hover, .ui-textbox:focus {
-    border-bottom: 1px solid var(--primary-light);
 }
 
 .blended {
