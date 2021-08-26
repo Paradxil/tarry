@@ -1,0 +1,44 @@
+style {
+    .ui-textbox, .ui-date-select-wrapper {
+        border: none !important;
+        background-color: #f8f9fa;
+        transition: border 0.5s;
+    }
+
+    .ui-textbox:focus {
+        background-color: var(--secondary-light);
+    }
+
+    .ui-textbox:hover,.ui-date-select-wrapper:hover {
+        background-color: var(--secondary-light) !important;
+    }
+
+    .ui-textbox-label {
+        color: var(--tertiary-dark);
+    }
+}
+
+app-layout currentpage="invoices"
+    widget title="Edit Invoice"
+        ui-linear-layout vertical padded
+            @element
+                ui-heading -- Billing
+            @element
+                ui-linear-layout
+                    @element fillspace
+                        ui-textbox label="Invoice ID"
+                    @element
+                        ui-date-select label="From" rounded showtime=false milliseconds=Date.now()
+                    @element
+                        ui-date-select label="To" rounded showtime=false milliseconds=Date.now()
+            @element
+                ui-combobox label="Bill From"
+            @element
+                ui-combobox label="Bill To"
+            @element
+                ui-spacer
+                ui-heading -- Filters
+            @element
+                project-filter
+            @element
+                chart
