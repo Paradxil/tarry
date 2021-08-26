@@ -51,12 +51,10 @@
     color: #f1f1f1;
 }
 
-.project-select {
-    border: none;
-    outline: none;
-    background-color: unset;
-}
-
 .timer {
     font-size: min(124px, 15vw);
+}
+
+.timer-header-wrapper .ui-textbox-label {
+    --label-small-scale: 0.5 !important;
 }
