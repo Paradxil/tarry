@@ -112,7 +112,7 @@ ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
             @element.manual-input-wrapper
                 ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
     @element.task-name-wrapper
-        ui-combobox.task-name.stealthy rounded key="task-name" placeholder="Task name..." options=state.tasklist value=state.name||"" on-select("selectProject")
+        ui-combobox.task-name.stealthy rounded key="task-name" label="Task Name" options=state.tasklist value=state.name||"" on-select("selectProject")
             @option|{option}|
                 ui-linear-layout fillspace aligncenter
                     @element fillspace
@@ -121,4 +121,4 @@ ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
                         ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
     @element.project-select-wrapper
         $ let options = state.projects.map((item)=>{return {name: item.name, search: item.name, value: item._id}});
-        ui-combobox.project-select.stealthy rounded placeholder="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
+        ui-combobox.project-select.stealthy rounded label="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
