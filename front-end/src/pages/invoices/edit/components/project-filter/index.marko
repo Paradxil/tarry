@@ -24,6 +24,7 @@ class {
         if(!this.state.selected.includes(this.comboboxControl.getValue())) {
             this.state.selected.push(this.comboboxControl.getValue());
             this.setStateDirty('selected');
+            this.emit("input", {selected: this.state.selected});
         }
 
         this.comboboxControl.setValue("");
@@ -32,6 +33,7 @@ class {
     removeProject(index) {
         this.state.selected.splice(index, 1);
         this.setStateDirty('selected');
+        this.emit("input", {selected: this.state.selected});
     }
 }
 
@@ -40,8 +42,11 @@ div.project-filter
     ui-combobox options=options label="Projects" on-select("selectProject") key="combobox"
         @option|{option}|
             project project=option
-    ui-spacer
+    ui-spacer space="4px"
     ui-linear-layout wrap
         for|project, index| of=state.selected
             @element
                 ui-button secondary rounded text=state.projectsMap[project].name trailingicon="delete" on-click("removeProject", index)
+        if(state.selected.length === 0)
+            @element
+                ui-button secondary rounded text="All Projects Selected"
