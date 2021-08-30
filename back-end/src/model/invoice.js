@@ -14,34 +14,8 @@ const invoiceSchema = new mongoose.Schema({
         name: String,
         amount: Number
     }], //Stores additional costs or expenses to add to the invoice.
-    billfrom: {
-        name: String,
-        company: String,
-        address: {
-            street: String,
-            city: String,
-            state: String,
-            zip: String
-        },
-        contact: {
-            phone: String,
-            email: String
-        }
-    },
-    billto: {
-        name: String,
-        company: String,
-        address: {
-            street: String,
-            city: String,
-            state: String,
-            zip: String
-        },
-        contact: {
-            phone: String,
-            email: String
-        }
-    }
+    billfrom: String, //ID of an address in the database.
+    billto: String //ID of an address in the database.
 });
 
 
