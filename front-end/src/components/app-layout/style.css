@@ -33,8 +33,9 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 100;
 }
 
-.page-wrapper {
+.content-wrapper {
     max-width: var(--content-width);
+    position: relative;
 }
 
 .blended {
