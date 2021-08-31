@@ -302,23 +302,23 @@ class Server {
         let dataAccessHandler = DataAccessHandlerFactory.createHandler(schema);
 
         if(routes.includes('all')) {
-            this.app.get(baseUrl + 'all/', this.isAuthenticated, dataAccessHandler.all);
+            this.app.get(baseUrl + 'all/', this.isAuthenticated, dataAccessHandler.all.bind(dataAccessHandler));
         }
 
         if(routes.includes('get')) {
-            this.app.get(baseUrl+':id', this.isAuthenticated, dataAccessHandler.get);
+            this.app.get(baseUrl+':id', this.isAuthenticated, dataAccessHandler.get.bind(dataAccessHandler));
         }
 
         if(routes.includes('add')) {
-            this.app.post(baseUrl, this.isAuthenticated, dataAccessHandler.add);
+            this.app.post(baseUrl, this.isAuthenticated, dataAccessHandler.add.bind(dataAccessHandler));
         }
 
         if(routes.includes('update')) {
-            this.app.post(baseUrl+'/update/:id', this.isAuthenticated, dataAccessHandler.update);
+            this.app.post(baseUrl+'/update/:id', this.isAuthenticated, dataAccessHandler.update.bind(dataAccessHandler));
         }
 
         if(routes.includes('delete')) {
-            this.app.delete(baseUrl+':id', this.isAuthenticated, dataAccessHandler.delete);
+            this.app.delete(baseUrl+':id', this.isAuthenticated, dataAccessHandler.delete.bind(dataAccessHandler));
         }
     }
 
