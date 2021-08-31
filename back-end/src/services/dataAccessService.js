@@ -15,6 +15,23 @@ class DataAccessService {
     async get(id) {
         return await this.dao.get(id);
     }
+
+    async all(userid) {
+        return await this.dao.all(userid);
+    }
+
+    async add(userid, data) {
+        data.userid = userid;
+        return await this.dao.add(data);
+    }
+
+    async update(id, data) {
+        return await this.dao.update(id, data);
+    }
+
+    async remove(id) {
+        return await this.dao.remove(id);
+    }
 }
 
 module.exports = DataAccessService;
