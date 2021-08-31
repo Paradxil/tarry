@@ -46,9 +46,9 @@ app-layout title=L.login
                 paper-modal
                     ui-form padded vertical gutter="16px"
                         @element
-                            ui-textbox placeholder=L.username id="username" value=state.username on-input("updateUsername")
+                            ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
                         @element
-                            ui-textbox placeholder=L.password id="password" value=state.password on-input("updatePassword") password
+                            ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
                         @element
                             div.icon-captcha key="icon-captcha" no-update
                         @element
