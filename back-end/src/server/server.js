@@ -35,6 +35,7 @@ const SaveInvoiceHandler = require('../api/saveInvoiceHandler');
 const GenerateInvoicePDFHandler = require('../api/generateInvoicePDFHandler');
 const GetInvoiceHandler = require('../api/getInvoiceHandler');
 const GetProjectHandler = require('../api/getProjectHandler');
+const DataAccessHandlerFactory = require('../api/dataAccessHandlerFactory');
 
 class Server {
     constructor() {
@@ -292,6 +293,33 @@ class Server {
             await handler.handle(req, res);
         });
 
+        //TODO: Have all data access routes use this factory.
+        this.dataAccessRouteFactory('address');
+    }
+
+    dataAccessRouteFactory(schema, routes=['get', 'all', 'add', 'update', 'delete']) {
+        let baseUrl = '/api/'+schema+'/';
+        let dataAccessHandler = DataAccessHandlerFactory.createHandler(schema);
+
+        if(routes.includes('all')) {
+            this.app.get(baseUrl + 'all/', this.isAuthenticated, dataAccessHandler.all);
+        }
+
+        if(routes.includes('get')) {
+            this.app.get(baseUrl+':id', this.isAuthenticated, dataAccessHandler.get);
+        }
+
+        if(routes.includes('add')) {
+            this.app.post(baseUrl, this.isAuthenticated, dataAccessHandler.add);
+        }
+
+        if(routes.includes('update')) {
+            this.app.post(baseUrl+'/update/:id', this.isAuthenticated, dataAccessHandler.update);
+        }
+
+        if(routes.includes('delete')) {
+            this.app.delete(baseUrl+':id', this.isAuthenticated, dataAccessHandler.delete);
+        }
     }
 
     initLoginHandler() {
