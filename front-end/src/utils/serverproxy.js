@@ -5,7 +5,7 @@ class ServerProxy {
         let response = await network.get("/api/task/active/");
         let task = null;
 
-        if(response.success) {
+        if(response.success && cb) {
             task = response.data;
             cb(task);
         }
@@ -16,7 +16,7 @@ class ServerProxy {
         let projectsMap = {};
         let projects = [];
 
-        if(response.success) {
+        if(response.success && cb) {
             projects = response.data;
 
             for(let project of projects) {
@@ -36,7 +36,7 @@ class ServerProxy {
 
         let report = {};
 
-        if(response.success) {
+        if(response.success && cb) {
             report = response.data;
             cb(report);
         }
@@ -47,7 +47,7 @@ class ServerProxy {
             end: endTime
         });
 
-        if(response.success) {
+        if(response.success && cb) {
             let newEntry = response.data;
             cb(newEntry);
         }
@@ -60,21 +60,21 @@ class ServerProxy {
             project: project
         });
 
-        if(response.success) {
+        if(response.success && cb) {
             cb();
         }
     }
 
     async deleteEntry(id, cb) {
         let response = await network.delete("/api/time/"+id);
-        if(response.success) {
+        if(response.success && cb) {
             cb();
         }
     }
 
     async deleteProject(id, cb) {
         let response = await network.delete('/api/project/' + id);
-        if(response.success) {
+        if(response.success && cb) {
             cb();
         }
     }
@@ -97,6 +97,20 @@ class ServerProxy {
         let response = await network.get("/api/invoice/all/");
         if(response.success && cb) {
             cb(response.data);
+        }
+    }
+
+    async getAddresses(cb) {
+        let response = await network.get("/api/address/all/");
+        if(response.success && cb) {
+            let addresses = response.data;
+            let addressesMap = {};
+
+            for(let address of addresses) {
+                addressesMap[address._id] = address;
+            }
+
+            cb(addresses, addressesMap);
         }
     }
 }
