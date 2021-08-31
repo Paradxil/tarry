@@ -7,16 +7,31 @@ class {
             selectedProjects: [],
             start: dateInPast(7),
             end: now(),
-            expenses: []
+            expenses: [],
+            addresses: [],
+            addressesMap: {}
         };
 
         this.expenseNameComponent = null;
         this.expenseAmountComponent = null;
+        this.addClientPopout = null;
+
+        ServerProxy.getAddresses((addresses, map)=>{
+            this.state.addressesMap = map;
+            this.state.addresses = addresses;
+
+            // Add fields for use with the combobox.
+            for(let address of this.state.addresses) {
+                address.value = address._id;
+                address.search = address.name + " " + address.email + " " + address.company + " " + address.phone;
+            }
+        });
     }
 
     onMount() {
         this.expenseNameComponent = this.getComponent("expense-name");
         this.expenseAmountComponent = this.getComponent("expense-amount");
+        this.addClientPopout = this.getComponent("add-client-popout");
     }
 
     onUpdate() {
@@ -27,6 +42,10 @@ class {
         // adding a new expense and rerendering the expense list.
         this.expenseNameComponent = this.getComponent("expense-name");
         this.expenseAmountComponent = this.getComponent("expense-amount");
+    }
+
+    showAddClientPopout() {
+        this.addClientPopout.toggleVisibility();
     }
 
     updateSelectedProjects(event) {
@@ -84,6 +103,7 @@ style {
 }
 
 app-layout currentpage="invoices"
+    add-client-popout key="add-client-popout"
     ui-linear-layout vertical gutter="16px"
         @element
             widget title="Edit Invoice"
@@ -112,9 +132,11 @@ app-layout currentpage="invoices"
                             @element
                                 ui-date-select label="To" rounded showtime=false milliseconds=Date.now()
                     @element
-                        ui-combobox label="Bill From"
+                        ui-combobox label="Bill From" options=state.addresses
                     @element
-                        ui-combobox label="Bill To"
+                        ui-combobox label="Bill To" options=state.addresses
+                            @first fillspace
+                                ui-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
         @element
             widget title="Filters"
                 ui-linear-layout vertical padded
