@@ -18,6 +18,7 @@ const invoiceSchema = new mongoose.Schema({
     billto: String //ID of an address in the database.
 });
 
+//TODO: Add a check to make sure the billfrom and billto addresses actually exist.
 
 //TODO: Add field encryption.
 //invoiceSchema.plugin(encrypt, { secret: process.env.SECRET, excludeFromEncryption: ['userid', 'template'], additionalAuthenticatedFields: ['userid', 'template'] });
