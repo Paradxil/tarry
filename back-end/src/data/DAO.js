@@ -62,7 +62,7 @@ class DAO {
      * @param {Object} data JSON with fields to update and their new values.
      * @returns The updated document.
      */
-    async update(data) {
+    async update(id, data) {
         let obj = await this.get(id);
 
         for(let key of data) {
