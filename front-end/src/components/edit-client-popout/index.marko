@@ -1,0 +1,87 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate() {
+        this.state = {
+            id: null,
+            address: {}
+        };
+        
+        this.popoutFormComponent = null;
+    }
+
+    onMount() {
+        this.popoutFormComponent = this.getComponent("popout-form");
+    }
+
+    loadAddress(id) {
+        this.state.id = id;
+        return new Promise((resolve) => {
+            ServerProxy.getAddress(id, (address) => {
+                this.state.address = address;
+                this.setStateDirty("address");
+                resolve();
+            });
+        });
+    }
+
+    clearAddress() {
+        this.state.id = null;
+        this.state.address = {};
+    }
+
+    toggleVisibility() {
+        this.popoutFormComponent.toggleVisibility();
+    }
+
+    saveAddress() {
+        if(this.state.id) {
+            ServerProxy.updateAddress(this.state.id, this.state.address, (address) => {
+                this.state.address = address;
+            });
+        }
+        else {
+            ServerProxy.addAddress(this.state.address, (address) => {
+                this.state.address = address;
+            });
+        }
+    }
+
+    setAddressValue(id, event) {
+        this.state.address[id] = event.value;
+    }
+}
+
+popout-form title=state.id==null?'Add Client':'Edit Client' key="popout-form"
+    @controls
+        controls [
+            controls = [
+                {
+                    name: 'save',
+                    icon: 'save'
+                }
+            ]
+            on-save("saveAddress")
+        ]
+    ui-linear-layout vertical padded
+        @element
+            ui-heading -- Address
+        @element
+            ui-textbox label="Name" value=state.address.name on-input('setAddressValue', 'name')
+        @element
+            ui-textbox label="Organization" value=state.address.organization on-input('setAddressValue', 'organization')
+        @element
+            ui-textbox label="Street Address" value=state.address.street on-input('setAddressValue', 'street')
+        @element
+            ui-textbox label="City" value=state.address.city on-input('setAddressValue', 'city')
+        @element
+            ui-textbox label="State" value=state.address.state on-input('setAddressValue', 'state')
+        @element
+            ui-textbox label="Zip" value=state.address.zip on-input('setAddressValue', 'zip')
+        @element
+            ui-spacer
+            ui-heading -- Contact
+        @element
+            ui-textbox label="Phone" value=state.address.phone on-input('setAddressValue', 'phone')
+        @element
+            ui-textbox label="Email" value=state.address.email on-input('setAddressValue', 'email')
