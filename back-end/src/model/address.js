@@ -5,7 +5,7 @@ var encrypt = require('mongoose-encryption');
 const addressSchema = new mongoose.Schema({
     userid: {type: String, required: true},
     name: String,
-    company: String,
+    organization: String,
     street: String,
     city: String,
     state: String,
