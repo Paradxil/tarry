@@ -113,6 +113,38 @@ class ServerProxy {
             cb(addresses, addressesMap);
         }
     }
+
+    async getAddress(id, cb) {
+        let response = await network.get("/api/address/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async addAddress(address, cb) {
+        let response = await network.post("/api/address", address);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async updateAddress(id, address, cb) {
+        let response = await network.post("/api/address/update/"+id, address);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async deleteAddress(id, cb) {
+        let response = await network.delete("/api/address/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
 }
 
 export default new ServerProxy();
