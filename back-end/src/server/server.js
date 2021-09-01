@@ -314,7 +314,7 @@ class Server {
         }
 
         if(routes.includes('update')) {
-            this.app.post(baseUrl+'/update/:id', this.isAuthenticated, dataAccessHandler.update.bind(dataAccessHandler));
+            this.app.post(baseUrl+'update/:id', this.isAuthenticated, dataAccessHandler.update.bind(dataAccessHandler));
         }
 
         if(routes.includes('delete')) {
