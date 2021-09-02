@@ -1,0 +1,35 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+
+class {
+    onCreate(input) {
+        this.state = {
+            invoice: input.invoice||null
+        };
+
+        if(this.state.invoice == null && input.invoiceid) {
+            ServerProxy.getInvoice(input.invoiceid, (invoice)=>{
+                this.state.invoice = invoice;
+                this.setStateDirty('invoice');
+            });
+        }
+    } 
+    
+    onInput(input) {
+        this.state.invoice = input.invoice;
+    }
+
+    setInvoice(invoice) {
+        this.state.invoice = invoice;
+        this.setStateDirty('invoice');
+    }
+}
+
+style {
+    .invoice-preview-wrapper{
+        padding: var(--padding-wide) !important;
+    }
+}
+
+widget.invoice-preview-wrapper title="Invoice Preview"
+    address address=state.invoice.billfrom||{}
+    invoice-time-chart expenses=state.invoice?state.invoice.expenses:[] data=state.invoice?state.invoice.data:{}
