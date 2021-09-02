@@ -20,9 +20,9 @@ class {
         this.comboboxControl = this.getComponent("combobox");
     }
 
-    selectProject() {
-        if(!this.state.selected.includes(this.comboboxControl.getValue())) {
-            this.state.selected.push(this.comboboxControl.getValue());
+    selectProject(event) {
+        if(!this.state.selected.includes(event.value)) {
+            this.state.selected.push(event.value);
             this.setStateDirty('selected');
             this.emit("input", {selected: this.state.selected});
         }
