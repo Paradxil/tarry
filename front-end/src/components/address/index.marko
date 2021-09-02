@@ -1,0 +1,13 @@
+div.address
+    ui-heading heading=1 -- ${input.address.name}
+    ui-heading -- ${input.address.company}
+    ui-text -- ${input.address.street}
+    ui-linear-layout
+        @element
+            ui-text -- ${input.address.city}
+        @element
+            ui-text -- ${input.address.state}
+        @element
+            ui-text -- ${input.address.zip}
+    ui-text -- ${input.address.phone}
+    ui-text -- ${input.address.email}
