@@ -271,23 +271,6 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Get all invoices for the current user
-        this.app.get('/api/invoice/all/', this.isAuthenticated, async function (req, res) {
-            let handler = new AllInvoiceHandler();
-            await handler.handle(req, res);
-        });
-
-        this.app.get('/api/invoice/:id', async function (req, res) {
-            let handler = new GetInvoiceHandler();
-            await handler.handle(req, res);
-        });
-
-        // Add/update invoice for the user
-        this.app.post('/api/invoice/', this.isAuthenticated, async function (req, res) {
-            let handler = new SaveInvoiceHandler();
-            await handler.handle(req, res);
-        });
-
         this.app.get('/api/invoice/pdf/:id', this.isAuthenticated, async function(req, res) {
             let handler = new GenerateInvoicePDFHandler();
             await handler.handle(req, res);
@@ -295,6 +278,7 @@ class Server {
 
         //TODO: Have all data access routes use this factory.
         this.dataAccessRouteFactory('address');
+        this.dataAccessRouteFactory('invoice');
     }
 
     dataAccessRouteFactory(schema, routes=['get', 'all', 'add', 'update', 'delete']) {
