@@ -145,6 +145,14 @@ class ServerProxy {
             cb(response.data);
         }
     }
+
+    async getInvoice(id, cb) {
+        let response = await network.get("/api/invoice/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
 }
 
 export default new ServerProxy();
