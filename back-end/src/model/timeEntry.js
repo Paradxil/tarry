@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
 
+//TODO: Consider using population.
+
 // Create a scheme for time entry
 const timeEntrySchema = new mongoose.Schema({
     userid: {type: String, required: true},
