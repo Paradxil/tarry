@@ -5,11 +5,16 @@ class {
     onCreate() {
         this.state = {
             invoice: {
-                expenses: []
+                start: dateInPast(7),
+                end: now(),
+                expenses: [],
+                data: {},
+                projects: [],
+                tasks: [],
+                billfrom: null,
+                billto: null
             },
             selectedProjects: [],
-            start: dateInPast(7),
-            end: now(),
             addresses: [],
             addressesMap: {}
         };
@@ -17,6 +22,7 @@ class {
         this.expenseNameComponent = null;
         this.expenseAmountComponent = null;
         this.addClientPopout = null;
+        this.invoicePreviewComponent = null;
 
         ServerProxy.getAddresses((addresses, map)=>{
             this.state.addressesMap = map;
@@ -25,8 +31,18 @@ class {
             // Add fields for use with the combobox.
             for(let address of this.state.addresses) {
                 address.value = address._id;
-                address.search = address.name + " " + address.email + " " + address.company + " " + address.phone;
+                address.search = (address.name||"") + " " + (address.email||"") + " " + (address.company||"") + " " + (address.phone||"");
             }
+        });
+
+        this.loadData();
+    }
+
+    loadData() {
+        ServerProxy.generateReport(this.state.invoice.start, this.state.invoice.end, this.state.invoice.projects, this.state.invoice.tasks, (report) => {
+            this.state.invoice.data = report;
+            this.setStateDirty("invoice");
+            this.invoicePreviewComponent.setInvoice(this.state.invoice);
         });
     }
 
@@ -34,6 +50,7 @@ class {
         this.expenseNameComponent = this.getComponent("expense-name");
         this.expenseAmountComponent = this.getComponent("expense-amount");
         this.addClientPopout = this.getComponent("add-client-popout");
+        this.invoicePreviewComponent = this.getComponent("invoice-preview");
     }
 
     onUpdate() {
@@ -58,7 +75,9 @@ class {
 
     updateSelectedProjects(event) {
         this.state.selectedProjects = event.selected;
+        this.state.invoice.projects = event.selected;
         this.setStateDirty("selectedProjects");
+        this.loadData();
     }
 
     addExpense() {
@@ -82,11 +101,18 @@ class {
         this.expenseNameComponent.setValue("");
 
         this.setStateDirty("invoice");
+        this.loadData();
     }
 
     removeExpense(index) {
         this.state.invoice.expenses.splice(index, 1);
         this.setStateDirty("invoice");
+        this.loadData();
+    }
+
+    setInvoiceValue(id, event) {
+        this.state.invoice[id] = event.value;
+        this.loadData();
     }
 }
 
@@ -138,15 +164,15 @@ app-layout currentpage="invoices"
                     @element
                         ui-linear-layout wrap
                             @element fillspace
-                                ui-textbox label="Invoice ID"
+                                ui-textbox label="Invoice ID" on-input('setInvoiceValue', 'id')
                             @element
-                                ui-date-select label="From" rounded showtime=false milliseconds=Date.now()
+                                ui-date-select milliseconds=state.invoice.start label="From" rounded showtime=false on-input('setInvoiceValue', 'start')
                             @element
-                                ui-date-select label="To" rounded showtime=false milliseconds=Date.now()
+                                ui-date-select milliseconds=state.invoice.end label="To" rounded showtime=false on-input('setInvoiceValue', 'end')
                     @element
                         ui-linear-layout aligncenter
                             @element fillspace
-                                ui-combobox label="Bill To" options=state.addresses
+                                ui-combobox label="Bill To" options=state.addresses on-select('setInvoiceValue', 'billfrom')
                                     @first fillspace
                                         ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
                                     @option|{option}|
@@ -164,7 +190,7 @@ app-layout currentpage="invoices"
                     @element
                         ui-linear-layout aligncenter
                             @element fillspace
-                                ui-combobox label="Bill To" options=state.addresses
+                                ui-combobox label="Bill To" options=state.addresses on-select('setInvoiceValue', 'billto')
                                     @first fillspace
                                         ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
                                     @option|{option}|
@@ -203,7 +229,4 @@ app-layout currentpage="invoices"
                         @element
                             ui-button icon="delete" title="Remove expense" rounded on-click("removeExpense", index)
         @element
-            widget title="Hours"
-                ui-linear-layout vertical padded
-                    @element
-                        invoice-time-chart includedprojects=state.selectedProjects start=state.start end=state.end expenses=state.invoice.expenses
+            invoice-preview key="invoice-preview" invoice=state.invoice
