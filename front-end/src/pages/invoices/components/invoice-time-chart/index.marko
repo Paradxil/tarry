@@ -9,7 +9,7 @@ class {
         this.end = input.end||now();
 
         this.state = {
-            data: null,
+            data: input.data||null,
             expenses: input.expenses||[]
         };
 
@@ -21,7 +21,12 @@ class {
         this.start = input.start||dateInPast(7);
         this.end = input.end||now();
 
-        this.loadData();
+        if(input.data) {
+            this.state.data = input.data;
+        }
+        else {
+            this.loadData();
+        }
     }
 
     loadData() {
