@@ -69,7 +69,7 @@ style {
     }
 }
 
-listwidget.invoice-chart vertical items=Object.values(state.data.projects||{})
+listwidget.invoice-chart vertical items=Object.values(state.data.projects||{}).filter((project) => {return project.timeTracked > 0;})
     @first
         ui-linear-layout.invoice-chart-header secondary padded rounded
             @element.invoice-expanded-column
