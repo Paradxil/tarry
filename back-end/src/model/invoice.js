@@ -14,11 +14,19 @@ const invoiceSchema = new mongoose.Schema({
         name: String,
         amount: Number
     }], //Stores additional costs or expenses to add to the invoice.
-    billfrom: String, //ID of an address in the database.
-    billto: String //ID of an address in the database.
+    billfrom: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
+        autopopulate: true
+    }, 
+    billto: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
+        autopopulate: true
+    }
 });
 
-//TODO: Add a check to make sure the billfrom and billto addresses actually exist.
+invoiceSchema.plugin(require('mongoose-autopopulate'));
 
 //TODO: Add field encryption.
 //invoiceSchema.plugin(encrypt, { secret: process.env.SECRET, excludeFromEncryption: ['userid', 'template'], additionalAuthenticatedFields: ['userid', 'template'] });
