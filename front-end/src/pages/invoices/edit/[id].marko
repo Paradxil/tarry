@@ -5,6 +5,7 @@ class {
     onCreate() {
         this.state = {
             invoice: {
+                id: "0000",
                 start: dateInPast(7),
                 end: now(),
                 expenses: [],
@@ -114,6 +115,11 @@ class {
         this.state.invoice[id] = event.value;
         this.loadData();
     }
+
+    setAddress(id, event) {
+        this.state.invoice[id] = this.state.addressesMap[event.value];
+        this.loadData();
+    }
 }
 
 style {
@@ -172,7 +178,7 @@ app-layout currentpage="invoices"
                     @element
                         ui-linear-layout aligncenter
                             @element fillspace
-                                ui-combobox label="Bill To" options=state.addresses on-select('setInvoiceValue', 'billfrom')
+                                ui-combobox label="Bill From" options=state.addresses on-select('setAddress', 'billfrom')
                                     @first fillspace
                                         ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
                                     @option|{option}|
@@ -190,7 +196,7 @@ app-layout currentpage="invoices"
                     @element
                         ui-linear-layout aligncenter
                             @element fillspace
-                                ui-combobox label="Bill To" options=state.addresses on-select('setInvoiceValue', 'billto')
+                                ui-combobox label="Bill To" options=state.addresses on-select('setAddress', 'billto')
                                     @first fillspace
                                         ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
                                     @option|{option}|
