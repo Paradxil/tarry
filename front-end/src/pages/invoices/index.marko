@@ -3,7 +3,7 @@ import ServerProxy from "../../utils/serverproxy.js";
 class {
     onCreate() {
         this.state = {
-            invoices: [{id: "No invoices found. Click the plus icon above to create a new invoice."}]
+            invoices: []
         };
 
         ServerProxy.getInvoices((invoices)=>{
@@ -31,8 +31,40 @@ app-layout currentpage="invoices" title="Invoices"
                 ]
                 on-add("addInvoice")
             ]
+        if(state.invoices.length === 0)
+            @first
+                ui-text -- No invoices found. Click the plus icon above to create a new invoice.
         @item|{data}|
             ui-linear-layout aligncenter
+                @element fillspace
+                    ui-linear-layout vertical gutter="0px"
+                        @element
+                            ui-text -- ${data.billto?data.billto.name:""} 
+                        @element
+                            ui-emphasis -- ${data.id}
                 @element
-                    ui-text -- ${data.id}
+                    controls [
+                        controls = [
+                            {
+                                name: "delete",
+                                title: "Delete invoice.",
+                                icon: "trash"
+                            },
+                            {
+                                name: "view",
+                                title: "Preview invoice.",
+                                icon: "eye"
+                            },
+                            {
+                                name: "download",
+                                title: "Download invoice as PDF.",
+                                icon: "download"
+                            },
+                            {
+                                name: "edit",
+                                title: "Edit invoice.",
+                                icon: "edit-2"
+                            }
+                        ]
+                    ]
     
