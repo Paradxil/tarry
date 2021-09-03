@@ -31,6 +31,11 @@ style {
         height: 11in;
     }
 
+    .invoice-preview-content {
+        place-content: space-between;
+        height: 100%;
+    }
+
     .invoice-footer {
         background-image: linear-gradient(45deg, var(--tertiary), var(--secondary));
         padding: 16px;
@@ -64,7 +69,7 @@ $ const addressPlaceholder = {
 }
 
 widget.invoice-preview-wrapper title="Invoice Preview"
-    ui-linear-layout vertical
+    ui-linear-layout.invoice-preview-content vertical
         @element
             ui-linear-layout
                 @element fillspace
@@ -86,7 +91,6 @@ widget.invoice-preview-wrapper title="Invoice Preview"
             address address=state.invoice.billto||addressPlaceholder
         @element
             invoice-time-chart data=state.invoice?state.invoice.data:{}
-        @element
             invoice-totals expenses=state.invoice?state.invoice.expenses:[] data=state.invoice?state.invoice.data:{}
         @element.invoice-footer
             ui-text -- Thank you for your business!

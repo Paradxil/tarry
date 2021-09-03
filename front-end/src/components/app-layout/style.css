@@ -34,8 +34,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .content-wrapper {
-    max-width: var(--content-width);
     position: relative;
+}
+
+.limit-width {
+    max-width: var(--content-width);
 }
 
 .blended {

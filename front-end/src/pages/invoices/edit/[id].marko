@@ -146,93 +146,95 @@ style {
     }
 }
 
-app-layout currentpage="invoices"
+app-layout currentpage="invoices" fullwidth
     edit-client-popout key="add-client-popout"
-    ui-linear-layout vertical gutter="16px"
+    ui-linear-layout
         @element
-            widget title="Edit Invoice"
-                @subtitle
-                    controls [
-                        controls = [
-                            {
-                                name: "save",
-                                title: "Save",
-                                icon: "save"
-                            },
-                            {
-                                name: "preview",
-                                title: "View preview",
-                                icon: "eye"
-                            }
-                        ]
-                    ]
-                ui-linear-layout vertical padded
-                    @element
-                        ui-linear-layout wrap
-                            @element fillspace
-                                ui-textbox label="Invoice ID" on-input('setInvoiceValue', 'id')
+            ui-linear-layout vertical gutter="16px"
+                @element
+                    widget title="Edit Invoice"
+                        @subtitle
+                            controls [
+                                controls = [
+                                    {
+                                        name: "save",
+                                        title: "Save",
+                                        icon: "save"
+                                    },
+                                    {
+                                        name: "preview",
+                                        title: "View preview",
+                                        icon: "eye"
+                                    }
+                                ]
+                            ]
+                        ui-linear-layout vertical padded
                             @element
-                                ui-date-select milliseconds=state.invoice.start label="From" rounded showtime=false on-input('setInvoiceValue', 'start')
+                                ui-linear-layout wrap
+                                    @element fillspace
+                                        ui-textbox label="Invoice ID" on-input('setInvoiceValue', 'id')
+                                    @element
+                                        ui-date-select milliseconds=state.invoice.start label="From" rounded showtime=false on-input('setInvoiceValue', 'start')
+                                    @element
+                                        ui-date-select milliseconds=state.invoice.end label="To" rounded showtime=false on-input('setInvoiceValue', 'end')
                             @element
-                                ui-date-select milliseconds=state.invoice.end label="To" rounded showtime=false on-input('setInvoiceValue', 'end')
-                    @element
-                        ui-linear-layout aligncenter
-                            @element fillspace
-                                ui-combobox label="Bill From" options=state.addresses on-select('setAddress', 'billfrom')
-                                    @first fillspace
-                                        ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
-                                    @option|{option}|
-                                        ui-linear-layout fillspace
-                                            @element fillspace fullwidth
-                                                ui-linear-layout vertical gutter='0px' fillspace fullwidth
+                                ui-linear-layout aligncenter
+                                    @element fillspace
+                                        ui-combobox label="Bill From" options=state.addresses on-select('setAddress', 'billfrom')
+                                            @first fillspace
+                                                ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
+                                            @option|{option}|
+                                                ui-linear-layout fillspace
+                                                    @element fillspace fullwidth
+                                                        ui-linear-layout vertical gutter='0px' fillspace fullwidth
+                                                            @element
+                                                                ui-text -- ${option.name}
+                                                            @element
+                                                                ui-emphasis -- ${option.email}
                                                     @element
-                                                        ui-text -- ${option.name}
-                                                    @element
-                                                        ui-emphasis -- ${option.email}
-                                            @element
-                                                ui-button rounded icon="edit-2" on-click("editClient", option._id)
+                                                        ui-button rounded icon="edit-2" on-click("editClient", option._id)
+                                    @element
+                                        ui-button filled disabled=state.invoice.billto==null rounded icon="edit-2" on-click("editClient")
                             @element
-                                ui-button filled disabled=state.invoice.billto==null rounded icon="edit-2" on-click("editClient")
-                    @element
-                        ui-linear-layout aligncenter
-                            @element fillspace
-                                ui-combobox label="Bill To" options=state.addresses on-select('setAddress', 'billto')
-                                    @first fillspace
-                                        ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
-                                    @option|{option}|
-                                        ui-linear-layout fillspace
-                                            @element fillspace fullwidth
-                                                ui-linear-layout vertical gutter='0px' fillspace fullwidth
+                                ui-linear-layout aligncenter
+                                    @element fillspace
+                                        ui-combobox label="Bill To" options=state.addresses on-select('setAddress', 'billto')
+                                            @first fillspace
+                                                ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
+                                            @option|{option}|
+                                                ui-linear-layout fillspace
+                                                    @element fillspace fullwidth
+                                                        ui-linear-layout vertical gutter='0px' fillspace fullwidth
+                                                            @element
+                                                                ui-text -- ${option.name}
+                                                            @element
+                                                                ui-emphasis -- ${option.email}
                                                     @element
-                                                        ui-text -- ${option.name}
-                                                    @element
-                                                        ui-emphasis -- ${option.email}
-                                            @element
-                                                ui-button rounded icon="edit-2" on-click("editClient", option._id)
+                                                        ui-button rounded icon="edit-2" on-click("editClient", option._id)
+                                    @element
+                                        ui-button filled disabled=state.invoice.billto==null rounded icon="edit-2" on-click("editClient")
+                @element
+                    widget title="Filters"
+                        ui-linear-layout vertical padded
                             @element
-                                ui-button filled disabled=state.invoice.billto==null rounded icon="edit-2" on-click("editClient")
-        @element
-            widget title="Filters"
-                ui-linear-layout vertical padded
-                    @element
-                        project-filter on-input("updateSelectedProjects")
-        @element
-            listwidget title="Expenses" items=state.invoice.expenses
-                @last key="add-expense"
-                    ui-linear-layout fillspace fullwidth aligncenter key='last'
-                        @element fillspace
-                            ui-textbox label="Name" key="expense-name"
-                        @element
-                            ui-textbox label="Amount" key="expense-amount"
-                        @element
-                            ui-button rounded icon="save" title="Save Expense" on-click("addExpense")
-                @item|{data, index}|
-                    ui-linear-layout aligncenter
-                        @element fillspace
-                            ui-text -- ${data.name}
-                        @element fillspace
-                            ui-text -- ${data.amount}
-                        @element
-                            ui-button icon="delete" title="Remove expense" rounded on-click("removeExpense", index)
+                                project-filter on-input("updateSelectedProjects")
+                @element
+                    listwidget title="Expenses" items=state.invoice.expenses
+                        @last key="add-expense"
+                            ui-linear-layout fillspace fullwidth aligncenter key='last'
+                                @element fillspace
+                                    ui-textbox label="Name" key="expense-name"
+                                @element
+                                    ui-textbox label="Amount" key="expense-amount"
+                                @element
+                                    ui-button rounded icon="save" title="Save Expense" on-click("addExpense")
+                        @item|{data, index}|
+                            ui-linear-layout aligncenter
+                                @element fillspace
+                                    ui-text -- ${data.name}
+                                @element fillspace
+                                    ui-text -- ${data.amount}
+                                @element
+                                    ui-button icon="delete" title="Remove expense" rounded on-click("removeExpense", index)
         @element
             invoice-preview key="invoice-preview" invoice=state.invoice

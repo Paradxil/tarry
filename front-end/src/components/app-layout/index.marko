@@ -31,5 +31,5 @@ template title=input.title||null
         topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar")
     app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
     ui-linear-layout.page-wrapper fillspace fullwidth paddedwide
-        @element.content-wrapper fillspace
+        @element.content-wrapper class={"limit-width":!input.fullwidth} fillspace
             <${input.renderBody} ismobile=state.ismobile/>
