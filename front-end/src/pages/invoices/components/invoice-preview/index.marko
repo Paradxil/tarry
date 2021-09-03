@@ -26,9 +26,10 @@ class {
 
 style {
     .invoice-preview-wrapper{
-        padding: 0.5in !important;
-        width: 8.5in;
+        padding: min(10%, 0.5in) !important;
+        max-width: 8.5in;
         height: 11in;
+        width: 100%;
     }
 
     .invoice-preview-content {
@@ -71,7 +72,7 @@ $ const addressPlaceholder = {
 widget.invoice-preview-wrapper title="Invoice Preview"
     ui-linear-layout.invoice-preview-content vertical
         @element
-            ui-linear-layout
+            ui-linear-layout wrap
                 @element fillspace
                     ui-linear-layout vertical
                         @element
