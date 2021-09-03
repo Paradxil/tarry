@@ -11,7 +11,6 @@ class {
                 expenses: [],
                 data: {},
                 projects: [],
-                tasks: [],
                 billfrom: null,
                 billto: null
             },
@@ -62,6 +61,23 @@ class {
         // adding a new expense and rerendering the expense list.
         this.expenseNameComponent = this.getComponent("expense-name");
         this.expenseAmountComponent = this.getComponent("expense-amount");
+    }
+
+    saveInvoice() {
+        let invoice = this.state.invoice;
+        invoice.billto = invoice.billto?invoice.billto._id||null:null;
+        invoice.billfrom = invoice.billfrom?invoice.billfrom._id||null:null;
+
+        if(invoice._id) {
+            ServerProxy.updateInvoice(invoice._id, invoice, (newinvoice)=> {
+                this.state.invoice = newinvoice;
+            });
+        }
+        else {
+            ServerProxy.addInvoice(invoice, (newinvoice)=> {
+                this.state.invoice = newinvoice;
+            });
+        }
     }
 
     showAddClientPopout() {
@@ -144,12 +160,22 @@ style {
     .new-client-button p {
         width: 100%;
     }
+
+    .invoice-edit-controls {
+        flex: 2;
+        min-width: 300px;
+    }
+
+    .invoice-edit-preview {
+        flex: 3;
+        min-width: 400px;
+    }
 }
 
 app-layout currentpage="invoices" fullwidth
     edit-client-popout key="add-client-popout"
-    ui-linear-layout
-        @element
+    ui-linear-layout wrap
+        @element.invoice-edit-controls
             ui-linear-layout vertical gutter="16px"
                 @element
                     widget title="Edit Invoice"
@@ -167,11 +193,12 @@ app-layout currentpage="invoices" fullwidth
                                         icon: "eye"
                                     }
                                 ]
+                                on-save("saveInvoice")
                             ]
                         ui-linear-layout vertical padded
                             @element
                                 ui-linear-layout wrap
-                                    @element fillspace
+                                    @element
                                         ui-textbox label="Invoice ID" on-input('setInvoiceValue', 'id')
                                     @element
                                         ui-date-select milliseconds=state.invoice.start label="From" rounded showtime=false on-input('setInvoiceValue', 'start')
@@ -224,7 +251,7 @@ app-layout currentpage="invoices" fullwidth
                             ui-linear-layout fillspace fullwidth aligncenter key='last'
                                 @element fillspace
                                     ui-textbox label="Name" key="expense-name"
-                                @element
+                                @element fillspace
                                     ui-textbox label="Amount" key="expense-amount"
                                 @element
                                     ui-button rounded icon="save" title="Save Expense" on-click("addExpense")
@@ -236,5 +263,5 @@ app-layout currentpage="invoices" fullwidth
                                     ui-text -- ${data.amount}
                                 @element
                                     ui-button icon="delete" title="Remove expense" rounded on-click("removeExpense", index)
-        @element
+        @element.invoice-edit-preview
             invoice-preview key="invoice-preview" invoice=state.invoice
