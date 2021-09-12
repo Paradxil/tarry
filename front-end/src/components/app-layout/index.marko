@@ -21,6 +21,10 @@ class {
     toggleSidebar() {
         this.sidebarComponent.toggle();
     }
+
+    changePage(page) {
+        window.location.assign("/"+page);
+    }
 }
 
 template title=input.title||null
@@ -28,8 +32,16 @@ template title=input.title||null
     confirmation-dialogue
     notification-popups
     if(state.ismobile)
-        topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar")
+        topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar") returnto=input.returnto
     app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
-    ui-linear-layout.page-wrapper fillspace fullwidth paddedwide
+    ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile}
+        @element
+            ui-linear-layout light aligncenter
+                if(input.returnto)
+                    @element
+                        ui-button rounded icon="arrow-left" on-click("changePage", input.returnto)
+                if(!state.ismobile)
+                    @element
+                        ui-heading heading=1 -- ${input.title}
         @element.content-wrapper class={"limit-width":!input.fullwidth} fillspace
             <${input.renderBody} ismobile=state.ismobile/>
