@@ -1,4 +1,5 @@
 import ServerProxy from "../../utils/serverproxy.js";
+import {emit} from "../../utils/events.js";
 
 class {
     onCreate() {
@@ -15,6 +16,39 @@ class {
 
     addInvoice() {
         window.location.assign("/invoices/edit");
+    }
+
+    confirmDeleteInvoice(data, i) {
+        emit("confirm", {
+            title:"Delete Invoice?", 
+            message:"Are you sure you want to delete invoice #" + data.id + "? This cannot be undone.",
+            actions: [
+                {
+                    text: "Delete",
+                    icon: "check",
+                    callback: ()=>{
+                        this.deleteInvoice(data._id, i);
+                    }
+                },
+                {
+                    text: "Cancel",
+                    icon: "x",
+                    callback: function() {}
+                }
+            ]}
+        );
+    }
+
+    deleteInvoice(id, i) {
+        ServerProxy.deleteInvoice(id, ()=>{
+            this.state.invoices.splice(i, 1);
+            this.setStateDirty("invoices");
+            emit("push", {title: "Invoice Deleted", message:"Invoice deleted successfully!"});
+        });
+    }
+
+    viewInvoice(data) {
+        window.location.assign("/invoices/view/" + data._id);
     }
 }
 
@@ -34,7 +68,7 @@ app-layout currentpage="invoices" title="Invoices"
         if(state.invoices.length === 0)
             @first
                 ui-text -- No invoices found. Click the plus icon above to create a new invoice.
-        @item|{data}|
+        @item|{data, index}|
             ui-linear-layout aligncenter
                 @element fillspace
                     ui-linear-layout vertical gutter="0px"
@@ -65,6 +99,10 @@ app-layout currentpage="invoices" title="Invoices"
                                 title: "Edit invoice.",
                                 icon: "edit-2"
                             }
-                        ]
+                        ],
+                        on-delete("confirmDeleteInvoice", data, index),
+                        on-view("viewInvoice", data),
+                        on-download("downloadInvoice", data),
+                        on-edit("editInvoice", data)
                     ]
     
