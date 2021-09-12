@@ -93,13 +93,6 @@ class ServerProxy {
         }
     }
 
-    async getInvoices(cb) {
-        let response = await network.get("/api/invoice/all/");
-        if(response.success && cb) {
-            cb(response.data);
-        }
-    }
-
     async getAddresses(cb) {
         let response = await network.get("/api/address/all/");
         if(response.success && cb) {
@@ -146,8 +139,40 @@ class ServerProxy {
         }
     }
 
+    async getInvoices(cb) {
+        let response = await network.get("/api/invoice/all/");
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
     async getInvoice(id, cb) {
         let response = await network.get("/api/invoice/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async addInvoice(data, cb) {
+        console.log(data);
+        let response = await network.post("/api/invoice", data);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async updateInvoice(id, data, cb) {
+        let response = await network.post("/api/invoice/update/"+id, data);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async deleteInvoice(id, cb) {
+        let response = await network.delete("/api/invoice/"+id);
 
         if(response.success && cb) {
             cb(response.data);
