@@ -37,6 +37,10 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
 }
 
+.content-top-margin {
+    margin-top: 60px !important;
+}
+
 .limit-width {
     max-width: var(--content-width);
 }
