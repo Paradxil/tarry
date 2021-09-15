@@ -1,5 +1,6 @@
 div.address
-    ui-text -- ${input.address.name}
+    if(!input.hidename)
+        ui-text -- ${input.address.name}
     ui-text -- ${input.address.organization}
     ui-text -- ${input.address.street}
     ui-linear-layout
