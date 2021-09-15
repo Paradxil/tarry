@@ -11,28 +11,37 @@ style {
     .subtotal-amount, .expense-amount {
         font-size: 18px;
     }
+
+    .total-wrapper {
+        background: var(--secondary-light);
+    }
+
+    .invoice-totals-wrapper {
+        margin-top: 8px;
+        align-self: flex-end;
+    }
 }
 
 ui-linear-layout.invoice-totals-wrapper vertical
     @element
         if(input.data.hoursTracked && input.expenses.length > 0)
             ui-linear-layout.subtotal-wrapper
-                @element fillspace padded alignright
+                @element fillspace padded alignleft
                     ui-heading.subtotal-heading heading=3 -- Subtotal
-                @element alignright padded placecenter
+                @element alignright padded placecenter fullwidth fillspace
                     ui-heading.subtotal-amount heading=3 --  ${parseFloat(input.data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
     $ let expensesTotal = 0;
     for|expense| of=input.expenses||[]
         $ expensesTotal += expense.amount;
         @element
             ui-linear-layout.expense-wrapper
-                @element fillspace padded alignright
-                    ui-text.expense-name -- ${expense.name}
-                @element alignright padded placecenter
+                @element fillspace padded alignleft
+                    ui-emphasis.expense-name -- ${expense.name}
+                @element alignright padded placecenter fullwidth
                     ui-text.expense-amount -- ${expense.amount.toLocaleString('en-US', {style: "currency", currency: "USD"})}
     @element
-        ui-linear-layout
-            @element padded fillspace alignright
+        ui-linear-layout.total-wrapper rounded padded
+            @element padded fillspace alignleft
                 ui-heading heading=2 -- Total
             @element alignright padded
                 ui-heading heading=2 -- ${parseFloat(input.data.earnings+expensesTotal||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}

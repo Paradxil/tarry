@@ -5,7 +5,7 @@ class {
         this.state = {
             projects: [],
             projectsMap: {},
-            selected: input.selectedprojects||[] // A list of selected projects
+            selected: [] // A list of selected projects
         };
 
         this.comboboxControl = null;
@@ -13,11 +13,17 @@ class {
         ServerProxy.getProjects((projects, projectsMap) => {
             this.state.projects = projects;
             this.state.projectsMap = projectsMap;
+            this.state.selected = input.selectedprojects;
         });
     }
 
     onMount() {
         this.comboboxControl = this.getComponent("combobox");
+    }
+
+    setProjects(projects) {
+        this.state.projects = projects;
+        this.setStateDirty("projects");
     }
 
     selectProject(event) {
@@ -46,7 +52,7 @@ div.project-filter
     ui-linear-layout wrap
         for|project, index| of=state.selected
             @element
-                ui-button secondary rounded text=state.projectsMap[project].name trailingicon="delete" on-click("removeProject", index)
+                ui-button style={'--secondary': state.projectsMap[project].color} secondary rounded text=state.projectsMap[project].name trailingicon="delete" on-click("removeProject", index)
         if(state.selected.length === 0)
             @element
                 ui-button secondary rounded text="All Projects Selected"

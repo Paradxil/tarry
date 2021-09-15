@@ -9,10 +9,12 @@ class {
         this.end = input.end||now();
 
         this.state = {
-            data: input.data||null
+            data: input.data||{}
         };
 
-        this.loadData();
+        if(this.state.data.length === 0) {
+            this.loadData();
+        }
     }
 
     onInput(input) {
@@ -22,6 +24,7 @@ class {
 
         if(input.data) {
             this.state.data = input.data;
+            this.setStateDirty("data");
         }
         else {
             this.loadData();
@@ -69,7 +72,8 @@ style {
     }
 }
 
-listwidget.invoice-chart vertical items=Object.values(state.data.projects||{}).filter((project) => {return project.timeTracked > 0;})
+$ let items = Object.values(state.data.projects||{}).filter((project) => {return project.timeTracked > 0;});
+listwidget.invoice-chart vertical items=items
     @first
         ui-linear-layout.invoice-chart-header secondary padded rounded
             @element.invoice-expanded-column

@@ -15,7 +15,7 @@ class {
     }
 
     addInvoice() {
-        window.location.assign("/invoices/edit");
+        window.location.assign("/invoices/edit/new");
     }
 
     confirmDeleteInvoice(data, i) {
@@ -49,6 +49,10 @@ class {
 
     viewInvoice(data) {
         window.location.assign("/invoices/view/" + data._id);
+    }
+
+    editInvoice(data) {
+        window.location.assign("/invoices/edit/" + data._id);
     }
 }
 

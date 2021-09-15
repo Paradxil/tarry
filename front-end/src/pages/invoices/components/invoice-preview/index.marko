@@ -56,7 +56,14 @@ style {
 
     .invoice-address {
         line-height: 1.75em;
-        margin-top: 15px;
+    }
+
+    .invoice-preview-wrapper .listwidget > *:nth-child(odd):not(:first-child) {
+        background-color: #f8f9fa;
+    }
+
+    .invoice-preview-date {
+        place-self: flex-end;
     }
 }
 
@@ -80,8 +87,8 @@ widget.invoice-preview-wrapper title="Invoice Preview"
                         ui-linear-layout vertical
                             @element
                                 ui-heading.invoice-heading heading=1 -- ${(state.invoice.billfrom||addressPlaceholder).name}
-                            @element
-                                ui-heading.invoice-heading -- ${(state.invoice.billfrom||addressPlaceholder).organization}
+                            @element.invoice-address
+                                address hidename=true address=state.invoice.billfrom||addressPlaceholder
                     @element
                         ui-linear-layout vertical
                             @element
@@ -89,12 +96,12 @@ widget.invoice-preview-wrapper title="Invoice Preview"
                             @element alignright
                                 ui-text.invoice-id -- #${state.invoice.id}
                             @element alignright
-                                ui-date time=false milliseconds=state.invoice.end
+                                ui-date.invoice-preview-date time=false milliseconds=state.invoice.end
             @element.invoice-address
                 ui-heading.invoice-heading -- Bill To
                 address address=state.invoice.billto||addressPlaceholder
             @element
-                invoice-time-chart data=state.invoice?state.invoice.data:{}
+                invoice-time-chart key="time-chart" data=state.invoice?state.invoice.data:{}
                 invoice-totals expenses=state.invoice?state.invoice.expenses:[] data=state.invoice?state.invoice.data:{}
             @element.invoice-footer
                 ui-text -- Thank you for your business!
