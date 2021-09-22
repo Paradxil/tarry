@@ -4,8 +4,11 @@ const DataAccessHandler = require("./dataAccessHandler");
 
 const Address = require("../model/address");
 const Invoice = require("../model/invoice");
+const TimeEntry = require("../model/timeEntry");
+const Project = require("../model/project");
+const Task = require("../model/task");
 
-const schemas = {"address": Address, "invoice": Invoice};
+const schemas = {"address": Address, "invoice": Invoice, "entry": TimeEntry, "project": Project, "task": Task};
 
 class DataAccessHandlerFactory {
     /**
