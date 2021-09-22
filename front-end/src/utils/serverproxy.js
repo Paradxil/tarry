@@ -78,6 +78,36 @@ class ServerProxy {
         }
     }
 
+    async getTask(id, cb) {
+        let response = await network.get("/api/task/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async deleteTask(id, cb) {
+        let response = await network.delete("/api/task/"+id);
+        if(response.success && cb) {
+            cb();
+        }
+    }
+
+    async addTask(task, cb) {
+        let response = await network.push("/api/task/", task);
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async updateTask(task, cb) {
+        let response = await network.post("/api/task/update/"+task._id, task);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
     async getEntry(id, cb) {
         let response = await network.get("/api/entry/"+id);
 
