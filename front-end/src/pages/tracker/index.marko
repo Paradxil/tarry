@@ -11,8 +11,8 @@ class {
         this.timeEntryList = this.getComponent("entry-list");
     }
 
-    continueTask(event) {
-        this.activeTaskComponent.continueTask(event.name, event.project);
+    continueTask(taskid) {
+        this.activeTaskComponent.continueTask(taskid);
     }
 
     refreshEntryList() {

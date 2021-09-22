@@ -107,8 +107,8 @@ class {
         }
     }
 
-    async continueTask(entry) {
-        this.emit("continuetask", {name: entry.task.name, project: entry.project});
+    async continueTask(taskid) {
+        this.emit("continuetask", taskid);
     }
 }
 
@@ -132,4 +132,4 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                                 ui-time milliseconds=data.end-data.start
                             @element
                                 $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
-                                controls controls=controls on-continue("continueTask", data) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
+                                controls controls=controls on-continue("continueTask", data.task._id) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)

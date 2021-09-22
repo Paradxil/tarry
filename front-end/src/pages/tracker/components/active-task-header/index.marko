@@ -16,51 +16,36 @@ class {
             now: now()
         };
 
-        this.taskNameComponent = null;
-        this.taskProjectComponent = null;
+        this.taskSelectComponent = null;
 
         ServerProxy.getProjects((projects) => this.state.projects=projects);
-
-        ServerProxy.getTasks((tasks) => {
-            this.state.tasklist = tasks.map((task) => {
-                return {
-                    search: task.name + " " + task.project.name, 
-                    value: task.name, project: task.project.name, 
-                    color: task.project.color, 
-                    projectid: task.project._id};
-                });
-        });
     }
 
     onMount() {
-        this.taskNameComponent = this.getComponent("task-name");
-        this.taskProjectComponent = this.getComponent("task-project");
+        this.taskSelectComponent = this.getComponent("task-select");
 
         // Perform this request onMount becuase we need to update a component's value.
         // Components are not available until the onMount event is called.
         ServerProxy.getActiveTask((task) => {
-            this.state.task = task;
-            this.state.name = task.name;
-            this.state.projectID = task.project._id;
+            this.state.taskID = task.taskid;
             this.state.startTime = task.start;
             this.state.tracking = true;
 
-            this.taskNameComponent.setValue(task.name);
-            this.taskProjectComponent.setValue(task.project.name);
+            this.taskSelectComponent.setTask(task.taskid);
         });
 
         window.setInterval(()=>this.state.now = now(), 500);
     }
 
-    continueTask(name, project) {
-        this.state.name = name;
-        this.state.startTime = Date.now();
-        this.state.projectID = project._id;
+    continueTask(taskid) {
+        if(this.state.tracking) {
+            emit("push", {title: "Error Continuing Task", message:"Stop current task before starting a new one."})
+            return;
+        }
 
-        this.taskNameComponent.setValue(name);
-        this.taskProjectComponent.setValue(project.name);
-
-        ServerProxy.startTask(this.state.name, this.state.startTime, this.state.projectID, ()=>{
+        this.taskSelectComponent.setTask(taskid);
+        this.startTime = now();
+        ServerProxy.startTask(taskid, ()=>{
             this.state.tracking = true;
         });
     }
@@ -70,10 +55,8 @@ class {
             emit("push", {title: "Warning", message:"Unable to start tracker, no task selected."})
             return;
         }
-
-        this.state.startTime = Date.now();
-
-        ServerProxy.startTask(this.state.taskID, this.state.startTime, ()=>{
+        this.startTime = now();
+        ServerProxy.startTask(this.state.taskID, ()=>{
             this.state.tracking = true;
         });
     }
@@ -84,8 +67,7 @@ class {
             //this.setStateDirty("data");
             this.state.tracking = false;
             this.state.projectID = null;
-            this.taskNameComponent.setValue("");
-            this.taskProjectComponent.setValue("");
+            this.taskSelectComponent.clearTask();
             this.emit("stopped");
         });
     }
@@ -117,7 +99,7 @@ ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
             @element.manual-input-wrapper
                 ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
     @element.task-name-wrapper
-        task-select on-select("selectTask")
+        task-select on-select("selectTask") class="stealthy" key="task-select"
     /*@element.project-select-wrapper
         $ let options = state.projects.map((item)=>{return {name: item.name, search: item.name, value: item._id}});
         ui-combobox.project-select.stealthy rounded label="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")*/

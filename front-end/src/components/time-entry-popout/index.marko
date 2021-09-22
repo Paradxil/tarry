@@ -20,7 +20,6 @@ class {
             ServerProxy.getEntry(id, (entry) => {
                 this.state.entry = entry;
                 this.setStateDirty("entry");
-                console.log(entry);
                 resolve();
             });
         });
@@ -41,11 +40,7 @@ class {
     }
 
     setTask(e) {
-        this.state.entry.task.name = e.value;
-    }
-
-    setProject(e) {
-        this.state.entry.task.project.name = e.value;
+        this.state.entry.task = e.taskid;
     }
 
     setStartDate(e) {
@@ -71,9 +66,7 @@ popout-form title=state.id==null?'Add Entry':'Edit Entry' key="time-entry-popout
     if(state.entry != null)
         ui-linear-layout vertical padded
             @element
-                ui-textbox label="Task Name" value=state.entry.task.name on-input("setTask")
-            @element
-                ui-textbox label="Project Name" value=state.entry.task.project.name on-input("setProject")
+                task-select on-select("setTask") key="task-select" task=state.entry.task._id
             @element
                 ui-date-select rounded milliseconds=state.entry.start||Date.now() on-input("setStartDate")
             @element
