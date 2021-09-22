@@ -1,0 +1,75 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate(input) {
+        this.state = {
+            projectlist: []
+        };
+
+        this.projectmap = {};
+
+        this.projectSelectComponent = null;
+
+        this.loadProjectList();
+    }
+
+    onMount() {
+        this.projectSelectComponent = this.getComponent("project-select");
+    }
+
+    setProject(projectid) {
+        if(projectid in this.projectmap) {
+            this.projectSelectComponent.setOption(this.projectToOption(this.projectmap[projectid]));
+        }
+    }
+
+    clearProject() {
+        this.projectSelectComponent.clearOption();
+    }
+
+    loadProjectList() {
+        ServerProxy.getProjects((projects, projectsMap) => {
+            this.projectmap = projectsMap;
+            this.state.projectlist = projects.map((project) => {
+                return this.projectToOption(project);
+            });
+
+            if(this.input.project) {
+                this.setProject(this.input.project);
+            }
+        });
+    }
+
+    // Translate a project into an option for the comobox input
+    projectToOption(project) {
+        return {
+            search: project.name, 
+            value: project.name,
+            name: project.name, 
+            color: project.color,
+            projectid: project._id
+        }
+    }
+
+    selectProject(event) {
+        this.emit("select", {projectid: event.option.projectid})
+    }
+
+    showProjectPopout(event) {
+        this.getComponent("project-popout").toggleVisibility();
+    }
+}
+
+style {
+    .project-select-add-button em {
+        width: 100%;
+    }
+}
+
+project-popout key="project-popout"
+ui-combobox.project-name class=input.class rounded key="project-select" label="Select Project" options=state.projectlist on-select("selectProject")
+    @first
+       ui-button.project-select-add-button trailingicon="plus" on-click("showProjectPopout")
+           ui-emphasis -- Add New Project
+    @option|{option}|
+        ui-text style={color: option.color} -- ${option.name}
