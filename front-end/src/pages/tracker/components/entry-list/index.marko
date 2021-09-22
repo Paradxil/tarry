@@ -9,11 +9,49 @@ class {
             disabled: []
         };
 
-        ServerProxy.generateReport(dateInPast(30), now(), [], [], (report) => {
+        this.timeEntryPopout = null;
+        this.firstDate = dateInPast(30);
+        this.generateReport();
+    }
+
+    generateReport() {
+        ServerProxy.generateReport(this.firstDate, now(), [], [], (report) => {
             this.state.data = report;
             this.state.data.days = this.state.data.days.reverse();
             this.setStateDirty("data");
         });
+    }
+
+    refresh() {
+        this.generateReport();
+    }
+
+    onMount() {
+        window.onscroll = this.loadMoreData.bind(this);
+        this.timeEntryPopout = this.getComponent("time-entry-popout");
+    }
+
+    async loadMoreData(event) {
+        if (document.documentElement.scrollTop > document.getElementById("entries-wrapper").clientHeight - 350 && !this.state.loadingData) {
+            this.state.loadingData = true;
+            let last = this.firstDate - (1000 * 60 * 60 * 24);
+            this.firstDate -= (1000 * 60 * 60 * 24 * 7);
+            
+            let response = await utils.post("/api/report", {
+                start: this.firstDate, //Start date
+                end: last, //End date
+                projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
+                tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
+            });
+            if(response.success) {
+                console.log(response.data);
+                console.log("YAY");
+                this.state.data.days = this.state.data.days.concat(response.data.days.reverse());
+                this.state.tasklist = this.state.tasklist.concat(Object.values(response.data.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};}));
+            }
+            this.setStateDirty("data");
+            this.setStateDirty("tasklist");
+        }
     }
 
     confirmDeleteEntry(entry, index, dayIndex) {
@@ -46,33 +84,9 @@ class {
         });
     }
 
-    cancelEdit(event) {
-        this.state.editid = null;
-    }
-
-    async saveEntry(event) {
-        this.state.editid = null;
-        let i = this.state.disabled.push(event.id)-1;
-        this.setStateDirty("disabled");
-        let entry = event.entry;
-        let response = await utils.post("/api/time/update", {
-            id: event.id,
-            name: entry.name,
-            project: entry.project._id,
-            start: entry.start,
-            end: entry.end
-        });
-        if(response.success) {
-            let newentry = response.data;
-            this.state.entries[newentry._id] = newentry;
-            this.setStateDirty("entries");
-        }
-        this.state.disabled.splice(i, 1);
-        this.setStateDirty("disabled");
-    }
-
-    editEntry(event) {
-        this.state.editid = event.id;
+    async editTimeEntry(id) {
+        await this.timeEntryPopout.loadTimeEntry(id);
+        this.timeEntryPopout.toggleVisibility();
     }
 
     async markTaskTodo(event) {
@@ -94,10 +108,11 @@ class {
     }
 
     async continueTask(entry) {
-        this.emit("continuetask", {name: entry.name, project: entry.project});
+        this.emit("continuetask", {name: entry.task.name, project: entry.project});
     }
 }
 
+time-entry-popout key="time-entry-popout" on-saved("refresh")
 ui-linear-layout vertical gutter="16px" id="entries-wrapper"
     for|day, dayIndex| of=state.data.days||[]
         if(day.entries.length > 0)
@@ -106,7 +121,7 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                     @item|{data, index}| // Data here is a timeEntry from the items list.
                         ui-linear-layout aligncenter wrap
                             @element fillspace
-                                ui-text -- ${data.name}
+                                ui-text -- ${data.task.name}
                             @element
                                 project project=data.project
                             @element
@@ -117,4 +132,4 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                                 ui-time milliseconds=data.end-data.start
                             @element
                                 $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
-                                controls controls=controls on-continue("continueTask", data) on-delete("confirmDeleteEntry", data, index, dayIndex)
+                                controls controls=controls on-continue("continueTask", data) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
