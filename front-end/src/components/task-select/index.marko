@@ -1,8 +1,64 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
 class {
-    
+    onCreate(input) {
+        this.state = {
+            tasklist: []
+        };
+
+        this.taskmap = {};
+
+        this.taskSelectComponent = null;
+
+        this.loadTaskList();
+    }
+
+    onMount() {
+        this.taskSelectComponent = this.getComponent("task-select");
+    }
+
+    setTask(taskid) {
+        if(taskid in this.taskmap) {
+            this.taskSelectComponent.setOption(this.taskToOption(this.taskmap[taskid]));
+        }
+    }
+
+    clearTask() {
+        this.taskSelectComponent.clearOption();
+    }
+
+    loadTaskList() {
+        ServerProxy.getTasks((tasks, tasksMap) => {
+            this.taskmap = tasksMap;
+            this.state.tasklist = tasks.map((task) => {
+                return this.taskToOption(task);
+            });
+
+            if(this.input.task) {
+                this.setTask(this.input.task);
+            }
+        });
+    }
+
+    // Translate a task into an option for the comobox input
+    taskToOption(task) {
+        return {
+            search: task.name + " " + task.project.name, 
+            value: task.name, project: task.project.name, 
+            color: task.project.color,
+            taskid: task._id, 
+            projectid: task.project._id
+        }
+    }
+
+    selectTask(event) {
+        this.emit("select", {projectid: event.option.projectid, taskid: event.option.taskid})
+    }
 }
 
-ui-combobox.task-name class=input.class rounded key="task-name" label="Select Task" options=state.tasklist value=state.name||"" on-select("selectProject")
+ui-combobox.task-name class=input.class rounded key="task-select" label="Select Task" options=state.tasklist on-select("selectTask")
+    @first
+       ui-button trailingicon="plus" text="New Task"
     @option|{option}|
         ui-linear-layout fillspace aligncenter
             @element fillspace
