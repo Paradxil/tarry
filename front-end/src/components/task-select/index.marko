@@ -1,0 +1,11 @@
+class {
+    
+}
+
+ui-combobox.task-name class=input.class rounded key="task-name" label="Select Task" options=state.tasklist value=state.name||"" on-select("selectProject")
+    @option|{option}|
+        ui-linear-layout fillspace aligncenter
+            @element fillspace
+                ui-text -- ${option.value}
+            @element
+                ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
