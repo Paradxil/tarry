@@ -7,6 +7,7 @@ class {
         this.state = {
             tracking: false,
             projectID: null,
+            taskID: null,
             name: null,
             startTime: now(),
             task: null,
@@ -20,13 +21,13 @@ class {
 
         ServerProxy.getProjects((projects) => this.state.projects=projects);
 
-        ServerProxy.generateReport(dateInPast(30), now(), [], [], (report) => {
-            this.state.tasklist = Object.values(report.tasks).map((el) => {
+        ServerProxy.getTasks((tasks) => {
+            this.state.tasklist = tasks.map((task) => {
                 return {
-                    search: el.name + " " + el.project.name, 
-                    value: el.name, project: el.project.name, 
-                    color: el.project.color, 
-                    projectid: el.project._id};
+                    search: task.name + " " + task.project.name, 
+                    value: task.name, project: task.project.name, 
+                    color: task.project.color, 
+                    projectid: task.project._id};
                 });
         });
     }
@@ -65,16 +66,14 @@ class {
     }
 
     async startTracker(event) {
-        this.state.name = this.taskNameComponent.getValue();
-
-        if(this.state.name === null || this.state.name.length === 0) {
-            emit("push", {title: "Warning", message:"Unable to start tracker, no task name given."})
+        if(this.state.taskID === null) {
+            emit("push", {title: "Warning", message:"Unable to start tracker, no task selected."})
             return;
         }
 
         this.state.startTime = Date.now();
 
-        ServerProxy.startTask(this.state.name, this.state.startTime, this.state.projectID, ()=>{
+        ServerProxy.startTask(this.state.taskID, this.state.startTime, ()=>{
             this.state.tracking = true;
         });
     }
@@ -87,17 +86,23 @@ class {
             this.state.projectID = null;
             this.taskNameComponent.setValue("");
             this.taskProjectComponent.setValue("");
+            this.emit("stopped");
         });
     }
 
-    selectProject(event) {
+    selectTask(event) {
+        this.state.taskID = event.taskid;
+        this.state.projectID = event.projectid;
+    }
+
+    /*selectProject(event) {
         if(event.option == null && event.option.value == null && event.option.projectid == null) {
             return;
         }
 
         this.taskProjectComponent.setValue(event.option.project||event.option.name);
         this.state.projectID = event.option.projectid||event.option.value;
-    }
+    }*/
 
     removeProject() {
         this.state.projectID = null;
@@ -112,13 +117,7 @@ ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
             @element.manual-input-wrapper
                 ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
     @element.task-name-wrapper
-        ui-combobox.task-name.stealthy rounded key="task-name" label="Task Name" options=state.tasklist value=state.name||"" on-select("selectProject")
-            @option|{option}|
-                ui-linear-layout fillspace aligncenter
-                    @element fillspace
-                        ui-text -- ${option.value}
-                    @element
-                        ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
-    @element.project-select-wrapper
+        task-select on-select("selectTask")
+    /*@element.project-select-wrapper
         $ let options = state.projects.map((item)=>{return {name: item.name, search: item.name, value: item._id}});
-        ui-combobox.project-select.stealthy rounded label="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")
+        ui-combobox.project-select.stealthy rounded label="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")*/
