@@ -168,7 +168,7 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Get all time entries for a user
+        /*// Get all time entries for a user
         this.app.get('/api/time/all/:userid', this.isAuthenticated, async function(req, res) {
             let handler = new AllTimeEntriesHandler(req, res);
             await handler.handle(req, res);
@@ -190,13 +190,13 @@ class Server {
         this.app.post('/api/time/update', this.isAuthenticated, async function(req, res) {
             let handler = new UpdateTimeEntryHandler(req, res);
             await handler.handle(req, res);
-        });
+        });*/
 
-        // Add a task
-        this.app.post('/api/task', this.isAuthenticated, async function(req, res) {
-            let handler = new AddTaskHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // // Add a task
+        // this.app.post('/api/task', this.isAuthenticated, async function(req, res) {
+        //     let handler = new AddTaskHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
         // Set the status of a task
         this.app.post('/api/task/status', this.isAuthenticated, async function(req, res) {
@@ -216,23 +216,23 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Get all tasks for a user
-        this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {
-            let handler = new AllTasksHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // // Get all tasks for a user
+        // this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {
+        //     let handler = new AllTasksHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
-        // Get all tasks for current user
-        this.app.get('/api/task/all', this.isAuthenticated, async function(req, res) {
-            let handler = new AllTasksHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // // Get all tasks for current user
+        // this.app.get('/api/task/all', this.isAuthenticated, async function(req, res) {
+        //     let handler = new AllTasksHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
-        // Get a task
-        this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
-            let handler = new GetTaskHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // // Get a task
+        // this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
+        //     let handler = new GetTaskHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
     
 
         // Start a task. Each user can only have one running active task at a time.
@@ -248,28 +248,28 @@ class Server {
         });
 
         // Get all projects for the current user
-        this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
-            let handler = new AllProjectsHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
+        //     let handler = new AllProjectsHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
-        //Get a project
-        this.app.get('/api/project/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new GetProjectHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // //Get a project
+        // this.app.get('/api/project/:id', this.isAuthenticated, async function(req, res) {
+        //     let handler = new GetProjectHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
-        // Add/update a project
-        this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
-            let handler = new SaveProjectHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // // Add/update a project
+        // this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
+        //     let handler = new SaveProjectHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
-        // Delete a project
-        this.app.delete('/api/project/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteProjectHandler(req, res);
-            await handler.handle(req, res);
-        });
+        // // Delete a project
+        // this.app.delete('/api/project/:id', this.isAuthenticated, async function(req, res) {
+        //     let handler = new DeleteProjectHandler(req, res);
+        //     await handler.handle(req, res);
+        // });
 
         this.app.get('/api/invoice/pdf/:id', this.isAuthenticated, async function(req, res) {
             let handler = new GenerateInvoicePDFHandler();
@@ -277,6 +277,9 @@ class Server {
         });
 
         //TODO: Have all data access routes use this factory.
+        this.dataAccessRouteFactory('entry');
+        this.dataAccessRouteFactory('task');
+        this.dataAccessRouteFactory('project');
         this.dataAccessRouteFactory('address');
         this.dataAccessRouteFactory('invoice');
     }
