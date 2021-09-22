@@ -1,0 +1,61 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate() {
+        this.state = {
+            id: null,
+            task: null
+        };
+        
+        this.popoutFormComponent = null;
+    }
+
+    onMount() {
+        this.popoutFormComponent = this.getComponent("task-popout-form");
+    }
+
+    loadTask(id) {
+        this.state.id = id;
+        return new Promise((resolve) => {
+            ServerProxy.getTask(id, (task) => {
+                this.state.task = task;
+                this.setStateDirty("task");
+                resolve();
+            });
+        });
+    }
+
+    clearTask() {
+        this.state.id = null;
+        this.state.task = null;
+    }
+
+    toggleVisibility() {
+        this.popoutFormComponent.toggleVisibility();
+    }
+
+    saveTask() {
+        ServerProxy.updateTask(this.state.task);
+        this.emit("saved");
+    }
+}
+
+popout-form title=state.id==null?'Add Task':'Edit Task' key="task-popout-form"
+    @controls
+        controls [
+            controls = [
+                {
+                    name: 'save',
+                    icon: 'save'
+                }
+            ]
+            on-save("saveTask")
+        ]
+    if(state.task != null)
+        ui-linear-layout vertical padded
+            @element
+                ui-textbox label="Task Name" value=state.task.name
+            @element
+                project-select project=state.task.project._id||null
+    else
+        ui-text -- Loading...
