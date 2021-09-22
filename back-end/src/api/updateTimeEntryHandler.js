@@ -20,7 +20,6 @@ class UpdateTimeEntryHandler {
             res.send(Response.Success(entry));
         }
         catch(err) {
-            console.log(err);
             res.send(Response.Error("Error updating entry."));            
         }
     }

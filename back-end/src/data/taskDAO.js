@@ -30,7 +30,6 @@ class TaskDAO {
                 return this.getTask(err.taskid);
             }
             else {
-                console.log(err);
                 throw new Error("Error adding task.");
             }
         }

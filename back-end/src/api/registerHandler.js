@@ -17,7 +17,6 @@ class RegisterHandler {
             res.send(Response.Success());
         }
         catch(err) {
-            console.log(err);
             res.send(Response.Error("Error register user.")); //TODO: Include more details, was the username already taken etc.
         }
     }

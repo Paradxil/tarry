@@ -14,7 +14,6 @@ class GenerateInvoicePDFHandler {
             res.send(pdf);
         }
         catch(err) {
-            console.log(err);
             res.send(Response.Error("Error generating PDF."));
         }
     }
