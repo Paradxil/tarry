@@ -1,17 +1,33 @@
 class {
     onCreate() {
         this.activeTaskComponent = null;
+        this.timeEntryPopout = null;
+        this.timeEntryList = null;
     }
 
     onMount() {
+        this.timeEntryPopout = this.getComponent("time-entry-popout");
         this.activeTaskComponent = this.getComponent("active-task");
+        this.timeEntryList = this.getComponent("entry-list");
     }
 
     continueTask(event) {
         this.activeTaskComponent.continueTask(event.name, event.project);
     }
+
+    refreshEntryList() {
+        this.timeEntryList.refresh();
+    }
+
+    addTimeEntry() {
+        this.timeEntryPopout.clearTimeEntry();
+        this.timeEntryPopout.toggleVisibility();
+    }
 }
 
 app-layout title="Time Tracker" currentpage="tracker"
-    active-task-header key="active-task"
-    entry-list on-continuetask("continueTask")
+    time-entry-popout key="time-entry-popout"
+    @controls
+        controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
+    active-task-header key="active-task" on-stopped("refreshEntryList")
+    entry-list key="entry-list" on-continuetask("continueTask")
