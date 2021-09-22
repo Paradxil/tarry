@@ -9,12 +9,14 @@ class {
         this.taskmap = {};
 
         this.taskSelectComponent = null;
+        this.taskPopout = null;
 
         this.loadTaskList();
     }
 
     onMount() {
         this.taskSelectComponent = this.getComponent("task-select");
+        this.taskPopout = this.getComponent("task-popout");
     }
 
     setTask(taskid) {
@@ -42,6 +44,7 @@ class {
 
     // Translate a task into an option for the comobox input
     taskToOption(task) {
+        console.log(task);
         return {
             search: task.name + " " + task.project.name, 
             value: task.name, project: task.project.name, 
@@ -54,14 +57,36 @@ class {
     selectTask(event) {
         this.emit("select", {projectid: event.option.projectid, taskid: event.option.taskid})
     }
+
+    async editTask(taskid, event) {
+        event.stopPropagation();
+        this.taskPopout.clearTask();
+        await this.taskPopout.loadTask(taskid);
+        this.taskPopout.toggleVisibility();
+    }
+
+    async showTaskPopout() {
+        this.taskPopout.clearTask();
+        this.taskPopout.toggleVisibility();
+    }
 }
 
+style {
+    .task-select-add-button em {
+        width: 100%;
+    }
+}
+
+task-popout key="task-popout"
 ui-combobox.task-name class=input.class rounded key="task-select" label="Select Task" options=state.tasklist on-select("selectTask")
     @first
-       ui-button trailingicon="plus" text="New Task"
+       ui-button.task-select-add-button rounded trailingicon="plus" on-click("showTaskPopout")
+           ui-emphasis -- Add New Task
     @option|{option}|
         ui-linear-layout fillspace aligncenter
             @element fillspace
                 ui-text -- ${option.value}
             @element
                 ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
+            @element
+                ui-button rounded icon="edit-2" on-click("editTask", option.taskid)
