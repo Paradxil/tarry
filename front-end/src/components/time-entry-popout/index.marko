@@ -1,0 +1,82 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate() {
+        this.state = {
+            id: null,
+            entry: null
+        };
+        
+        this.popoutFormComponent = null;
+    }
+
+    onMount() {
+        this.popoutFormComponent = this.getComponent("time-entry-popout-form");
+    }
+
+    loadTimeEntry(id) {
+        this.state.id = id;
+        return new Promise((resolve) => {
+            ServerProxy.getEntry(id, (entry) => {
+                this.state.entry = entry;
+                this.setStateDirty("entry");
+                console.log(entry);
+                resolve();
+            });
+        });
+    }
+
+    clearTimeEntry() {
+        this.state.id = null;
+        this.state.entry = null;
+    }
+
+    toggleVisibility() {
+        this.popoutFormComponent.toggleVisibility();
+    }
+
+    saveTimeEntry() {
+        ServerProxy.updateEntry(this.state.entry);
+        this.emit("saved");
+    }
+
+    setTask(e) {
+        this.state.entry.task.name = e.value;
+    }
+
+    setProject(e) {
+        this.state.entry.task.project.name = e.value;
+    }
+
+    setStartDate(e) {
+        this.state.entry.start = e.value;
+    }
+
+    setEndDate(e) {
+        this.state.entry.end = e.value;
+    }
+}
+
+popout-form title=state.id==null?'Add Entry':'Edit Entry' key="time-entry-popout-form"
+    @controls
+        controls [
+            controls = [
+                {
+                    name: 'save',
+                    icon: 'save'
+                }
+            ]
+            on-save("saveTimeEntry")
+        ]
+    if(state.entry != null)
+        ui-linear-layout vertical padded
+            @element
+                ui-textbox label="Task Name" value=state.entry.task.name on-input("setTask")
+            @element
+                ui-textbox label="Project Name" value=state.entry.task.project.name on-input("setProject")
+            @element
+                ui-date-select rounded milliseconds=state.entry.start||Date.now() on-input("setStartDate")
+            @element
+                ui-date-select rounded milliseconds=state.entry.end||Date.now() on-input("setEndDate")
+    else
+        ui-text -- Loading...
