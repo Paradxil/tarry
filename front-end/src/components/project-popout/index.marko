@@ -1,0 +1,61 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate() {
+        this.state = {
+            id: null,
+            project: null
+        };
+        
+        this.popoutFormComponent = null;
+    }
+
+    onMount() {
+        this.popoutFormComponent = this.getComponent("project-popout-form");
+    }
+
+    loadProject(id) {
+        this.state.id = id;
+        return new Promise((resolve) => {
+            ServerProxy.getProject(id, (project) => {
+                this.state.project = project;
+                this.setStateDirty("project");
+                resolve();
+            });
+        });
+    }
+
+    clearProject() {
+        this.state.id = null;
+        this.state.project = null;
+    }
+
+    toggleVisibility() {
+        this.popoutFormComponent.toggleVisibility();
+    }
+
+    saveProject() {
+        ServerProxy.updateProject(this.state.project);
+        this.emit("saved");
+    }
+}
+
+popout-form title=state.id==null?'Add Project':'Edit Project' key="project-popout-form"
+    @controls
+        controls [
+            controls = [
+                {
+                    name: 'save',
+                    icon: 'save'
+                }
+            ]
+            on-save("saveProject")
+        ]
+    if(state.project != null)
+        ui-linear-layout vertical padded
+            @element
+                ui-textbox label="Project Name"
+            @element
+                project-select
+    else
+        ui-text -- Loading...
