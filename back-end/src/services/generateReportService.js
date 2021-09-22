@@ -95,23 +95,24 @@ class GenerateReportService {
         let entries = await this.entryDAO.getAll(userid);
         let newEntries = [];
 
-        //Compile entry, project, and task data.
+        //Compile entry and project data.
         for (let i = 0; i < entries.length; i++) {
             let entry = entries[i].toJSON();
 
-            let task = await this.taskDAO.getTask(entry.taskid);
-            entry.task = task.toJSON();
-            entry.name = task.name;
-            entry.projectid = task.project;
-            entry.status = task.status;
-
             //Filter out entries that have projects not included in the filter
-            if(this.projectsFilter != null && this.projectsFilter.length > 0 && !this.projectsFilter.includes(entry.projectid)) {
+            if(this.projectsFilter != null && this.projectsFilter.length > 0 && !this.projectsFilter.includes(entry.task.projectid)) {
                 continue;
             }
 
-            let project = await this.projectDAO.get(task.project);
+            if(!entry.task) {
+                continue;
+            }
+
+            entry.taskid = entry.task._id;
+
+            let project = entries[i].task.project;
             if(project != null) {
+                entry.projectid = project._id;
                 entry.project = project.toJSON();
                 newEntries.push(entry);
             }
@@ -138,10 +139,10 @@ class GenerateReportService {
                         timeTracked: 0, 
                         hoursTracked: 0,
                         earnings: 0,
-                        project: entry.project,
-                        name: entry.name,
+                        project: entry.task.project,
+                        name: entry.task.name,
                         status: entry.status,
-                        id: entry.taskid
+                        id: entry.task._id
                     };
                 }
 
@@ -166,9 +167,9 @@ class GenerateReportService {
                         earnings: 0,
                         entries: [],
                         tasks: {},
-                        name: entry.project.name,
-                        color: entry.project.color,
-                        wage: entry.project.wage
+                        name: entry.task.project.name,
+                        color: entry.task.project.color,
+                        wage: entry.task.project.wage
                     };
                 }
 

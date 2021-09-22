@@ -6,10 +6,17 @@ var encrypt = require('mongoose-encryption');
 // Create a scheme for time entry
 const timeEntrySchema = new mongoose.Schema({
     userid: {type: String, required: true},
-    taskid: {type: String, required: true},
+    taskid: {type: String},
+    task: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tasks',
+        autopopulate: {path: 'task', populate: { path: 'project' }}
+    },
     start: {type: Number, required: true},
     end: {type: Number, required: true}
 });
+
+timeEntrySchema.plugin(require('mongoose-autopopulate'));
 
 timeEntrySchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: []});
 

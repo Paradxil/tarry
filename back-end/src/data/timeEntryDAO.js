@@ -1,4 +1,5 @@
 const TimeEntry = require('../model/timeEntry');
+var mongoose = require('mongoose');
 
 class TimeEntryDAO {
     constructor() {
@@ -69,7 +70,7 @@ class TimeEntryDAO {
     }
 
     async getAllFromTask(taskid) {
-        return await TimeEntry.find({taskid: taskid});
+        return await TimeEntry.find({task: taskid});
     }
 
     async getPaginated(userid, max=10, last=null) {
@@ -88,7 +89,7 @@ class TimeEntryDAO {
     async add(userid, taskid, start, end) {
         let entry = new TimeEntry({
             userid: userid,
-            taskid: taskid,
+            task: mongoose.Types.ObjectId(taskid),
             start: start,
             end: end
         });
@@ -99,7 +100,7 @@ class TimeEntryDAO {
     async update(id, userid, taskid, start, end,) {
         let entry = await this.get(id);
         entry.userid = userid;
-        entry.taskid = taskid;
+        entry.task = mongoose.Types.ObjectId(taskid);
         entry.start = start;
         entry.end = end;
         await entry.save();

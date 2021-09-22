@@ -6,10 +6,16 @@ const taskSchema = new mongoose.Schema({
     name: {type: String, required: true},
     userid: {type: String, required: true},
     status: {type: String, required: true, enum: ["untracked", "todo", "completed"], default: "untracked"},
-    project: {type: String, required: false}
+    project: {        
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Projects',
+        autopopulate: true
+    }
 });
 
-taskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
+taskSchema.plugin(require('mongoose-autopopulate'));
+
+//taskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
 
 //Check for duplicates
 taskSchema.pre('validate', async function() {
