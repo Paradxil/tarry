@@ -53,11 +53,10 @@ class ServerProxy {
         }
     }
 
-    async startTask(name, startTime, project, cb) {
+    async startTask(taskid, cb) {
         let response = await network.post("/api/start", {
-            name: name,
-            start: startTime,
-            project: project
+            taskid: taskid,
+            start: Date.now()
         });
 
         if(response.success && cb) {

@@ -6,7 +6,6 @@ class StopTaskService {
     async stopTask(userid, end) {
         let activeDAO = new ActiveTaskDAO();
         let timeEntryDAO = new TimeEntryDAO();
-        let taskDAO = new TaskDAO();
 
         let activetask = await activeDAO.get(userid);
         await activeDAO.remove(userid);

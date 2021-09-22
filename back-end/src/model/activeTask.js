@@ -5,8 +5,7 @@ var encrypt = require('mongoose-encryption');
 const activeTaskSchema = new mongoose.Schema({
     taskid: {type: String, required: true},
     userid: {type: String, required: true, unique: true},
-    start: {type: Number, required: true},
-    project: {type: String, required: false}
+    start: {type: Number, required: true}
 });
 
 activeTaskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
