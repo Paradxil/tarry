@@ -40,6 +40,6 @@ style {
 ui-linear-layout.notifications-wrapper vertical
     for|notification| of=state.notifications
         @element class="notification" key=notification.id
-            ui-card rounded accent raised
+            ui-card rounded filled raised
                 @header title=notification.title heading=3 accent padded
                 ui-text padded -- ${notification.message}
