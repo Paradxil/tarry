@@ -1,4 +1,5 @@
 import ServerProxy from "../../utils/serverproxy.js";
+import {emit} from "../../utils/events.js";
 
 class {
     onCreate() {
@@ -12,6 +13,10 @@ class {
 
     onMount() {
         this.popoutFormComponent = this.getComponent("task-popout-form");
+    }
+
+    newTask() {
+        this.state.task = {};
     }
 
     loadTask(id) {
@@ -35,8 +40,26 @@ class {
     }
 
     saveTask() {
-        ServerProxy.updateTask(this.state.task);
-        this.emit("saved");
+        if(this.state.task._id) {
+            ServerProxy.updateTask(this.state.task);
+            this.emit("saved");
+            emit("push", {title: "Success!", message:"Task saved successfully."});
+        }
+        else {
+            ServerProxy.addTask(this.state.task, (task)=>{
+                emit("push", {title: "Success!", message:"Task saved successfully."});
+                this.emit("saved");
+                this.state.task = task;
+            });
+        }
+    }
+
+    setTaskName(event) {
+        this.state.task.name = event.value;
+    }
+
+    setTaskProject(event) {
+        this.state.task.project = event.projectid;
     }
 }
 
@@ -54,8 +77,8 @@ popout-form title=state.id==null?'Add Task':'Edit Task' key="task-popout-form"
     if(state.task != null)
         ui-linear-layout vertical padded
             @element
-                ui-textbox label="Task Name" value=state.task.name
+                ui-textbox label="Task Name" value=state.task.name on-input("setTaskName")
             @element
-                project-select project=state.task.project._id||null
+                project-select project=state.task.project?state.task.project._id:null on-select("setTaskProject")
     else
         ui-text -- Loading...
