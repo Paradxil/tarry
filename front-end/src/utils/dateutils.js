@@ -2,6 +2,10 @@ export function dateInPast(daysAgo) {
     return (Date.now() - (1000 * 60 * 60 * 24 * daysAgo));
 }
 
+export function hoursPast(hours) {
+    return (Date.now() - (1000 * 60 * 60 * hours));
+}
+
 export function now() {
     return Date.now();
 }
