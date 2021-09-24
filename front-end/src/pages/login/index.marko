@@ -1,56 +1,5 @@
-import network from "../../utils/network.js";
 import {Localize} from "../../utils/localization.js";
 
-class {
-    onCreate() {
-        this.state = {
-            username: "",
-            password: ""
-        }
-    }
-
-    onMount() {
-        if(window.loadCaptcha) {
-            window.loadCaptcha();
-        }
-    }
-
-    async login(event) {
-        let response = await network.post('/api/login', {
-            username: this.state.username,
-            password: this.state.password,
-            captchaid: window.getCaptchaID()
-        });
-
-        if(response.success) {
-            window.location.replace("/tracker");
-        }
-    }
-
-    updatePassword(event) {
-        this.state.password = event.value;
-    }
-
-    updateUsername(event) {
-        this.state.username = event.value;
-    }
-}
-
 $ const L = Localize(r.strings.login);
-app-layout title=L.login
-    ui-container centered padded
-        ui-linear-layout vertical padded gutter="16px"
-            @element
-                ui-heading heading=1 centered light -- ${L.login}
-            @element
-                paper-modal
-                    ui-form padded vertical gutter="16px"
-                        @element
-                            ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
-                        @element
-                            ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
-                        @element
-                            div.icon-captcha key="icon-captcha" no-update
-                        @element
-                            ui-submit preventdefault on-click("login") 
-                                -- ${L.login}
+app-layout title=L.login currentpage="login"
+    login-form

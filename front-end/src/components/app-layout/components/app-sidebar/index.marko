@@ -1,5 +1,6 @@
 import {Localize} from "../../../../utils/localization.js";
 import network from "../../../../utils/network.js";
+import {deleteCookie} from "../../../../utils/cookie.js";
 
 class {
     onCreate() {
@@ -35,9 +36,8 @@ class {
 
     async logoutUser() {
         let response = await network.post("/api/logout");
-        if(response.success) {
-            this.changePage("login");
-        }
+        sessionStorage.clear();
+        this.changePage("login");
     }
 
     toggle() {
