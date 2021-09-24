@@ -1,2 +1,16 @@
+style {
+    @media print {
+        .invoice-preview-wrapper {
+            position: fixed;
+            top:0px;
+            left:0px;
+            border-radius: 0px !important;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+        }
+    }
+}
+
 app-layout title="Invoice Preview" currentpage="invoices" returnto="invoices"
     invoice-preview invoiceid=input.params.id
