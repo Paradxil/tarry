@@ -1,4 +1,5 @@
 import ServerProxy from "../../utils/serverproxy.js";
+import {now, hoursPast} from "../../utils/dateutils.js";
 
 class {
     onCreate() {
@@ -12,6 +13,14 @@ class {
 
     onMount() {
         this.popoutFormComponent = this.getComponent("time-entry-popout-form");
+    }
+
+    newTimeEntry() {
+        this.state.entry = {
+            task: null,
+            start: hoursPast(1),
+            end: now()
+        };
     }
 
     loadTimeEntry(id) {
@@ -35,8 +44,16 @@ class {
     }
 
     saveTimeEntry() {
-        ServerProxy.updateEntry(this.state.entry);
-        this.emit("saved");
+        if(this.state.entry._id) {
+            ServerProxy.updateEntry(this.state.entry);
+            this.emit("saved");
+        }
+        else {
+            ServerProxy.addEntry(this.state.entry, (entry)=>{
+                this.state.entry = entry;
+                this.emit("saved");
+            });
+        }
     }
 
     setTask(e) {
@@ -66,7 +83,7 @@ popout-form title=state.id==null?'Add Entry':'Edit Entry' key="time-entry-popout
     if(state.entry != null)
         ui-linear-layout vertical padded
             @element
-                task-select on-select("setTask") key="task-select" task=state.entry.task._id
+                task-select on-select("setTask") key="task-select" task=state.entry.task?state.entry.task._id:null
             @element
                 ui-date-select rounded milliseconds=state.entry.start||Date.now() on-input("setStartDate")
             @element
