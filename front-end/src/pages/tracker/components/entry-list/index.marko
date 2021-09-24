@@ -110,6 +110,12 @@ class {
     }
 }
 
+style {
+    .duration-wrapper {
+        align-items: flex-end;
+    }
+}
+
 time-entry-popout key="time-entry-popout" on-saved("refresh")
 ui-linear-layout vertical gutter="16px" id="entries-wrapper"
     for|day, dayIndex| of=state.data.days||[]
@@ -126,11 +132,18 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                                         @element
                                             project project=data.project
                             @element
-                                ui-date date=false milliseconds=data.start
-                            @element
-                                ui-date date=false milliseconds=data.end
-                            @element
-                                ui-time milliseconds=data.end-data.start
-                            @element
+                                ui-linear-layout.duration-wrapper vertical gutter="0px" alignright
+                                    @element
+                                        ui-linear-layout
+                                            @element
+                                                ui-date date=false milliseconds=data.start
+                                            @element
+                                                ui-text -- -
+                                            @element
+                                                ui-date date=false milliseconds=data.end
+                                    @element
+                                        ui-emphasis
+                                            ui-duration start=data.start end=data.end
+                            @element fullwidth=input.ismobile alignright
                                 $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
                                 controls controls=controls on-continue("continueTask", data.task._id) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
