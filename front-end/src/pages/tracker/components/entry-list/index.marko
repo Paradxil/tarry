@@ -44,8 +44,6 @@ class {
                 tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
             });
             if(response.success) {
-                console.log(response.data);
-                console.log("YAY");
                 this.state.data.days = this.state.data.days.concat(response.data.days.reverse());
                 this.state.tasklist = this.state.tasklist.concat(Object.values(response.data.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};}));
             }
