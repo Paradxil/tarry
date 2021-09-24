@@ -1,0 +1,45 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {now, dateInPast} from "../../utils/dateutils.js";
+
+class {
+    async onCreate() {
+        this.state = {
+            data: null,
+            start: dateInPast(7),
+            end: now()
+        };
+
+        this.generateReport();
+    }
+    async generateReport() {
+        ServerProxy.generateReport(this.state.start, this.state.end, [], [], (data) => {
+            this.state.data = data;
+            this.setStateDirty('data');
+        });
+    }
+    setStartDate(event) {
+        this.state.start = event.value;
+        this.generateReport();
+    }
+    setEndDate(event) {
+        this.state.end = event.value;
+        this.generateReport();
+    }
+}
+
+app-layout title="Reports" currentpage="reports"
+    @controls
+        ui-linear-layout
+            @element centered
+                ui-text -- From: 
+            @element
+                ui-date-select milliseconds = state.start showtime=false on-input("setStartDate")
+            @element centered
+                ui-text -- To: 
+            @element
+                ui-date-select milliseconds = state.end showtime=false on-input("setEndDate")
+    ui-linear-layout vertical fillspace fullwidth gutter="8px"
+        @element
+            widget title="Overview"
+                ui-container paddedwide
+                    graph data=state.data
