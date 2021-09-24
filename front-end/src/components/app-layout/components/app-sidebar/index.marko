@@ -50,7 +50,7 @@ ui-sidebar collapsed=input.ismobile?false:state.collapsed hidden=input.ismobile?
     @item.site-title icon=state.ismobile?"chevron-left":"menu" text="Time Tracker"
     @item icon="user" text=state.user?state.user.username||"loading...":"loading..." page="account"
     @item text=L.tracker icon="clock" page="tracker" accent=input.currentpage==="tracker"
-    @item text=L.todo icon="list" page="todo" accent=input.currentpage==="todo"
+    @item text=L.tasks icon="list" page="tasks" accent=input.currentpage==="tasks"
     @item text=L.projects icon="clipboard" page="projects" accent=input.currentpage==="projects"
     @item text=L.invoice icon="file" page="invoices" accent=input.currentpage==="invoices"
     @item text=L.reports icon="bar-chart-2" page="reports" accent=input.currentpage==="reports"
