@@ -27,33 +27,31 @@ class {
 
 style {
     .confirmation-wrapper {
-        position: fixed;
-        top: 0px;
-        left: 0px;
-        width: 100%;
-        height: 100%;
         z-index: 100;
-        background-color: rgba(0,0,0,0.25);
     }
 
     .confirmation-dialogue {
         max-width: 500px;
     }
+
+    .confirmation-options {
+        place-content: flex-end;
+    }
 }
 
 if(state.confirmations.length > 0)
     $ let confirmation = state.confirmations[0];
-    ui-linear-layout.confirmation-wrapper vertical centered
+    ui-linear-layout.confirmation-wrapper vertical centered fullscreen
         @element.confirmation-dialogue
-            ui-card rounded accent raised
+            ui-card rounded filled raised
                 @header accent padded
                     ui-linear-layout fillspace
                         @element fillspace placecenter
                             ui-heading heading=3 alignleft -- ${confirmation.title}
                         @element
-                            ui-button icon="x" on-click("closeConfirmation")
+                            ui-button rounded icon="x" on-click("closeConfirmation")
                 ui-text padded alignleft -- ${confirmation.message}
-                ui-linear-layout padded centered
+                ui-linear-layout.confirmation-options padded aligncenter fullwidth fillspace
                     for|action| of=confirmation.actions
                         @element
                             ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)
