@@ -183,7 +183,7 @@ style {
         color: var(--tertiary-dark);
     }
 
-    .new-client-button p {
+    .new-client-button em {
         width: 100%;
     }
 
@@ -237,7 +237,8 @@ app-layout currentpage="invoices" fullwidth returnto="invoices"
                                         @element fillspace
                                             ui-combobox label="Bill From" options=state.addresses value=state.invoice.billfrom?state.invoice.billfrom.name:"" on-select('setAddress', 'billfrom') key="bill-from"
                                                 @first fillspace
-                                                    ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
+                                                    ui-button.new-client-button fillspace trailingicon="plus" on-click("showAddClientPopout")
+                                                        ui-emphasis -- Add New Client
                                                 @option|{option}|
                                                     ui-linear-layout fillspace
                                                         @element fillspace fullwidth
@@ -255,7 +256,8 @@ app-layout currentpage="invoices" fullwidth returnto="invoices"
                                         @element fillspace
                                             ui-combobox label="Bill To" options=state.addresses value=state.invoice.billto?state.invoice.billto.name:"" on-select('setAddress', 'billto') key="bill-to"
                                                 @first fillspace
-                                                    ui-button.new-client-button fillspace trailingicon="plus" text="Add New Client" on-click("showAddClientPopout")
+                                                    ui-button.new-client-button fillspace trailingicon="plus" on-click("showAddClientPopout")
+                                                        ui-emphasis -- Add New Client
                                                 @option|{option}|
                                                     ui-linear-layout fillspace
                                                         @element fillspace fullwidth
