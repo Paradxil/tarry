@@ -16,7 +16,7 @@
     padding-bottom: 100px !important;
 }
 
-.timer-header-wrapper input {
+.timer-header-wrapper .task-name {
     color: var(--text-light) !important;
 }
 
