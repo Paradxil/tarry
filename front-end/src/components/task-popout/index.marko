@@ -41,9 +41,10 @@ class {
 
     saveTask() {
         if(this.state.task._id) {
-            ServerProxy.updateTask(this.state.task);
-            this.emit("saved");
-            emit("push", {title: "Success!", message:"Task saved successfully."});
+            ServerProxy.updateTask(this.state.task, (task) => {
+                this.emit("saved");
+                emit("push", {title: "Success!", message:"Task saved successfully."});
+            });
         }
         else {
             ServerProxy.addTask(this.state.task, (task)=>{
