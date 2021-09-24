@@ -6,9 +6,12 @@
     "@marko/serve": "^4.2.1",
     "axios": "^0.21.1",
     "chart.js": "^3.4.1",
+    "chartjs-chart-matrix": "^1.1.0",
+    "date-fns": "^2.24.0",
     "feather-marko": "^0.0.3",
     "fs": "^0.0.1-security",
     "marko": "^5.10.3",
+    "regenerator-runtime": "^0.13.9",
     "simple-marko-ui": "file:../../simple-marko-ui"
   },
   "babel": {
@@ -26,7 +29,7 @@
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
-    "build": "npx marko-build ./src/templates/template.marko --static",
+    "build": "npx marko-build ./src/pages",
     "dev": "npx marko-serve ./src/pages"
   },
   "author": "",
