@@ -39,18 +39,20 @@ class {
             if(this.input.task) {
                 this.setTask(this.input.task);
             }
+
+            this.setStateDirty("tasklist");
+            this.setStateDirty("task");
         });
     }
 
     // Translate a task into an option for the comobox input
     taskToOption(task) {
-        console.log(task);
         return {
-            search: task.name + " " + task.project.name, 
-            value: task.name, project: task.project.name, 
-            color: task.project.color,
+            search: task.name + " " + (task.project?task.project.name:""), 
+            value: task.name, project: task.project?task.project.name:null, 
+            color: task.project?task.project.color:null,
             taskid: task._id, 
-            projectid: task.project._id
+            projectid: task.project?task.project._id:null
         }
     }
 
@@ -67,6 +69,7 @@ class {
 
     async showTaskPopout() {
         this.taskPopout.clearTask();
+        this.taskPopout.newTask();
         this.taskPopout.toggleVisibility();
     }
 }
@@ -77,7 +80,7 @@ style {
     }
 }
 
-task-popout key="task-popout"
+task-popout key="task-popout" on-saved("loadTaskList")
 ui-combobox.task-name class=input.class rounded key="task-select" label="Select Task" options=state.tasklist on-select("selectTask")
     @first
        ui-button.task-select-add-button rounded trailingicon="plus" on-click("showTaskPopout")
