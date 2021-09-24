@@ -6,7 +6,7 @@ var encrypt = require('mongoose-encryption');
 // Create a scheme for time entry
 const timeEntrySchema = new mongoose.Schema({
     userid: {type: String, required: true},
-    taskid: {type: String},
+    //taskid: {type: String},
     task: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tasks',
