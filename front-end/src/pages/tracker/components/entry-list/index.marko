@@ -119,9 +119,12 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                     @item|{data, index}| // Data here is a timeEntry from the items list.
                         ui-linear-layout aligncenter wrap
                             @element fillspace
-                                ui-text -- ${data.task.name}
-                            @element
-                                project project=data.project
+                                ui-linear-layout vertical gutter="0px"
+                                    @element fillspace
+                                        ui-text -- ${data.task.name}
+                                    if(data.project)
+                                        @element
+                                            project project=data.project
                             @element
                                 ui-date date=false milliseconds=data.start
                             @element

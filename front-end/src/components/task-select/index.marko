@@ -29,6 +29,10 @@ class {
         this.taskSelectComponent.clearOption();
     }
 
+    refreshTaskList() {
+        this.loadTaskList();
+    }
+
     loadTaskList() {
         ServerProxy.getTasks((tasks, tasksMap) => {
             this.taskmap = tasksMap;
@@ -52,7 +56,8 @@ class {
             value: task.name, project: task.project?task.project.name:null, 
             color: task.project?task.project.color:null,
             taskid: task._id, 
-            projectid: task.project?task.project._id:null
+            projectid: task.project?task.project._id:null,
+            project: task.project?task.project:null
         }
     }
 
@@ -80,7 +85,7 @@ style {
     }
 }
 
-task-popout key="task-popout" on-saved("loadTaskList")
+task-popout key="task-popout" on-saved("refreshTaskList")
 ui-combobox.task-name class=input.class rounded key="task-select" label="Select Task" options=state.tasklist on-select("selectTask")
     @first
        ui-button.task-select-add-button rounded trailingicon="plus" on-click("showTaskPopout")
@@ -88,8 +93,11 @@ ui-combobox.task-name class=input.class rounded key="task-select" label="Select 
     @option|{option}|
         ui-linear-layout fillspace aligncenter
             @element fillspace
-                ui-text -- ${option.value}
-            @element
-                ui-text style={color: option.color + " !important", fontSize: "14px"} -- ${option.project}
+                ui-linear-layout vertical gutter="0px"
+                    @element
+                        ui-text -- ${option.value}
+                    if(option.project)
+                        @element
+                            project project=option.project
             @element
                 ui-button rounded icon="edit-2" on-click("editTask", option.taskid)
