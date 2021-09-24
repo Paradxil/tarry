@@ -94,7 +94,7 @@ class ServerProxy {
     }
 
     async addTask(task, cb) {
-        let response = await network.push("/api/task/", task);
+        let response = await network.post("/api/task/", task);
         if(response.success && cb) {
             cb(response.data);
         }
@@ -124,7 +124,7 @@ class ServerProxy {
     }
 
     async addEntry(entry, cb) {
-        let response = await network.push("/api/entry/", entry);
+        let response = await network.post("/api/entry/", entry);
         if(response.success && cb) {
             cb(response.data);
         }
