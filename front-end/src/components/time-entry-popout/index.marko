@@ -83,10 +83,12 @@ popout-form title=state.id==null?'Add Entry':'Edit Entry' key="time-entry-popout
     if(state.entry != null)
         ui-linear-layout vertical padded
             @element
+                ui-linear-layout
+                    @element
+                        ui-date-select label="Start" rounded milliseconds=state.entry.start||Date.now() on-input("setStartDate")
+                    @element
+                        ui-date-select label="End" rounded milliseconds=state.entry.end||Date.now() on-input("setEndDate")
+            @element
                 task-select on-select("setTask") key="task-select" task=state.entry.task?state.entry.task._id:null
-            @element
-                ui-date-select rounded milliseconds=state.entry.start||Date.now() on-input("setStartDate")
-            @element
-                ui-date-select rounded milliseconds=state.entry.end||Date.now() on-input("setEndDate")
     else
         ui-text -- Loading...
