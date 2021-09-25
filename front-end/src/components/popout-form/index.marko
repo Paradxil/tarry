@@ -43,6 +43,16 @@ style {
         border-top-left-radius: var(--rounded-radius);
         border-top-right-radius: var(--rounded-radius);
     }
+
+    .mobile-page-wrapper .popout-form-wrapper {
+        z-index: 200 !important;
+        height: 100%;
+        touch-action: none;
+    }
+
+    .mobile-page-wrapper .popout-form {
+        height: 100%;
+    }
 }
 
 if(state.visible)
@@ -50,7 +60,7 @@ if(state.visible)
         @element.popout-form-wrapper
             ui-element.popout-form rounded raised filled
                 ui-linear-layout fillspace fullwidth vertical gutter="0px"
-                    @element.popout-topbar fillspace
+                    @element.popout-topbar
                         ui-linear-layout fillspace fullwidth secondary paddedwide aligncenter
                             @element
                                 ui-button rounded icon="arrow-left" on-click('toggleVisibility')
@@ -59,5 +69,5 @@ if(state.visible)
                             if(input.controls && input.controls.renderBody)
                                 @element
                                     <${input.controls.renderBody}/>
-                    @element.popout-content-wrapper padded
+                    @element.popout-content-wrapper padded fillspace
                         <${input.renderBody}/>
