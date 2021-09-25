@@ -56,6 +56,8 @@ class {
     }
 
     showProjectPopout(event) {
+        this.getComponent("project-popout").clearProject();
+        this.getComponent("project-popout").newProject();
         this.getComponent("project-popout").toggleVisibility();
     }
 }
