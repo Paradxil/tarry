@@ -30,14 +30,10 @@ class {
 app-layout title="Reports" currentpage="reports"
     @controls
         ui-linear-layout
-            @element centered
-                ui-text -- From: 
             @element
-                ui-date-select milliseconds = state.start showtime=false on-input("setStartDate")
-            @element centered
-                ui-text -- To: 
+                ui-date-select label="From" milliseconds = state.start showtime=false on-input("setStartDate")
             @element
-                ui-date-select milliseconds = state.end showtime=false on-input("setEndDate")
+                ui-date-select label="To" milliseconds = state.end showtime=false on-input("setEndDate")
     ui-linear-layout vertical fillspace fullwidth gutter="8px"
         @element
             widget title="Overview"
