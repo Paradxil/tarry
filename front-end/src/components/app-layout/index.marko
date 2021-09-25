@@ -49,7 +49,7 @@ template title=input.title||null
     if(state.ismobile)
         topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar") returnto=input.returnto
     app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
-    ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile}
+    ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile, "mobile-page-wrapper": state.ismobile}
         @element 
             ui-linear-layout light aligncenter class={"limit-width":!input.fullwidth}
                 if(input.returnto)
