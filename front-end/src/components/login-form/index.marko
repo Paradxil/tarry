@@ -39,19 +39,13 @@ class {
 }
 
 $ const L = Localize(r.strings.login);
-ui-container centered padded
-    ui-linear-layout vertical padded gutter="16px"
-        @element
-            ui-heading heading=1 centered light -- ${L.login}
-        @element
-            paper-modal
-                ui-form padded vertical gutter="16px"
-                    @element
-                        ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
-                    @element
-                        ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
-                    @element
-                        div.icon-captcha key="icon-captcha" no-update
-                    @element
-                        ui-submit preventdefault on-click("login") 
-                            -- ${L.login}
+ui-form padded vertical gutter="16px"
+    @element
+        ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
+    @element
+        ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
+    @element
+        div.icon-captcha key="icon-captcha" no-update
+    @element
+        ui-submit preventdefault on-click("login") 
+            -- ${L.login}
