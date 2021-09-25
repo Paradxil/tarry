@@ -99,12 +99,12 @@ class GenerateReportService {
         for (let i = 0; i < entries.length; i++) {
             let entry = entries[i].toJSON();
 
-            //Filter out entries that have projects not included in the filter
-            if(this.projectsFilter != null && this.projectsFilter.length > 0 && !this.projectsFilter.includes(entry.task.projectid)) {
+            if(!entry.task) {
                 continue;
             }
 
-            if(!entry.task) {
+            //Filter out entries that have projects not included in the filter
+            if(this.projectsFilter != null && this.projectsFilter.length > 0 && !this.projectsFilter.includes(entry.task.project._id.toString())) {
                 continue;
             }
 
