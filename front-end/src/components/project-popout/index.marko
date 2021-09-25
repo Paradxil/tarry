@@ -1,4 +1,5 @@
 import ServerProxy from "../../utils/serverproxy.js";
+import {colors} from "../../utils/theme.js";
 
 class {
     onCreate() {
@@ -25,6 +26,14 @@ class {
         });
     }
 
+    newProject() {
+        this.state.project = {
+            name: null,
+            color: colors[0],
+            wage: 15
+        };
+    }
+
     clearProject() {
         this.state.id = null;
         this.state.project = null;
@@ -35,8 +44,29 @@ class {
     }
 
     saveProject() {
-        ServerProxy.updateProject(this.state.project);
-        this.emit("saved");
+        if(this.state.project._id) {
+            ServerProxy.updateProject(this.state.project, ()=>{
+                this.emit("saved");
+            });
+        }
+        else {
+            ServerProxy.addProject(this.state.project, (project)=>{
+                this.emit("saved");
+                this.state.project = project;
+            })
+        }
+    }
+
+    setColor(event) {
+        this.state.project.color = event.value;
+    }
+
+    setName(event) {
+        this.state.project.name = event.value;
+    }
+
+    setWage(event) {
+        this.state.project.wage = parseInt(event.value);
     }
 }
 
@@ -54,8 +84,10 @@ popout-form title=state.id==null?'Add Project':'Edit Project' key="project-popou
     if(state.project != null)
         ui-linear-layout vertical padded
             @element
-                ui-textbox label="Project Name"
+                ui-textbox label="Project Name" value=state.project.name on-input('setName')
             @element
-                project-select
+                ui-color-select colors=colors value=state.project.color on-input('setColor')
+            @element
+                ui-textbox label="Hourly Rate" value=state.project.wage on-input('setWage')
     else
         ui-text -- Loading...
