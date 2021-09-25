@@ -44,7 +44,7 @@ class {
         }
 
         this.taskSelectComponent.setTask(taskid);
-        this.startTime = now();
+        this.state.startTime = now();
         ServerProxy.startTask(taskid, ()=>{
             this.state.tracking = true;
         });
@@ -55,7 +55,7 @@ class {
             emit("push", {title: "Warning", message:"Unable to start tracker, no task selected."})
             return;
         }
-        this.startTime = now();
+        this.state.startTime = now();
         ServerProxy.startTask(this.state.taskID, ()=>{
             this.state.tracking = true;
         });
@@ -95,7 +95,7 @@ ui-linear-layout.timer-header-wrapper light fullwidth vertical paddedwide
     @element.timer-wrapper
         ui-linear-layout fullwidth
             @element
-                ui-time.timer showseconds=true milliseconds=state.tracking?(state.now - state.startTime):0
+                ui-timer.timer start=state.tracking?state.startTime:now()
             @element.manual-input-wrapper
                 ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
     @element.task-name-wrapper
