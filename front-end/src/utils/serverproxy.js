@@ -145,10 +145,18 @@ class ServerProxy {
         }
     }
 
-    async saveProject(project, cb) {
+    async addProject(project, cb) {
         let response = await network.post('/api/project', project);
         if(response.success && cb) {
-            cb(response.data.project);
+            cb(response.data);
+        }
+    }
+
+    async updateProject(project, cb) {
+        let response = await network.post("/api/project/update/"+project._id, project);
+
+        if(response.success && cb) {
+            cb(response.data);
         }
     }
 
