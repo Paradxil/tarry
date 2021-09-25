@@ -87,7 +87,7 @@ class Server {
         this.app.use(session({ 
             secret: process.env.SESSION_SECRET,
             cookie: {
-                maxAge: process.env.SESSION_DURATION
+                maxAge: parseInt(process.env.SESSION_DURATION)
             },
             saveUninitialized: false,
             resave: false,
