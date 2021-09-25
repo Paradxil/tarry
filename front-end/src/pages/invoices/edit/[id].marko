@@ -53,6 +53,7 @@ class {
         ServerProxy.generateReport(this.state.invoice.start, this.state.invoice.end, this.state.invoice.projects, this.state.invoice.tasks, (report) => {
             this.state.invoice.data = report;
             this.invoicePreviewComponent.setInvoice(this.state.invoice);
+            this.setStateDirty('invoice');
         });
     }
 
@@ -220,7 +221,7 @@ app-layout currentpage="invoices" fullwidth returnto="invoices"
                                             icon: "eye"
                                         }
                                     ]
-                                    on-save("saveInvoice")
+                                    on-save("saveInvoice", ()=>{})
                                     on-preview("previewInvoice")
                                 ]
                             ui-linear-layout vertical padded
