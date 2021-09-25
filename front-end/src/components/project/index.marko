@@ -1,1 +1,4 @@
-ui-emphasis style={'--text-dark': input.project.color} dark -- ${input.project.name}
+import emphasis from "<ui-emphasis>";
+import text from "<ui-text>";
+
+<${input.emphasis===false?text:emphasis} style={'--text-dark': input.project.color} dark>${input.project.name}</>
