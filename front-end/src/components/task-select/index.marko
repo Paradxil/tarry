@@ -29,7 +29,9 @@ class {
         this.taskSelectComponent.clearOption();
     }
 
-    refreshTaskList() {
+    refreshTaskList(event) {
+        this.taskSelectComponent.setOption(event.task);
+        this.emit("select", {projectid: event.task.projectid, taskid: event.task._id});
         this.loadTaskList();
     }
 
