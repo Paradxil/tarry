@@ -10,7 +10,7 @@ class {
     }
 
     pushNotification(event) {
-        this.state.notifications.splice(0,0,{title: event.title||"Notification", message: event.message||"", id:Date.now()});
+        this.state.notifications.push({title: event.title||"Notification", message: event.message||"", id:Date.now()});
         window.setTimeout(()=>{this.state.notifications.pop();this.setStateDirty("notifications");}, event.timeout?event.timeout*1000:1000*7);
         this.setStateDirty("notifications");
     }
