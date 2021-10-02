@@ -42,15 +42,17 @@ class {
     saveTask() {
         if(this.state.task._id) {
             ServerProxy.updateTask(this.state.task, (task) => {
-                this.emit("saved");
+                this.emit("saved", {task: task});
                 emit("push", {title: "Success!", message:"Task saved successfully."});
+                this.toggleVisibility();
             });
         }
         else {
             ServerProxy.addTask(this.state.task, (task)=>{
                 emit("push", {title: "Success!", message:"Task saved successfully."});
-                this.emit("saved");
                 this.state.task = task;
+                this.emit("saved", {task: task});
+                this.toggleVisibility();
             });
         }
     }
