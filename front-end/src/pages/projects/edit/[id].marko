@@ -41,8 +41,19 @@ class {
         this.state.project.wage = parseInt(event.value);
     }
 
-    async saveProject() {
-        ServerProxy.saveProject(this.state.project);
+    saveProject() {
+        if(this.state.project._id) {
+            ServerProxy.updateProject(this.state.project, ()=>{
+                this.emit("saved");
+            });
+        }
+        else {
+            ServerProxy.addProject(this.state.project, (project)=>{
+                this.emit("saved");
+                this.state.project = project;
+            })
+        }
+        
     }
     
 }
