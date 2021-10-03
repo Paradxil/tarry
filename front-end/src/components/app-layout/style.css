@@ -58,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 0px;
 }
 
-.ui-textbox, .ui-date-select-wrapper {
+.ui-textbox, .ui-date-select-wrapper, .ui-input {
     border: none !important;
     background-color: #f8f9fa;
     transition: border 0.5s;
