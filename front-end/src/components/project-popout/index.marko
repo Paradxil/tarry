@@ -84,9 +84,9 @@ popout-form title=state.id==null?'Add Project':'Edit Project' key="project-popou
     if(state.project != null)
         ui-linear-layout vertical padded
             @element
-                ui-textbox label="Project Name" value=state.project.name on-input('setName')
+                ui-color-select rounded colors=colors value=state.project.color on-input('setColor')
             @element
-                ui-color-select colors=colors value=state.project.color on-input('setColor')
+                ui-textbox label="Project Name" value=state.project.name on-input('setName')
             @element
                 ui-textbox label="Hourly Rate" value=state.project.wage on-input('setWage')
     else
