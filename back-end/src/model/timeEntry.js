@@ -22,7 +22,7 @@ timeEntrySchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: [
 
 //Check that start < end
 timeEntrySchema.pre('validate', async function() {
-    if(this.end <= this.start) {
+    if(this.end < this.start) {
         throw new Error("Error, entry must end after it starts.");
     }
 });
