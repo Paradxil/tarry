@@ -1,6 +1,7 @@
 import network from "../../utils/network.js";
 import {Localize} from "../../utils/localization.js";
 import {setCookie} from "../../utils/cookie.js";
+import ServerProxy from "../../utils/serverproxy.js";
 
 class {
     onCreate() {
@@ -24,9 +25,29 @@ class {
         });
 
         if(response.success) {
-            sessionStorage.setItem("sessionexpires", Date.now() + 18000000);
-            window.location.replace("/tracker");
+            sessionStorage.setItem("sessionexpires", Date.now() + 18000000); //TODO: Get this value from the login response.
+
+            this.loadUserData();
         }
+    }
+
+    loadUserData() {
+        ServerProxy.getUser((user)=>{
+            sessionStorage.setItem("user", user);
+
+            ServerProxy.getSettings((settings)=>{
+                for(let setting of settings) {
+                    sessionStorage.setItem(setting.name, setting.value);
+                    if('primary-color' === setting.name) {
+                        document.querySelector(':root').style.setProperty('--secondary', 'var(--oc-'+setting.value+'-4)');
+                    }
+                    if('secondary-color' === setting.name) {
+                        document.querySelector(':root').style.setProperty('--tertiary', 'var(--oc-'+setting.value+'-4)');
+                    }
+                }
+                window.location.replace("/tracker");
+            });
+        });
     }
 
     updatePassword(event) {
