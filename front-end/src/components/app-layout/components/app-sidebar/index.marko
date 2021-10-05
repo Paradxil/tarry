@@ -1,12 +1,22 @@
 import {Localize} from "../../../../utils/localization.js";
 import network from "../../../../utils/network.js";
 import {deleteCookie} from "../../../../utils/cookie.js";
+import ServerProxy from "../../../../utils/serverproxy.js";
 
 class {
     onCreate() {
         this.state = {
-            collapsed: false
+            collapsed: false,
+            username: "loading"
         };
+
+        this.getUserData();
+    }
+
+    getUserData() {
+        ServerProxy.getUser((user)=>{
+            this.state.username = user.username;
+        });
     }
 
     onInput(input) {
@@ -48,7 +58,7 @@ class {
 $ const L = Localize(r.strings.sidebar);
 ui-sidebar collapsed=input.ismobile?false:state.collapsed hidden=input.ismobile?state.collapsed:false on-itemclick("sidebarItemClick") overlay=input.ismobile
     @item.site-title icon=state.ismobile?"chevron-left":"menu" text="Time Tracker"
-    @item icon="user" text=state.user?state.user.username||"loading...":"loading..." page="account"
+    @item icon="user" text=state.username page="account"
     @item text=L.tracker icon="clock" page="tracker" accent=input.currentpage==="tracker"
     @item text=L.tasks icon="list" page="tasks" accent=input.currentpage==="tasks"
     @item text=L.projects icon="clipboard" page="projects" accent=input.currentpage==="projects"
