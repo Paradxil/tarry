@@ -64,7 +64,6 @@ class DAO {
      */
     async update(id, data) {
         let obj = await this.get(id);
-
         for(let key in data) {
             if(key in obj) {
                 obj[key] = data[key];

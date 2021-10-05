@@ -277,6 +277,7 @@ class Server {
         });
 
         //TODO: Have all data access routes use this factory.
+        this.dataAccessRouteFactory('setting');
         this.dataAccessRouteFactory('entry');
         this.dataAccessRouteFactory('task');
         this.dataAccessRouteFactory('project');
