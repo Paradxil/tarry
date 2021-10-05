@@ -19,11 +19,11 @@
 }
 
 .ui-sidebar .ui-button:hover {
-    background-color: #868e96;
+    background-color: var(--secondary-dark);
 }
 
 .ui-sidebar .ui-list-item:hover {
-    box-shadow: 0px 0px 5px #868e96 !important;
+    box-shadow: 0px 0px 5px var(--secondary-dark) !important;
 }
 
 .ui-sidebar .ui-button {
