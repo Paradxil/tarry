@@ -1,18 +1,84 @@
 <!doctype html>
 <html lang="en">
-  <head no-update>
-    <meta charset="UTF-8">
-    <title>${input.title ? input.title + " | Paper Time" : "Paper Time"}</title>
-    <!--<link rel="icon" type="image/png" sizes="32x32" href="./favicon.png"/>-->
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta
-      name="Description"
-      content="Paper Time - an open source time tracker."/>
-    <script src="https://iconcaptcha.com/captcha/api.js" async defer></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400&family=Montserrat&display=swap" rel="stylesheet">
-  </head>
-  <body class=input.class>
-    <${input.renderBody}/>
-  </body>
+    <head no-update>
+        <meta charset="UTF-8"/>
+        <title>${input.title ? input.title + " | Paper Time" : "Paper Time"}</title>
+        <!--<link rel="icon" type="image/png" sizes="32x32" href="./favicon.png"/>-->
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="Description" content="Paper Time - an open source time tracker."/>
+        <script src="https://iconcaptcha.com/captcha/api.js" async defer/>
+        <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Dosis:wght@400&family=Montserrat&display=swap"
+            rel="stylesheet"/>
+        <link rel="stylesheet" href="../../../node_modules/open-color/open-color.css"/>
+        <style>
+            :root {
+                --content-width: 1000px !important;
+                --primary: #fff !important;
+                --primary-dark: #f1f3f5 !important;
+                --accent-1: #fff !important;
+                --text-dark: #495057 !important;
+                --text-light: #fff !important;
+                --border: #ced4da !important;
+                --rounded-radius: 5px !important;
+                --padding: 8px !important;
+                --padding-narrow: 4px !important;
+                --padding-wide: 16px !important;
+                --text-font: 'Montserrat', sans-serif !important;
+                --button-font: 'Montserrat', sans-serif !important;
+                --header-font: 'Montserrat', sans-serif !important;
+                --font-size-h1: 2.5em !important;
+            }
+
+            ::selection {
+                background-color: var(--secondary);
+                color: var(--text-light);
+            }
+            
+            * {
+                margin: 0px;
+                padding: 0px;
+                box-sizing: border-box;
+            }
+            
+            h1, h2, h3, h4, h5, h6 {
+                font-weight: 100;
+            }
+            
+            .ui-textbox, .ui-date-select-wrapper, .ui-input {
+                border: none !important;
+                background-color: #f8f9fa;
+                transition: border 0.5s;
+            }
+            
+            .ui-textbox:focus {
+                background-color: var(--secondary-light);
+            }
+            
+            .ui-textbox:hover,.ui-date-select-wrapper:hover {
+                background-color: var(--secondary-light) !important;
+            }
+            
+            .ui-textbox-label {
+                color: var(--tertiary-dark);
+            }
+        </style>
+        <script>
+            let primaryColor = window.sessionStorage.getItem("primary-color");
+            primaryColor = primaryColor==null?"blue":primaryColor;
+            document.querySelector(':root').style.setProperty('--secondary', 'var(--oc-'+primaryColor+'-4)');
+            document.querySelector(':root').style.setProperty('--secondary-dark', 'var(--oc-'+primaryColor+'-6)');
+            document.querySelector(':root').style.setProperty('--secondary-light', 'var(--oc-'+primaryColor+'-2)');
+        
+            let secondaryColor = window.sessionStorage.getItem("secondary-color");
+            secondaryColor = secondaryColor==null?"cyan":secondaryColor;
+            document.querySelector(':root').style.setProperty('--tertiary', 'var(--oc-'+secondaryColor+'-4)');
+            document.querySelector(':root').style.setProperty('--tertiary-dark', 'var(--oc-'+secondaryColor+'-6)');
+            document.querySelector(':root').style.setProperty('--tertiary-light', 'var(--oc-'+secondaryColor+'-2)');
+        </script>
+    </head>
+    <body class=input.class>
+        <${input.renderBody}/>
+    </body>
 </html>
