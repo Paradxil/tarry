@@ -1,3 +1,11 @@
-app-layout
-    h1 -- Paper Time
-    ui-button href="/login" text="Login"
+template title="Time Tracker"
+    page-background
+    ui-linear-layout vertical fullwidth light aligncenter placecenter gutter="20px"
+        @element
+            ui-heading heading=1 -- Paper Time
+        @element
+            ui-linear-layout
+                @element
+                    ui-button href="/login" filled rounded text="Login"
+                @element
+                    ui-button href="/register" rounded text="Register"
