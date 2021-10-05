@@ -10,7 +10,7 @@ class {
         };
 
         this.timeEntryPopout = null;
-        this.firstDate = dateInPast(30);
+        this.firstDate = dateInPast(300);
         this.generateReport();
     }
 
@@ -55,7 +55,7 @@ class {
     confirmDeleteEntry(entry, index, dayIndex) {
         emit("confirm", {
             title:"Delete Entry?", 
-            message:"Are you sure you want to delete the entry for '" + entry.name + "' on " + new Date(entry.start).toDateString() + "? This cannot be undone.",
+            message:"Are you sure you want to delete the entry for '" + entry.task.name + "' on " + new Date(entry.start).toDateString() + "? This cannot be undone.",
             actions: [
                 {
                     text: "Yes",
@@ -79,6 +79,7 @@ class {
         ServerProxy.deleteEntry(entry._id, ()=>{
             this.state.data.days[dayIndex].entries.splice(index, 1);
             this.setStateDirty("data");
+            emit("push", {title: "Success!", message:"Time entry for " + entry.task.name + " on " + new Date(entry.start).toDateString() + " deleted."});
         });
     }
 
