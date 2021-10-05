@@ -40,6 +40,12 @@ class {
         });
     }
 
+    refreshList(event) {
+        this.projectSelectComponent.setOption(event.project);
+        this.emit("select", {projectid: event.project._id});
+        this.loadProjectList();
+    }
+
     // Translate a project into an option for the comobox input
     projectToOption(project) {
         return {
@@ -68,7 +74,7 @@ style {
     }
 }
 
-project-popout key="project-popout"
+project-popout key="project-popout" on-saved("refreshList")
 ui-combobox.project-name class=input.class rounded key="project-select" label="Select Project" options=state.projectlist on-select("selectProject")
     @first
        ui-button.project-select-add-button trailingicon="plus" on-click("showProjectPopout")
