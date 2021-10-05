@@ -1,6 +1,14 @@
 import network from "./network.js";
 
 class ServerProxy {
+    async getUser(cb) {
+        let response = await network.get("/api/user");
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
     async getActiveTask(cb) {
         let response = await network.get("/api/task/active/");
         let task = null;
@@ -247,6 +255,46 @@ class ServerProxy {
 
     async deleteInvoice(id, cb) {
         let response = await network.delete("/api/invoice/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async getSettings(cb) {
+        let response = await network.get("/api/setting/all/");
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async getSetting(id, cb) {
+        let response = await network.get("/api/setting/"+id);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async addSetting(data, cb) {
+        console.log(data);
+        let response = await network.post("/api/setting", data);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async updateSetting(data, cb) {
+        let response = await network.post("/api/setting/update/"+data._id, data);
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
+    async deleteSetting(id, cb) {
+        let response = await network.delete("/api/setting/"+id);
 
         if(response.success && cb) {
             cb(response.data);
