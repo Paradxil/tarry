@@ -1,5 +1,5 @@
 import ServerProxy from "../../utils/serverproxy.js";
-import {colors} from "../../utils/theme.js";
+import {colors_list, color_to_css_var} from "../../utils/theme.js";
 
 class {
     onCreate() {
@@ -29,7 +29,7 @@ class {
     newProject() {
         this.state.project = {
             name: null,
-            color: colors[0],
+            color: colors_list[0].value,
             wage: 15
         };
     }
@@ -45,14 +45,18 @@ class {
 
     saveProject() {
         if(this.state.project._id) {
-            ServerProxy.updateProject(this.state.project, ()=>{
-                this.emit("saved");
+            ServerProxy.updateProject(this.state.project, (project)=>{
+                emit("push", {title: "Success!", message:"Project saved successfully."});
+                this.emit("saved", {project: project});
+                this.popoutFormComponent.toggleVisibility();
             });
         }
         else {
             ServerProxy.addProject(this.state.project, (project)=>{
-                this.emit("saved");
+                emit("push", {title: "Success!", message:"Project created successfully."});
+                this.emit("saved", {project: project});
                 this.state.project = project;
+                this.popoutFormComponent.toggleVisibility();
             })
         }
     }
@@ -84,7 +88,7 @@ popout-form title=state.id==null?'Add Project':'Edit Project' key="project-popou
     if(state.project != null)
         ui-linear-layout vertical padded
             @element
-                ui-color-select rounded colors=colors value=state.project.color on-input('setColor')
+                ui-color-select rounded colors=colors_list value={value: state.project.color, color: color_to_css_var(state.project.color)} on-input('setColor') label="Project Color"
             @element
                 ui-textbox label="Project Name" value=state.project.name on-input('setName')
             @element
