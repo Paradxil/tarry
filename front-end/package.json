@@ -11,8 +11,10 @@
     "feather-marko": "^0.0.3",
     "fs": "^0.0.1-security",
     "marko": "^5.10.3",
+    "open-color": "^1.9.1",
     "regenerator-runtime": "^0.13.9",
-    "simple-marko-ui": "file:../../simple-marko-ui"
+    "simple-marko-ui": "file:../../simple-marko-ui",
+    "timezones-list": "^3.0.1"
   },
   "babel": {
     "plugins": [
