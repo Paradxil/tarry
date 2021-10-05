@@ -1,1 +1,22 @@
-app-layout title="Account" currentpage="account"
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate() {
+        this.state = {
+            user: {
+                username: "loading..."
+            }
+        };
+
+        this.getUserData();
+    }
+
+    getUserData() {
+        ServerProxy.getUser((user)=>{
+            this.state.user = user;
+        });
+    }
+}
+
+app-layout title="Dashboard" currentpage="account"
+    widget title=state.user.username
