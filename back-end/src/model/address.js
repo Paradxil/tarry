@@ -1,7 +1,8 @@
+const config = require('../utils/config');
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
 
-// Create a scheme for invoices
+// Create a scheme for addresses
 const addressSchema = new mongoose.Schema({
     userid: {type: String, required: true},
     name: String,
@@ -14,9 +15,7 @@ const addressSchema = new mongoose.Schema({
     email: String
 });
 
+addressSchema.plugin(encrypt, { secret: config.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid'] });
 
-//TODO: Add field encryption.
-//invoiceSchema.plugin(encrypt, { secret: process.env.SECRET, excludeFromEncryption: ['userid', 'template'], additionalAuthenticatedFields: ['userid', 'template'] });
-
-// Create a model for invoices
+// Create a model for addresses
 module.exports = mongoose.model('Address', addressSchema);

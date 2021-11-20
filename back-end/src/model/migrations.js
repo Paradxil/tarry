@@ -2,58 +2,40 @@ const TimeEntryDAO = require("../data/timeEntryDAO");
 const TaskDAO = require("../data/taskDAO");
 const UserDAO = require("../data/userDAO");
 const TimeEntryModel = require("../model/timeEntry");
+const config = require('../utils/config');
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
+const ProjectDAO = require("../data/projectDAO");
+const Address = require("./address");
 
 class Migrations {
     static MIGRATIONS = {
-        0: async function(userid) {
-            console.log("RUNNING MIGRATION 0");
-
-            let timeEntryDAO = new TimeEntryDAO();
-
-            let taskDAO = new TaskDAO();
-            let tasks = await taskDAO.getAllTasks(userid);
-
-            for(let task of tasks) {
-                await timeEntryDAO.add(userid, task._id, task.start, task.end);
-            }
-
-            let userDAO = new UserDAO();
-            let user = await userDAO.getUserById(userid);
-            user.schemaVersion = 1;
-            await user.save();
-        }/*,
-        1: async function (userid) { //Remove encryption from timeEntries
-            console.log("RUNNING MIGRATION 1");
-
-            // new schema without plugins
-            let tmpSchema = new mongoose.Schema({
-                userid: { type: String, required: true },
-                taskid: { type: String, required: true },
-                start: { type: Number, required: true },
-                end: { type: Number, required: true }
+        1: async function (userid) {
+            console.log("MIGRATE ADDRESS SCHEMA - ENCRYPT EXISTING DOCUMENTS");
+            const tmpAddressSchema = new mongoose.Schema({
+                userid: {type: String, required: true},
+                name: String,
+                organization: String,
+                street: String,
+                city: String,
+                state: String,
+                zip: String,
+                phone: String,
+                email: String
             });
 
-            tmpSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['start', 'end']});
-            let tmpModel = TimeEntryModel.compile(TimeEntryModel.modelName, tmpSchema, TimeEntryModel.collection.name, TimeEntryModel.db, mongoose);
-
-            let timeEntryDAO = new TimeEntryDAO();
-            let entries = await tmpModel.find({ userid: userid });
-            for(let entry of entries) {
-                let e = await timeEntryDAO.get(entry._id);
-                console.log(entry);
-                console.log(e);
-                e.end = entry.end||e.end;
-                e.start = entry.start||e.start;
-                await e.save();
-            }
+            tmpAddressSchema.plugin(encrypt.migrations, { secret: config.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid'] });
+            const TmpAddress = Address.compile(Address.modelName, tmpAddressSchema, Address.collection.name, Address.db, mongoose);
+            TmpAddress.migrateToA(function(err){
+                if (err){ throw err; }
+                console.log('Migration successful');
+            });
 
             let userDAO = new UserDAO();
             let user = await userDAO.getUserById(userid);
             user.schemaVersion = 2;
             await user.save();
-        }*/
+        }
     }
 
     static ShouldMigrate(version) {
