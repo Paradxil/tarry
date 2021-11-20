@@ -2,5 +2,5 @@ import emphasis from "<ui-emphasis>";
 import text from "<ui-text>";
 import {color_to_css_var} from "../../utils/theme.js"
 
-$ let color = input.project.color[0]==="#"?input.project.color:color_to_css_var(input.project.color)
+$ let color = input.project.color[0]==="#"?input.project.color:color_to_css_var(input.project.color, 6)
 <${input.emphasis===false?text:emphasis} style={'--text-dark': color} dark>${input.project.name}</>
