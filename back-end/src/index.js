@@ -1,6 +1,6 @@
-require('dotenv').config();
+const config = require('./utils/config');
 
 const Server = require('./server/server');
 
 let server = new Server();
-server.start(process.env.PORT);
+server.start(config.PORT);

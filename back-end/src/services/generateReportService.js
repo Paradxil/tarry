@@ -1,12 +1,10 @@
 const TimeEntryDAO = require('../data/timeEntryDAO');
-const ProjectDAO = require('../data/projectDAO');
 const TaskDAO = require('../data/taskDAO');
 
 class GenerateReportService {
     constructor() {
         this.entryDAO = new TimeEntryDAO();
         this.taskDAO = new TaskDAO();
-        this.projectDAO = new ProjectDAO();
         this.projectsFilter = [];
     }
 

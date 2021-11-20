@@ -29,6 +29,7 @@ class DataAccessHandler {
             res.send(Response.Success(data));
         }
         catch(err) {
+            console.log(err);
             res.send(Response.Error("Error retrieving the data from the database."));
         }
     }

@@ -12,29 +12,14 @@ const UserDAO = require('../data/userDAO');
 const LoginHandler = require('../api/loginHandler');
 const CaptchaHandler = require('../api/captchaHandler');
 const RegisterHandler = require('../api/registerHandler');
-const AllTasksHandler = require('../api/allTasksHandler');
-const AddTaskHandler = require('../api/addTaskHandler');
-const DeleteTaskHandler = require('../api/deleteTaskHandler');
 const StartTaskHandler = require('../api/startTaskHandler');
 const StopTaskHandler = require('../api/stopTaskHandler');
 const GetActiveTaskHandler = require('../api/getActiveTaskHandler');
-const SaveProjectHandler = require('../api/saveProjectHandler');
-const DeleteProjectHandler = require('../api/deleteProjectHandler');
-const AllProjectsHandler = require('../api/allProjectsHandler');
-const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
-const PaginatedTimeEntriesHandler = require("../api/paginatedTimeEntriesHandler");
-const DeleteTimeEntryHandler = require("../api/deleteTimeEntryHandler");
-const GetTaskHandler = require("../api/getTaskHandler");
 const SetTaskStatusHandler = require('../api/setTaskStatusHandler');
-const UpdateTimeEntryHandler = require('../api/updateTimeEntryHandler');
 
 const Response = require("../model/response/response");
 const GenerateReportHandler = require('../api/generateReportHandler');
-const AllInvoiceHandler = require('../api/allInvoiceHandler');
-const SaveInvoiceHandler = require('../api/saveInvoiceHandler');
 const GenerateInvoicePDFHandler = require('../api/generateInvoicePDFHandler');
-const GetInvoiceHandler = require('../api/getInvoiceHandler');
-const GetProjectHandler = require('../api/getProjectHandler');
 const DataAccessHandlerFactory = require('../api/dataAccessHandlerFactory');
 
 class Server {

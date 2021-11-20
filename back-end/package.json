@@ -25,5 +25,8 @@
     "passport-local": "^1.0.0",
     "puppeteer": "^10.1.0",
     "timezones-list": "^3.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.2.0"
   }
 }

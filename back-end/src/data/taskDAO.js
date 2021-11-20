@@ -1,4 +1,3 @@
-const task = require('../model/task');
 const Task = require('../model/task');
 
 class TaskDAO {
