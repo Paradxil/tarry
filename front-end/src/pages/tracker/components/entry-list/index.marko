@@ -6,16 +6,17 @@ class {
     onCreate() {
         this.state = {
             data: {},
-            disabled: []
+            disabled: [],
+            loadingData: false
         };
 
         this.timeEntryPopout = null;
-        this.firstDate = dateInPast(300);
+        this.daysInPast = 7;
         this.generateReport();
     }
 
     generateReport() {
-        ServerProxy.generateReport(this.firstDate, now(), [], [], (report) => {
+        ServerProxy.generateReport(dateInPast(this.daysInPast), now(), [], [], (report) => {
             this.state.data = report;
             this.state.data.days = this.state.data.days.reverse();
             this.setStateDirty("data");
@@ -32,23 +33,18 @@ class {
     }
 
     async loadMoreData(event) {
-        if (document.documentElement.scrollTop > document.getElementById("entries-wrapper").clientHeight - 350 && !this.state.loadingData) {
+        if (document.documentElement.scrollHeight - document.documentElement.scrollTop <= document.documentElement.clientHeight + 500 && !this.state.loadingData) {
             this.state.loadingData = true;
-            let last = this.firstDate - (1000 * 60 * 60 * 24);
-            this.firstDate -= (1000 * 60 * 60 * 24 * 7);
-            
-            let response = await utils.post("/api/report", {
-                start: this.firstDate, //Start date
-                end: last, //End date
-                projects: [], //A list of projectIDs to include in the report. Empty to include all projects.
-                tasks: [] //A list of taskIDs to include in the report. Empty to include all tasks.
+            let end = dateInPast(this.daysInPast + 1);
+            this.daysInPast += 7;
+            let start = dateInPast(this.daysInPast);
+
+            ServerProxy.generateReport(start, end, [], [], (report) => {
+                this.state.loadingData = false;
+                this.state.data.days = this.state.data.days.concat(report.days.reverse());
+
+                this.setStateDirty("data");
             });
-            if(response.success) {
-                this.state.data.days = this.state.data.days.concat(response.data.days.reverse());
-                this.state.tasklist = this.state.tasklist.concat(Object.values(response.data.tasks).map((el) => {return {search: el.name + " " + el.project.name, value: el.name, project: el.project.name, color: el.project.color, projectid: el.project._id};}));
-            }
-            this.setStateDirty("data");
-            this.setStateDirty("tasklist");
         }
     }
 
