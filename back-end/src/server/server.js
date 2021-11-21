@@ -153,72 +153,17 @@ class Server {
             await handler.handle(req, res);
         });
 
-        /*// Get all time entries for a user
-        this.app.get('/api/time/all/:userid', this.isAuthenticated, async function(req, res) {
-            let handler = new AllTimeEntriesHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get paginated time entries for a user
-        this.app.post('/api/time/', this.isAuthenticated, async function(req, res) {
-            let handler = new PaginatedTimeEntriesHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Delete a time entry
-        this.app.delete('/api/time/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteTimeEntryHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Update a time entry
-        this.app.post('/api/time/update', this.isAuthenticated, async function(req, res) {
-            let handler = new UpdateTimeEntryHandler(req, res);
-            await handler.handle(req, res);
-        });*/
-
-        // // Add a task
-        // this.app.post('/api/task', this.isAuthenticated, async function(req, res) {
-        //     let handler = new AddTaskHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-
         // Set the status of a task
         this.app.post('/api/task/status', this.isAuthenticated, async function(req, res) {
             let handler = new SetTaskStatusHandler(req, res);
             await handler.handle(req, res);
         });
-
-        // Delete a task
-        /*this.app.delete('/api/task/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteTaskHandler(req, res);
-            await handler.handle(req, res);
-        });*/
         
         // Get the users active running task.
         this.app.get('/api/task/active', this.isAuthenticated, async function(req, res) {
             let handler = new GetActiveTaskHandler(req, res);
             await handler.handle(req, res);
         });
-
-        // // Get all tasks for a user
-        // this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {
-        //     let handler = new AllTasksHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-
-        // // Get all tasks for current user
-        // this.app.get('/api/task/all', this.isAuthenticated, async function(req, res) {
-        //     let handler = new AllTasksHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-
-        // // Get a task
-        // this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
-        //     let handler = new GetTaskHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-    
 
         // Start a task. Each user can only have one running active task at a time.
         this.app.post('/api/start', this.isAuthenticated, async function(req, res) {
@@ -231,30 +176,6 @@ class Server {
             let handler = new StopTaskHandler(req, res);
             await handler.handle(req, res);
         });
-
-        // Get all projects for the current user
-        // this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
-        //     let handler = new AllProjectsHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-
-        // //Get a project
-        // this.app.get('/api/project/:id', this.isAuthenticated, async function(req, res) {
-        //     let handler = new GetProjectHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-
-        // // Add/update a project
-        // this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
-        //     let handler = new SaveProjectHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
-
-        // // Delete a project
-        // this.app.delete('/api/project/:id', this.isAuthenticated, async function(req, res) {
-        //     let handler = new DeleteProjectHandler(req, res);
-        //     await handler.handle(req, res);
-        // });
 
         this.app.get('/api/invoice/pdf/:id', this.isAuthenticated, async function(req, res) {
             let handler = new GenerateInvoicePDFHandler();
