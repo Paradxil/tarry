@@ -9,7 +9,7 @@ const projectSchema = new mongoose.Schema({
     wage: {type: Number, required: true}
 });
 
-//projectSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
+projectSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
 
 // Create a model for users
 module.exports = mongoose.model('Projects', projectSchema);

@@ -1,6 +1,5 @@
 const ActiveTaskDAO = require('../data/activeTaskDAO');
 const TimeEntryDAO = require('../data/timeEntryDAO');
-const TaskDAO = require('../data/taskDAO');
 
 class StopTaskService {
     async stopTask(userid, end) {
