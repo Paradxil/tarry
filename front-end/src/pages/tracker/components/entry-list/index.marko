@@ -144,3 +144,6 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
                             @element fullwidth=input.ismobile alignright
                                 $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
                                 controls controls=controls on-continue("continueTask", data.task._id) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
+    if(state.loadingData)
+        @element fullwidth aligncenter paddedwide light
+            loader
