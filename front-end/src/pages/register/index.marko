@@ -6,7 +6,8 @@ class {
         this.state = {
             username: "",
             password: "",
-            email: ""
+            email: "",
+            message: ""
         }
     }
 
@@ -25,6 +26,9 @@ class {
         if(response.success) {
             window.location.replace("/tracker");
         }
+        else {
+            this.state.message = response.message;
+        }
     }
 
     updatePassword(event) {
@@ -37,6 +41,12 @@ class {
 
     updateEmail(event) {
         this.state.email = event.value;
+    }
+}
+
+style {
+    .ui-submit {
+        border: none !important;
     }
 }
 
@@ -57,6 +67,8 @@ template title=L.register
                         ui-textbox label=L.email id="email" value=state.email on-input("updateEmail")
                     @element
                         div.icon-captcha key="icon-captcha" no-update
+                    @element
+                        ui-emphasis centered -- ${state.message}
                     @element
                         ui-submit preventdefault on-click("register")
                             -- ${L.register}

@@ -7,7 +7,8 @@ class {
     onCreate() {
         this.state = {
             username: "",
-            password: ""
+            password: "",
+            message: ""
         }
     }
 
@@ -28,6 +29,9 @@ class {
             sessionStorage.setItem("sessionexpires", Date.now() + 18000000); //TODO: Get this value from the login response.
 
             this.loadUserData();
+        }
+        else {
+            this.state.message = response.message;
         }
     }
 
@@ -59,6 +63,12 @@ class {
     }
 }
 
+style {
+    .ui-submit {
+        border: none !important;
+    }
+}
+
 $ const L = Localize(r.strings.login);
 ui-form padded vertical gutter="16px"
     @element
@@ -67,6 +77,8 @@ ui-form padded vertical gutter="16px"
         ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
     @element
         div.icon-captcha key="icon-captcha" no-update
+    @element
+        ui-emphasis.error-message centered -- ${state.message}
     @element
         ui-submit preventdefault on-click("login") 
             -- ${L.login}
