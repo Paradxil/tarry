@@ -1,13 +1,12 @@
 import {Localize} from "../../utils/localization.js";
 
 $ const L = Localize(r.strings.login);
-template title=L.login
-    page-background
-    ui-linear-layout vertical aligncenter placecenter fullwidth
-        @element
-            ui-heading light heading=1 -- ${L.login}
-        @element
-            paper-modal 
-                login-form
-        @element
-            ui-button rounded href="/register" -- create new account
+ui-linear-layout vertical aligncenter placecenter fullwidth
+    @element
+        ui-heading light heading=1 -- ${L.login}
+    @element
+        paper-modal 
+            login-form
+    @element
+        router-link path='/register'
+            ui-button rounded -- create new account

@@ -1,3 +1,4 @@
 {
+    "tags-dir": "./src/pages",
     "transform": "./src/utils/resources.js"
 }

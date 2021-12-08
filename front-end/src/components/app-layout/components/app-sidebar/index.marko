@@ -2,6 +2,7 @@ import {Localize} from "../../../../utils/localization.js";
 import network from "../../../../utils/network.js";
 import {deleteCookie} from "../../../../utils/cookie.js";
 import ServerProxy from "../../../../utils/serverproxy.js";
+import {navigate} from "../../../../utils/router.js";
 
 class {
     onCreate() {
@@ -41,7 +42,7 @@ class {
     }
 
     changePage(page) {
-        window.location.assign("/"+page);
+        navigate("/"+page);
     }
 
     async logoutUser() {

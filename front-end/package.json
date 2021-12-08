@@ -13,7 +13,7 @@
     "marko": "^5.10.3",
     "open-color": "^1.9.1",
     "regenerator-runtime": "^0.13.9",
-    "simple-marko-ui": "file:../../simple-marko-ui",
+    "simple-marko-ui": "^0.0.2",
     "timezones-list": "^3.0.1"
   },
   "babel": {
@@ -29,10 +29,9 @@
   "name": "front-end",
   "version": "0.0.1",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "build": "npx marko-build ./src/pages",
-    "dev": "npx marko-serve ./src/pages"
+    "build": "npx marko-build ./src/app/app.marko --static",
+    "dev": "npx marko-serve ./src/app/app.marko"
   },
   "author": "",
   "license": "GPL3",

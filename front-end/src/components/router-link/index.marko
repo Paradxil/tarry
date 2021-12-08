@@ -1,0 +1,16 @@
+import {navigate} from "../../utils/router.js";
+
+class {
+    handleClick(event) {
+        navigate(this.input.path);
+    }
+}
+
+style {
+    .routerLink {
+        display: content;
+    }
+}
+
+div on-click('handleClick')
+    <${input.renderBody}/>

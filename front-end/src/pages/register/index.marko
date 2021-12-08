@@ -51,26 +51,25 @@ style {
 }
 
 $ const L = Localize(r.strings.register);
-template title=L.register
-    page-background
-    ui-linear-layout vertical fullwidth placecenter aligncenter padded gutter="16px"
-        @element
-            ui-heading heading=1 light centered -- ${L.register}
-        @element
-            paper-modal
-                ui-form padded vertical gutter="16px"
-                    @element
-                        ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
-                    @element
-                        ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
-                    @element
-                        ui-textbox label=L.email id="email" value=state.email on-input("updateEmail")
-                    @element
-                        div.icon-captcha key="icon-captcha" no-update
-                    @element
-                        ui-emphasis centered -- ${state.message}
-                    @element
-                        ui-submit preventdefault on-click("register")
-                            -- ${L.register}
-        @element
-            ui-button rounded href="/login" -- login
+ui-linear-layout vertical fullwidth placecenter aligncenter padded gutter="16px"
+    @element
+        ui-heading heading=1 light centered -- ${L.register}
+    @element
+        paper-modal
+            ui-form padded vertical gutter="16px"
+                @element
+                    ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
+                @element
+                    ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
+                @element
+                    ui-textbox label=L.email id="email" value=state.email on-input("updateEmail")
+                @element
+                    div.icon-captcha key="icon-captcha" no-update
+                @element
+                    ui-emphasis centered -- ${state.message}
+                @element
+                    ui-submit preventdefault on-click("register")
+                        -- ${L.register}
+    @element
+        router-link path='/login'
+            ui-button rounded -- login

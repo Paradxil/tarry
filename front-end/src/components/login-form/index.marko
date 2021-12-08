@@ -2,6 +2,7 @@ import network from "../../utils/network.js";
 import {Localize} from "../../utils/localization.js";
 import {setCookie} from "../../utils/cookie.js";
 import ServerProxy from "../../utils/serverproxy.js";
+import {navigate} from "../../utils/router.js";
 
 class {
     onCreate() {
@@ -49,7 +50,7 @@ class {
                         document.querySelector(':root').style.setProperty('--tertiary', 'var(--oc-'+setting.value+'-4)');
                     }
                 }
-                window.location.replace("/tracker");
+                navigate("/tracker");
             });
         });
     }

@@ -80,53 +80,52 @@ class {
     }
 }
 
-app-layout title="Tasks" currentpage="tasks"
-    task-popout key="task-popout" on-saved("loadTaskList")
-    listwidget items=state.filteredTasks
-        @title
-            ui-linear-layout
-                @element
-                    ui-button rounded text="All" accent=state.filter=='all' on-click("switchFilter", 'all')
-                @element
-                    ui-button rounded text="Todo" accent=state.filter=='todo' on-click("switchFilter", 'todo')
-        @subtitle
-            ui-button rounded icon="plus" title="Add new task." on-click("addNewTask")
-        if(state.filteredTasks.length === 0)
-            @first
-                ui-text -- No tasks found labeled '${state.filter}'.
-        @item|{data, index}|
-            ui-linear-layout aligncenter
-                @element fillspace
-                    ui-linear-layout vertical gutter="0px"
+task-popout key="task-popout" on-saved("loadTaskList")
+listwidget items=state.filteredTasks
+    @title
+        ui-linear-layout
+            @element
+                ui-button rounded text="All" accent=state.filter=='all' on-click("switchFilter", 'all')
+            @element
+                ui-button rounded text="Todo" accent=state.filter=='todo' on-click("switchFilter", 'todo')
+    @subtitle
+        ui-button rounded icon="plus" title="Add new task." on-click("addNewTask")
+    if(state.filteredTasks.length === 0)
+        @first
+            ui-text -- No tasks found labeled '${state.filter}'.
+    @item|{data, index}|
+        ui-linear-layout aligncenter
+            @element fillspace
+                ui-linear-layout vertical gutter="0px"
+                    @element
+                        ui-text -- ${data.name} 
+                    if(data.project)
                         @element
-                            ui-text -- ${data.name} 
-                        if(data.project)
-                            @element
-                                project project=data.project
-                @element
-                    controls [
-                        controls = [
-                            {
-                                name: "delete",
-                                title: "Delete task.",
-                                icon: "trash"
-                            },
-                            {
-                                name: "flag",
-                                title: "Mark todo.",
-                                icon: "flag"
-                            },
-                            {
-                                name: "view",
-                                title: "View task details.",
-                                icon: "eye"
-                            },
-                            {
-                                name: "edit",
-                                title: "Edit task.",
-                                icon: "edit-2"
-                            }
-                        ],
-                        on-edit("editTask", data._id),
-                        on-delete("confirmDeleteTask", data)
-                    ]
+                            project project=data.project
+            @element
+                controls [
+                    controls = [
+                        {
+                            name: "delete",
+                            title: "Delete task.",
+                            icon: "trash"
+                        },
+                        {
+                            name: "flag",
+                            title: "Mark todo.",
+                            icon: "flag"
+                        },
+                        {
+                            name: "view",
+                            title: "View task details.",
+                            icon: "eye"
+                        },
+                        {
+                            name: "edit",
+                            title: "Edit task.",
+                            icon: "edit-2"
+                        }
+                    ],
+                    on-edit("editTask", data._id),
+                    on-delete("confirmDeleteTask", data)
+                ]

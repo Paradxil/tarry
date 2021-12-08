@@ -1,11 +1,11 @@
-template title="Time Tracker"
-    page-background
-    ui-linear-layout vertical fullwidth light aligncenter placecenter gutter="20px"
-        @element
-            ui-heading heading=1 -- Paper Time
-        @element
-            ui-linear-layout
-                @element
-                    ui-button href="/login" filled rounded text="Login"
-                @element
-                    ui-button href="/register" rounded text="Register"
+ui-linear-layout vertical fullwidth light aligncenter placecenter gutter="20px"
+    @element
+        ui-heading heading=1 -- Paper Time
+    @element
+        ui-linear-layout
+            @element
+                router-link path='/login'
+                    ui-button filled rounded text="Login"
+            @element
+                router-link path='/register'
+                    ui-button rounded text="Register"

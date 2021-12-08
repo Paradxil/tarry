@@ -26,9 +26,7 @@ class {
     }
 }
 
-app-layout title="Time Tracker" currentpage="tracker"
-    time-entry-popout key="time-entry-popout" on-saved("refreshEntryList")
-    @controls
-        controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
-    active-task-header key="active-task" on-stopped("refreshEntryList")
-    entry-list key="entry-list" on-continuetask("continueTask")
+time-entry-popout key="time-entry-popout" on-saved("refreshEntryList")
+controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
+active-task-header key="active-task" on-stopped("refreshEntryList")
+entry-list key="entry-list" on-continuetask("continueTask")

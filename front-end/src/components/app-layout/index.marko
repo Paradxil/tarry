@@ -1,6 +1,7 @@
 import 'regenerator-runtime/runtime';
 import ServerProxy from "../../utils/serverproxy.js";
 import {hasCookie} from "../../utils/cookie.js";
+import {emit} from "../../utils/events.js";
 //import "../../utils/settings.js";
 
 class {
@@ -47,25 +48,23 @@ class {
     }
 }
 
-template title=input.title||null
-    login-popout key='login-popout'
-    page-background
-    confirmation-dialogue
-    notification-popups
-    if(state.ismobile)
-        topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar") returnto=input.returnto
-    app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
-    ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile, "mobile-page-wrapper": state.ismobile}
-        @element 
-            ui-linear-layout light aligncenter class={"limit-width":!input.fullwidth}
-                if(input.returnto)
-                    @element
-                        ui-button rounded icon="arrow-left" on-click("changePage", input.returnto)
-                if(!state.ismobile)
-                    @element fillspace
-                        ui-heading heading=1 -- ${input.title}
-                if(input.controls&&input.controls.renderBody)
-                    @element
-                        <${input.controls.renderBody}/>
-        @element.content-wrapper class={"limit-width":!input.fullwidth} fillspace
-            <${input.renderBody} ismobile=state.ismobile/>
+login-popout key='login-popout'
+confirmation-dialogue
+notification-popups
+if(state.ismobile)
+    topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar") returnto=input.returnto
+app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
+ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile, "mobile-page-wrapper": state.ismobile}
+    @element 
+        ui-linear-layout light aligncenter class={"limit-width":!input.fullwidth}
+            if(input.returnto)
+                @element
+                    ui-button rounded icon="arrow-left" on-click("changePage", input.returnto)
+            if(!state.ismobile)
+                @element fillspace
+                    ui-heading heading=1 -- ${input.title}
+            if(input.controls&&input.controls.renderBody)
+                @element
+                    <${input.controls.renderBody}/>
+    @element.content-wrapper class={"limit-width":!input.fullwidth} fillspace
+        <${input.renderBody} ismobile=state.ismobile/>

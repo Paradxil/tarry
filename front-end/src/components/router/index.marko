@@ -1,0 +1,57 @@
+import Router, {listen, navigate} from "../../utils/router.js";
+
+class {
+    onCreate() {
+        this.state = {
+            currentRoute: null,
+            params: {}
+        };
+    }
+
+    onMount() {
+        Router.initialize();
+
+        listen('popstate', (event) => {
+            this.navigate(event.state.path)
+        });
+
+        listen('navigate', (path) => {
+            this.navigate(path);
+        });
+
+        if(this.input.defaultRoute) {
+            navigate(this.input.defaultRoute);
+        }
+    }
+
+    navigate(path) {
+        for(let route of this.input.routes) {
+            let routeParams = route.path.match(/:\S*(\/|$)/i);
+
+            let p = route.path.replaceAll('/', '\\/');
+            p = route.path.replaceAll(/:\S*(\/|$)/gi, '(\\S*)');
+            p += '$'
+
+            let search = new RegExp(p, 'i');
+            let matches = path.match(search)
+
+            if(matches !== null) {
+                this.state.params = {};
+
+                let paramIndex = 1;
+                for(let i = 0; i + 1 < matches.length && i < routeParams.length; i++) {
+                    this.state.params[routeParams[i].replaceAll(':', '')] = matches[i + 1]; 
+                }
+
+                this.state.currentRoute = route;
+
+                return
+            }
+        }
+    }
+}
+
+if(state.currentRoute && state.currentRoute.component)
+    <${state.currentRoute?state.currentRoute.component:null} params=state.params/>
+else
+    <${state.currentRoute?state.currentRoute.renderBody:null} params=state.params/>

@@ -1,0 +1,34 @@
+import {listen} from "../utils/events.js"
+import invoicesedit from "../pages/invoices/edit/[id].marko"
+
+class {
+    onCreate() {
+        this.state = {
+            currentPage: 0
+        };
+
+        listen('navigate', (event)=>{this.state.currentPage = event.page})
+    }
+}
+
+template title=input.title||null
+    page-background
+    app-layout
+        router default-route='/'
+            @route path='/'
+                index
+            @route path='/login'
+                login
+            @route path='/register'
+                register
+            @route path='/tracker'
+                tracker
+            @route path='/tasks'
+                tasks
+            @route path='/projects'
+                projects
+            @route path='/invoices'
+                invoices
+            @route|{params}| path='/invoices/edit/:id' component=invoicesedit
+            @route path='/reports'
+                reports

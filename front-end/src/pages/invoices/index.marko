@@ -1,5 +1,6 @@
 import ServerProxy from "../../utils/serverproxy.js";
 import {emit} from "../../utils/events.js";
+import {navigate} from "../../utils/router.js";
 
 class {
     onCreate() {
@@ -48,65 +49,63 @@ class {
     }
 
     viewInvoice(data) {
-        window.location.assign("/invoices/view/" + data._id);
+        navigate("/invoices/view/" + data._id);
     }
 
     editInvoice(data) {
-        window.location.assign("/invoices/edit/" + data._id);
+        navigate("/invoices/edit/" + data._id);
     }
 }
 
-app-layout currentpage="invoices" title="Invoices"
-    listwidget items=state.invoices title="Invoices"
-        @subtitle
-            controls [
-                controls = [
-                    {
-                        name: "add",
-                        title: "Create a new invoice.",
-                        icon: "plus"
-                    }
-                ]
-                on-add("addInvoice")
+listwidget items=state.invoices title="Invoices"
+    @subtitle
+        controls [
+            controls = [
+                {
+                    name: "add",
+                    title: "Create a new invoice.",
+                    icon: "plus"
+                }
             ]
-        if(state.invoices.length === 0)
-            @first
-                ui-text -- No invoices found. Click the plus icon above to create a new invoice.
-        @item|{data, index}|
-            ui-linear-layout aligncenter
-                @element fillspace
-                    ui-linear-layout vertical gutter="0px"
-                        @element
-                            ui-text -- ${data.billto?data.billto.name:""} 
-                        @element
-                            ui-emphasis -- ${data.id}
-                @element
-                    controls [
-                        controls = [
-                            {
-                                name: "delete",
-                                title: "Delete invoice.",
-                                icon: "trash"
-                            },
-                            {
-                                name: "view",
-                                title: "Preview invoice.",
-                                icon: "eye"
-                            },
-                            {
-                                name: "download",
-                                title: "Download invoice as PDF.",
-                                icon: "download"
-                            },
-                            {
-                                name: "edit",
-                                title: "Edit invoice.",
-                                icon: "edit-2"
-                            }
-                        ],
-                        on-delete("confirmDeleteInvoice", data, index),
-                        on-view("viewInvoice", data),
-                        on-download("downloadInvoice", data),
-                        on-edit("editInvoice", data)
-                    ]
-    
+            on-add("addInvoice")
+        ]
+    if(state.invoices.length === 0)
+        @first
+            ui-text -- No invoices found. Click the plus icon above to create a new invoice.
+    @item|{data, index}|
+        ui-linear-layout aligncenter
+            @element fillspace
+                ui-linear-layout vertical gutter="0px"
+                    @element
+                        ui-text -- ${data.billto?data.billto.name:""} 
+                    @element
+                        ui-emphasis -- ${data.id}
+            @element
+                controls [
+                    controls = [
+                        {
+                            name: "delete",
+                            title: "Delete invoice.",
+                            icon: "trash"
+                        },
+                        {
+                            name: "view",
+                            title: "Preview invoice.",
+                            icon: "eye"
+                        },
+                        {
+                            name: "download",
+                            title: "Download invoice as PDF.",
+                            icon: "download"
+                        },
+                        {
+                            name: "edit",
+                            title: "Edit invoice.",
+                            icon: "edit-2"
+                        }
+                    ],
+                    on-delete("confirmDeleteInvoice", data, index),
+                    on-view("viewInvoice", data),
+                    on-download("downloadInvoice", data),
+                    on-edit("editInvoice", data)
+                ]
