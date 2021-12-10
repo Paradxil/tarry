@@ -114,11 +114,11 @@ style {
 
 time-entry-popout key="time-entry-popout" on-saved("refresh")
 ui-linear-layout vertical gutter="16px" id="entries-wrapper"
-    for|day, dayIndex| of=state.data.days||[]
+    for|day, dayIndex| of=state.data.days?state.data.days.filter(day=>day.entries.length>0):[]
         if(day.entries.length > 0)
-            @element
+            @element key=dayIndex style={animationName: 'load', animationDuration: '0.5s', animationDelay: (dayIndex * 0.1) + 's', animationFillMode: 'both'}
                 listwidget title=niceDate(day.date) subtitle=day.hoursTracked.toFixed(2)+"hrs" items=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
-                    @item|{data, index}| // Data here is a timeEntry from the items list.
+                    @item|{data, index}| // Data here is a timeEntry from the items list. 
                         ui-linear-layout aligncenter wrap
                             @element fillspace
                                 ui-linear-layout vertical gutter="0px"

@@ -10,6 +10,11 @@
     z-index: 200;
 }
 
+.ui-sidebar .ui-list {
+    top: 0px;
+    position: sticky;
+}
+
 .ui-sidebar .ui-linear-layout-child {
     overflow-y: clip;
 }

@@ -4,7 +4,7 @@ widget title=input.title||null subtitle=input.subtitle||null nopadding class=inp
             @element.listwidget-first paddedwide fillspace alignleft placecenter
                 <${input.first.renderBody}/>
         for|item, index| of=input.items
-            @element paddedwide fillspace alignleft placecenter
+            @element paddedwide fillspace alignleft placecenter key=index
                 <${input.item.renderBody} data=item index=index/>
         if(input.last)
             @element.listwidget-last paddedwide fillspace alignleft placecenter

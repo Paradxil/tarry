@@ -22,3 +22,8 @@
     border-bottom: 1px solid rgba(0,0,0,0.25);
     border-radius: 0px;
 }
+
+@keyframes load {
+    0% {transform: translateX(50px); opacity: 0;}
+    100% {transform: translateX(0px); opacity: 1;}
+}
