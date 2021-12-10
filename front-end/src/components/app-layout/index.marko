@@ -53,7 +53,7 @@ if(state.ismobile)
 if(input.sidebar)
     app-sidebar key="sidebar" currentpage=input.currentpage ismobile=state.ismobile
 
-ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile, "mobile-page-wrapper": state.ismobile}
+ui-linear-layout.page-wrapper fillspace fullwidth padded vertical class={"content-top-margin": state.ismobile, "mobile-page-wrapper": state.ismobile}
     @element 
         ui-linear-layout light aligncenter class={"limit-width":!input.fullwidth}
             if(input.returnto)

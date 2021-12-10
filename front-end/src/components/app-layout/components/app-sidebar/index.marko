@@ -58,7 +58,7 @@ class {
 
 $ const L = Localize(r.strings.sidebar);
 ui-sidebar collapsed=input.ismobile?false:state.collapsed hidden=input.ismobile?state.collapsed:false on-itemclick("sidebarItemClick") overlay=input.ismobile
-    @item.site-title icon=state.ismobile?"chevron-left":"menu" text="Time Tracker"
+    @item.site-title icon=state.ismobile?"chevron-left":"menu" text="Time Tracker" secondary raised
     @item icon="user" text=state.username page="account"
     @item text=L.tracker icon="clock" page="tracker" accent=input.currentpage==="tracker"
     @item text=L.tasks icon="list" page="tasks" accent=input.currentpage==="tasks"

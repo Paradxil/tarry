@@ -11,8 +11,15 @@
 }
 
 .ui-sidebar .ui-list {
+    max-height: 100vh;
     top: 0px;
     position: sticky;
+    overflow: auto;
+}
+
+.ui-sidebar .site-title {
+    position: sticky;
+    top: 0px;
 }
 
 .ui-sidebar .ui-linear-layout-child {
