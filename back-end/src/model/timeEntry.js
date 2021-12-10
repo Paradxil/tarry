@@ -6,7 +6,6 @@ var encrypt = require('mongoose-encryption');
 // Create a scheme for time entry
 const timeEntrySchema = new mongoose.Schema({
     userid: {type: String, required: true},
-    //taskid: {type: String},
     task: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tasks',
@@ -16,9 +15,9 @@ const timeEntrySchema = new mongoose.Schema({
     end: {type: Number, required: true}
 });
 
-timeEntrySchema.plugin(require('mongoose-autopopulate'));
-
 timeEntrySchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: []});
+
+timeEntrySchema.plugin(require('mongoose-autopopulate'));
 
 //Check that start < end
 timeEntrySchema.pre('validate', async function() {

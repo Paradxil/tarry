@@ -2,7 +2,7 @@ import 'regenerator-runtime/runtime';
 import ServerProxy from "../../utils/serverproxy.js";
 import {hasCookie} from "../../utils/cookie.js";
 import {emit} from "../../utils/events.js";
-//import "../../utils/settings.js";
+import {navigate} from 'simple-marko-router';
 
 class {
     onCreate() {
@@ -20,11 +20,6 @@ class {
         this.loginPopout = this.getComponent("login-popout");
 
         let sessionExpires = sessionStorage.getItem("sessionexpires");
-
-        if(sessionExpires == null && input.currentpage!=="login") {
-            this.changePage("login");
-            return;
-        }
 
         if(sessionExpires <= Date.now()) {
             this.loggedin = false;
@@ -44,16 +39,20 @@ class {
     }
 
     changePage(page) {
-        window.location.assign("/"+page);
+        navigate("/"+page);
     }
 }
 
 login-popout key='login-popout'
 confirmation-dialogue
 notification-popups
+
 if(state.ismobile)
-    topbar currentpage=input.currentpage on-togglesidebar("toggleSidebar") returnto=input.returnto
-app-sidebar key="sidebar" currentpage=input.currentpage||input.title||null ismobile=state.ismobile
+    topbar currentpage=input.title on-togglesidebar("toggleSidebar") returnto=input.returnto
+
+if(input.sidebar)
+    app-sidebar key="sidebar" currentpage=input.currentpage ismobile=state.ismobile
+
 ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"content-top-margin": state.ismobile, "mobile-page-wrapper": state.ismobile}
     @element 
         ui-linear-layout light aligncenter class={"limit-width":!input.fullwidth}
@@ -67,4 +66,4 @@ ui-linear-layout.page-wrapper fillspace fullwidth paddedwide vertical class={"co
                 @element
                     <${input.controls.renderBody}/>
     @element.content-wrapper class={"limit-width":!input.fullwidth} fillspace
-        <${input.renderBody} ismobile=state.ismobile/>
+        <${input.renderBody} ismobile=state.ismobile/> 

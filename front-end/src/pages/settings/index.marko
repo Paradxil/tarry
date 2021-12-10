@@ -52,21 +52,20 @@ macro|{name, renderBody}| name="setting"
         @element
             <${renderBody}/>
 
-app-layout title="Settings" currentpage="settings"
-    ui-linear-layout vertical
-        @element
-            widget title="Appearance"
-                ui-linear-layout vertical
-                    @element
-                        ui-color-select label="Primary Color" colors=colors_list on-input("setSetting", "primary-color")
-                    @element
-                        ui-color-select label="Accent Color" colors=colors_list on-input("setSetting", "secondary-color")
-        @element
-            widget title="Local"
-                ui-linear-layout vertical
-                    @element
-                        setting name="Hour Format"
-                            ui-select rounded options=[{value: "24", text: "24 Hour"}, {value: "12", text: "12 Hour"}] on-input("setSetting", "hour-format")
-                    @element
-                        setting name="Time Zone"
-                            ui-select rounded options=timezones.map((tz)=>{return {value: tz.tzCode, text: tz.label}}) on-input("setSetting", "time-zone")
+ui-linear-layout vertical
+    @element
+        widget title="Appearance"
+            ui-linear-layout vertical
+                @element
+                    ui-color-select label="Primary Color" colors=colors_list on-input("setSetting", "primary-color")
+                @element
+                    ui-color-select label="Accent Color" colors=colors_list on-input("setSetting", "secondary-color")
+    @element
+        widget title="Local"
+            ui-linear-layout vertical
+                @element
+                    setting name="Hour Format"
+                        ui-select rounded options=[{value: "24", text: "24 Hour"}, {value: "12", text: "12 Hour"}] on-input("setSetting", "hour-format")
+                @element
+                    setting name="Time Zone"
+                        ui-select rounded options=timezones.map((tz)=>{return {value: tz.tzCode, text: tz.label}}) on-input("setSetting", "time-zone")

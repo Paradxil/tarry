@@ -19,7 +19,6 @@ class {
         ServerProxy.generateReport(dateInPast(this.daysInPast), now(), [], [], (report) => {
             this.state.data = report;
             this.state.data.days = this.state.data.days.reverse();
-            this.setStateDirty("data");
         });
     }
 

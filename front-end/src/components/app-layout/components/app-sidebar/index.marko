@@ -2,7 +2,7 @@ import {Localize} from "../../../../utils/localization.js";
 import network from "../../../../utils/network.js";
 import {deleteCookie} from "../../../../utils/cookie.js";
 import ServerProxy from "../../../../utils/serverproxy.js";
-import {navigate} from "../../../../utils/router.js";
+import {navigate} from "simple-marko-router";
 
 class {
     onCreate() {
@@ -21,6 +21,7 @@ class {
     }
 
     onInput(input) {
+        console.log(input);
         if(input.ismobile) {
             this.state.collapsed = true;
         }

@@ -27,15 +27,13 @@ class {
     }
 }
 
-app-layout title="Reports" currentpage="reports"
-    @controls
-        ui-linear-layout
-            @element
-                ui-date-select label="From" milliseconds = state.start showtime=false on-input("setStartDate")
-            @element
-                ui-date-select label="To" milliseconds = state.end showtime=false on-input("setEndDate")
-    ui-linear-layout vertical fillspace fullwidth gutter="8px"
-        @element
-            widget title="Overview"
-                ui-container paddedwide
-                    graph data=state.data
+ui-linear-layout
+    @element
+        ui-date-select label="From" milliseconds = state.start showtime=false on-input("setStartDate")
+    @element
+        ui-date-select label="To" milliseconds = state.end showtime=false on-input("setEndDate")
+ui-linear-layout vertical fillspace fullwidth gutter="8px"
+    @element
+        widget title="Overview"
+            ui-container paddedwide
+                graph data=state.data

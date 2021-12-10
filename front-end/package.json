@@ -13,6 +13,7 @@
     "marko": "^5.10.3",
     "open-color": "^1.9.1",
     "regenerator-runtime": "^0.13.9",
+    "simple-marko-router": "^1.1.1",
     "simple-marko-ui": "^0.0.2",
     "timezones-list": "^3.0.1"
   },
@@ -30,10 +31,13 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "build": "npx marko-build ./src/app/app.marko --static",
+    "build": "NODE_ENV==production npx marko-build ./src/app/app.marko --static",
     "dev": "npx marko-serve ./src/app/app.marko"
   },
   "author": "",
   "license": "GPL3",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "eslint": "^8.4.1"
+  }
 }

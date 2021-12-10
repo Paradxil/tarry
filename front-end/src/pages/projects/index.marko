@@ -66,36 +66,35 @@ class {
     }
 }
 
-app-layout title="Projects" currentpage="projects"
-    project-popout key="project-popout" on-saved("refreshProjects")
-    listwidget items=state.projects title="Projects"
-        @subtitle
-            controls [
-                controls = [
-                    {
-                        name: "Add",
-                        icon: "plus"
-                    }
-                ]
-                on-add("addProject")
+project-popout key="project-popout" on-saved("refreshProjects")
+listwidget items=state.projects title="Projects"
+    @subtitle
+        controls [
+            controls = [
+                {
+                    name: "Add",
+                    icon: "plus"
+                }
             ]
-        @item|{data, index}|
-            ui-linear-layout aligncenter
-                @element fillspace
-                    project project=data emphasis=false
-                @element
-                    ui-text -- ${data.rate}
-                @element
-                    controls [
-                        controls = [{
-                            name: "Delete",
-                            icon: "trash"
-                        },
-                        {
-                            name: "Edit",
-                            icon: "edit-2"
+            on-add("addProject")
+        ]
+    @item|{data, index}|
+        ui-linear-layout aligncenter
+            @element fillspace
+                project project=data emphasis=false
+            @element
+                ui-text -- ${data.rate}
+            @element
+                controls [
+                    controls = [{
+                        name: "Delete",
+                        icon: "trash"
+                    },
+                    {
+                        name: "Edit",
+                        icon: "edit-2"
 
-                        }]
-                        on-edit("editProject", data._id)
-                        on-delete("confirmDeleteProject", data, index)
-                    ]
+                    }]
+                    on-edit("editProject", data._id)
+                    on-delete("confirmDeleteProject", data, index)
+                ]

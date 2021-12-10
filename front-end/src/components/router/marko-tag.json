@@ -1,8 +1,0 @@
-{
-    "nested-tags": {
-        "route": {
-            "target-property": "routes",
-            "is-repeated": true
-        }
-    }
-}

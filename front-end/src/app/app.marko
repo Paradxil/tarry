@@ -1,20 +1,41 @@
-import {listen} from "../utils/events.js"
-import invoicesedit from "../pages/invoices/edit/[id].marko"
+import invoicesedit from "../pages/invoices/edit/[id].marko";
+import invoicesview from "../pages/invoices/view/[id].marko";
 
 class {
     onCreate() {
         this.state = {
-            currentPage: 0
+            currentpage: '',
+            title: '',
+            returnto: null,
+            sidebar: false
         };
 
-        listen('navigate', (event)=>{this.state.currentPage = event.page})
+        this.titles=['Paper Time', 'Login', 'Register', 'Tracker', 'Tasks', 'Projects', 'Invoices', 'Edit Invoice', 'View Invoice', 'Reports', 'Settings'];
+        this.pages=['index', 'login', 'register', 'tracker', 'tasks', 'projects', 'invoices', 'invoices', 'invoices', 'reports', 'settings'];
+
+    }
+
+    updateTopBar(event) {
+        let i = event.index;
+
+        this.state.title = this.titles[i];
+        this.state.currentpage = this.pages[i];
+        this.state.sidebar = !(i < 2);
+        this.state.returnto = null;
+
+        if(i === 7 || i === 8) {
+            this.state.returnto = 'invoices';
+        }
+        
+        this.forceUpdate();
+        this.update();
     }
 }
 
-template title=input.title||null
+template title="Login"
     page-background
-    app-layout
-        router default-route='/'
+    app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar
+        router default-route='/' on-navigate('updateTopBar')
             @route path='/'
                 index
             @route path='/login'
@@ -30,5 +51,8 @@ template title=input.title||null
             @route path='/invoices'
                 invoices
             @route|{params}| path='/invoices/edit/:id' component=invoicesedit
+            @route|{params}| path='/invoices/view/:id' component=invoicesview
             @route path='/reports'
                 reports
+            @route path='/settings'
+                settings
