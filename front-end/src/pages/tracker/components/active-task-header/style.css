@@ -52,6 +52,7 @@
 }
 
 .timer {
+    font-variant-numeric: tabular-nums;
     font-size: min(124px, 15vw);
 }
 
