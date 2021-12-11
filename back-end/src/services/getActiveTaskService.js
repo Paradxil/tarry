@@ -6,7 +6,6 @@ class GetActiveTaskService {
     async getTask(userid) {
         let dao = new ActiveTaskDAO();
         let taskDAO = new TaskDAO();
-        let projectDAO = new ProjectDAO();
 
         let activeTask = await dao.get(userid);
 
@@ -20,7 +19,7 @@ class GetActiveTaskService {
             }
 
             if(task.project !== null) {
-                let project = await projectDAO.get(task.project);
+                let project = await ProjectDAO.get(task.project);
 
                 if(project !== null) {
                     activeTask.project = project;

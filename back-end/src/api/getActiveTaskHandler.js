@@ -23,6 +23,7 @@ class GetActiveTaskHandler {
             }
         }
         catch(err) {
+            console.log(err);
             res.send(Response.Error("Error getting active task."));
         }
     }
