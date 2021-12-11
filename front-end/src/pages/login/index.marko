@@ -1,12 +1,12 @@
 import {Localize} from "../../utils/localization.js";
 
 $ const L = Localize(r.strings.login);
-ui-linear-layout vertical aligncenter placecenter fullwidth
-    @element
+ui-linear-layout vertical aligncenter placecenter fullwidth paddedwide
+    @element fillspace
         ui-heading light heading=1 -- ${L.login}
-    @element
+    @element fillspace fullwidth
         paper-modal 
             login-form
-    @element
+    @element fillspace
         router-link path='/register'
             ui-button rounded -- create new account

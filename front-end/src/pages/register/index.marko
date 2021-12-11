@@ -51,10 +51,10 @@ style {
 }
 
 $ const L = Localize(r.strings.register);
-ui-linear-layout vertical fullwidth placecenter aligncenter padded gutter="16px"
-    @element
+ui-linear-layout vertical fullwidth placecenter aligncenter paddedwide gutter="16px"
+    @element fillspace
         ui-heading heading=1 light centered -- ${L.register}
-    @element
+    @element fullwidth
         paper-modal
             ui-form padded vertical gutter="16px"
                 @element
@@ -70,6 +70,6 @@ ui-linear-layout vertical fullwidth placecenter aligncenter padded gutter="16px"
                 @element
                     ui-submit preventdefault on-click("register")
                         -- ${L.register}
-    @element
+    @element fillspace
         router-link path='/login'
             ui-button rounded -- login
