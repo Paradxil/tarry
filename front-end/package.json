@@ -4,6 +4,7 @@
     "@marko-tags/context": "^2.2.2",
     "@marko/build": "^4.2.1",
     "@marko/serve": "^4.2.1",
+    "@use-gesture/vanilla": "^10.2.2",
     "axios": "^0.21.1",
     "chart.js": "^3.4.1",
     "chartjs-chart-matrix": "^1.1.0",

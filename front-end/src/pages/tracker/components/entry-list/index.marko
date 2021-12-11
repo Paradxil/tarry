@@ -119,30 +119,31 @@ ui-linear-layout vertical gutter="16px" id="entries-wrapper"
             @element key=dayIndex style={animationName: 'load', animationDuration: '0.5s', animationDelay: (dayIndex * 0.1) + 's', animationFillMode: 'both'}
                 listwidget title=niceDate(day.date) subtitle=day.hoursTracked.toFixed(2)+"hrs" items=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
                     @item|{data, index}| // Data here is a timeEntry from the items list. 
-                        ui-linear-layout aligncenter wrap
-                            @element fillspace
-                                ui-linear-layout vertical gutter="0px"
-                                    @element fillspace
-                                        ui-text -- ${data.task.name}
-                                    if(data.project)
+                        swipeable left
+                            ui-linear-layout aligncenter wrap paddedwide fillspace placecenter filled rounded
+                                @element fillspace
+                                    ui-linear-layout vertical gutter="0px"
+                                        @element fillspace
+                                            ui-text -- ${data.task.name}
+                                        if(data.project)
+                                            @element
+                                                project project=data.project
+                                @element
+                                    ui-linear-layout.duration-wrapper vertical gutter="0px" alignright
                                         @element
-                                            project project=data.project
-                            @element
-                                ui-linear-layout.duration-wrapper vertical gutter="0px" alignright
-                                    @element
-                                        ui-linear-layout
-                                            @element
-                                                ui-date date=false milliseconds=data.start
-                                            @element
-                                                ui-text -- -
-                                            @element
-                                                ui-date date=false milliseconds=data.end
-                                    @element
-                                        ui-emphasis
-                                            ui-duration start=data.start end=data.end
-                            @element fullwidth=input.ismobile alignright
-                                $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
-                                controls controls=controls on-continue("continueTask", data.task._id) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
+                                            ui-linear-layout
+                                                @element
+                                                    ui-date date=false milliseconds=data.start
+                                                @element
+                                                    ui-text -- -
+                                                @element
+                                                    ui-date date=false milliseconds=data.end
+                                        @element
+                                            ui-emphasis
+                                                ui-duration start=data.start end=data.end
+                                @element fullwidth=input.ismobile alignright
+                                    $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
+                                    controls controls=controls on-continue("continueTask", data.task._id) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
     if(state.loadingData)
         @element fullwidth aligncenter paddedwide light
             loader

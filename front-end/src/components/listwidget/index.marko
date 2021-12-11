@@ -1,11 +1,10 @@
-widget title=input.title||null subtitle=input.subtitle||null nopadding class=input.class
-    ui-linear-layout.listwidget vertical gutter="0px" rounded
+widget.listwidget title=input.title||null subtitle=input.subtitle||null nopadding class=input.class
+    ui-container vertical gutter="0px" rounded
         if(input.first)
             @element.listwidget-first paddedwide fillspace alignleft placecenter
                 <${input.first.renderBody}/>
         for|item, index| of=input.items
-            @element paddedwide fillspace alignleft placecenter key=index
-                <${input.item.renderBody} data=item index=index/>
+            <${input.item.renderBody} data=item index=index/>
         if(input.last)
             @element.listwidget-last paddedwide fillspace alignleft placecenter
                 <${input.last.renderBody}/>
