@@ -17,7 +17,7 @@
     overflow: auto;
 }
 
-.ui-sidebar .site-title {
+.ui-sidebar.site-title {
     position: sticky;
     top: 0px;
 }
