@@ -62,7 +62,12 @@ style {
         font-style: italic !important;
     }
 
+    .invoice-chart-wrapper {
+        overflow-x: auto;
+    }
+
     .invoice-chart {
+        min-width: 450px;
         box-shadow: none !important;
     }
 
@@ -73,31 +78,32 @@ style {
 }
 
 $ let items = Object.values(state.data.projects||{}).filter((project) => {return project.timeTracked > 0;});
-listwidget.invoice-chart vertical items=items
-    @first
-        ui-linear-layout.invoice-chart-header secondary padded rounded
-            @element.invoice-expanded-column
-                ui-heading.invoice-heading heading=3 -- Description
-            @element fillspace alignright
-                ui-heading.invoice-heading heading=3 -- Hours
-            @element fillspace alignright
-                ui-heading.invoice-heading heading=3 -- Rate
-            @element fillspace alignright
-                ui-heading.invoice-heading heading=3 -- Total
-    if(state.data == null)
-        @last
-            ui-text -- No time entries found for the selected date range and filters.
-    @item|{data}|
-        ui-linear-layout
-            @element.invoice-expanded-column.invoice-row-description
-                ui-linear-layout vertical
-                    @element
-                        ui-text -- ${data.name}
-                    @element.invoice-tasks-summary
-                        ui-text -- ${Object.values(data.tasks||{}).map((el) => {return el.name}).join(', ')}
-            @element.invoice-row-time fillspace alignright
-                ui-text -- ${data.hoursTracked.toFixed(2)}
-            @element.invoice-row-rate fillspace alignright
-                ui-text -- ${parseFloat(data.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
-            @element.invoice-row-tota fillspace alignright
-                ui-text --  ${parseFloat(data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+div.invoice-chart-wrapper
+    listwidget.invoice-chart vertical items=items
+        @first
+            ui-linear-layout.invoice-chart-header secondary padded rounded
+                @element.invoice-expanded-column
+                    ui-heading.invoice-heading heading=3 -- Description
+                @element fillspace alignright
+                    ui-heading.invoice-heading heading=3 -- Hours
+                @element fillspace alignright
+                    ui-heading.invoice-heading heading=3 -- Rate
+                @element fillspace alignright
+                    ui-heading.invoice-heading heading=3 -- Total
+        if(state.data == null)
+            @last
+                ui-text -- No time entries found for the selected date range and filters.
+        @item|{data}|
+            ui-linear-layout
+                @element.invoice-expanded-column.invoice-row-description
+                    ui-linear-layout vertical
+                        @element
+                            ui-text -- ${data.name}
+                        @element.invoice-tasks-summary
+                            ui-text -- ${Object.values(data.tasks||{}).map((el) => {return el.name}).join(', ')}
+                @element.invoice-row-time fillspace alignright
+                    ui-text -- ${data.hoursTracked.toFixed(2)}
+                @element.invoice-row-rate fillspace alignright
+                    ui-text -- ${parseFloat(data.wage||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
+                @element.invoice-row-tota fillspace alignright
+                    ui-text --  ${parseFloat(data.earnings||'0').toLocaleString('en-US', {style: "currency", currency: "USD"})}
