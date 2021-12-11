@@ -20,7 +20,7 @@ class {
 
         this.state.title = this.titles[i];
         this.state.currentpage = this.pages[i];
-        this.state.sidebar = !(i < 2);
+        this.state.sidebar = !(i < 3);
         this.state.returnto = null;
 
         if(i === 7 || i === 8) {
@@ -56,3 +56,5 @@ template title="Login"
                 reports
             @route path='/settings'
                 settings
+            @route path='/account'
+                account
