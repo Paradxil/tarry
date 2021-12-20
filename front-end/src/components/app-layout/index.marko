@@ -62,9 +62,6 @@ ui-linear-layout.page-wrapper fillspace fullwidth padded vertical class={"conten
             if(input.returnto)
                 @element
                     ui-button rounded icon="arrow-left" on-click("changePage", input.returnto)
-            if(!state.ismobile)
-                @element fillspace
-                    ui-heading heading=1 -- ${input.title}
             if(input.controls&&input.controls.renderBody)
                 @element
                     <${input.controls.renderBody}/>

@@ -92,7 +92,11 @@ listwidget items=state.filteredTasks
         ui-button rounded icon="plus" title="Add new task." on-click("addNewTask")
     if(state.filteredTasks.length === 0)
         @first
-            ui-text -- No tasks found labeled '${state.filter}'.
+            ui-linear-layout aligncenter paddedwide
+                @element fillspace
+                    ui-text padded -- Looks like you don't have any tasks yet!
+                @element
+                    ui-button secondary rounded text='Add Task' icon='plus' on-click('addNewTask')
     @item|{data, index}|
         ui-linear-layout aligncenter paddedwide 
             @element fillspace

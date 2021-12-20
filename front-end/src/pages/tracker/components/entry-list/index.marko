@@ -113,6 +113,7 @@ style {
 }
 
 time-entry-popout key="time-entry-popout" on-saved("refresh")
+
 ui-linear-layout vertical gutter="16px" id="entries-wrapper"
     for|day, dayIndex| of=state.data.days?state.data.days.filter(day=>day.entries.length>0):[]
         if(day.entries.length > 0)

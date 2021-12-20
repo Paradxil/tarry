@@ -71,7 +71,11 @@ listwidget items=state.invoices title="Invoices"
         ]
     if(state.invoices.length === 0)
         @first
-            ui-text -- No invoices found. Click the plus icon above to create a new invoice.
+            ui-linear-layout aligncenter paddedwide
+                @element fillspace
+                    ui-text padded -- Looks like you don't have any invoices yet!
+                @element
+                    ui-button secondary rounded text='Add Invoice' icon='plus' on-click('addInvoice')
     @item|{data, index}|
         ui-linear-layout aligncenter paddedwide
             @element fillspace

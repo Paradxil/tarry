@@ -33,7 +33,6 @@
 }
 
 .manual-input-wrapper {
-    flex: 1;
     font-size: min(100px, 15vw);
     place-content: center;
     align-items: flex-end;
