@@ -1,7 +1,7 @@
 require("regenerator-runtime/runtime");
 
 const axios = require('axios').create({
-    baseURL: 'http://192.168.1.153:8081', //TODO: Configure this with environment variables
+    baseURL: process.env.BACKEND_LOCATION||'http://localhost:8083',
     headers: { "Access-Control-Allow-Origin": "*" },
     withCredentials: true
 });
