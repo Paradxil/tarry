@@ -1,11 +1,16 @@
 import network from "./network.js";
 
 class ServerProxy {
-    async getUser(cb) {
+    async getUser(cb, err) {
         let response = await network.get("/api/user");
 
         if(response.success && cb) {
             cb(response.data);
+        }
+        else {
+            if(err) {
+                err(response.data);
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 import invoicesedit from "../pages/invoices/edit/[id].marko";
 import invoicesview from "../pages/invoices/view/[id].marko";
+import ServerProxy from '../utils/serverproxy.js';
+import {navigate} from 'simple-marko-router';
 
 class {
     onCreate() {
@@ -7,12 +9,27 @@ class {
             currentpage: '',
             title: '',
             returnto: null,
-            sidebar: false
+            sidebar: false,
+            loggedin: false
         };
 
         this.titles=['Paper Time', 'Login', 'Register', 'Tracker', 'Tasks', 'Projects', 'Invoices', 'Edit Invoice', 'View Invoice', 'Reports', 'Settings'];
         this.pages=['index', 'login', 'register', 'tracker', 'tasks', 'projects', 'invoices', 'invoices', 'invoices', 'reports', 'settings'];
+    }
 
+    onMount() {
+        navigate('')
+        this.isLoggedIn();
+    }
+
+    isLoggedIn() {
+        ServerProxy.getUser(() => {
+            this.state.loggedin = true;
+            navigate('/tracker');
+        }, ()=> {
+            this.state.loggedin = false;
+            navigate('/login');
+        });
     }
 
     updateTopBar(event) {
@@ -35,7 +52,7 @@ class {
 template title="Login"
     page-background
     app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar
-        router default-route='/' on-navigate('updateTopBar')
+        router default-route='/loading' on-navigate('updateTopBar')
             @route path='/'
                 index
             @route path='/login'
@@ -58,3 +75,5 @@ template title="Login"
                 settings
             @route path='/account'
                 account
+            @route path='/loading'
+                loader
