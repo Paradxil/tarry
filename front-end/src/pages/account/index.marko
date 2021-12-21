@@ -1,0 +1,22 @@
+import ServerProxy from "../../utils/serverproxy.js";
+
+class {
+    onCreate() {
+        this.state = {
+            user: {
+                username: "loading..."
+            }
+        };
+
+        this.getUserData();
+    }
+
+    getUserData() {
+        ServerProxy.getUser((user)=>{
+            this.state.user = user;
+        });
+    }
+}
+
+widget title=state.user.username
+    ui-text padded -- User dashboard coming soon!

@@ -1,0 +1,39 @@
+class {
+    onCreate() {
+        this.activeTaskComponent = null;
+        this.timeEntryPopout = null;
+        this.timeEntryList = null;
+    }
+
+    onMount() {
+        this.timeEntryPopout = this.getComponent("time-entry-popout");
+        this.activeTaskComponent = this.getComponent("active-task");
+        this.timeEntryList = this.getComponent("entry-list");
+    }
+
+    continueTask(taskid) {
+        this.activeTaskComponent.continueTask(taskid);
+    }
+
+    refreshEntryList() {
+        this.timeEntryList.refresh();
+    }
+
+    addTimeEntry() {
+        this.timeEntryPopout.clearTimeEntry();
+        this.timeEntryPopout.newTimeEntry();
+        this.timeEntryPopout.toggleVisibility();
+    }
+}
+
+style {
+    .controls-wrapper > .ui-container {
+        place-content: flex-end;
+    }
+}
+
+time-entry-popout key="time-entry-popout" on-saved("refreshEntryList")
+ui-container.controls-wrapper light fullwidth
+    controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
+active-task-header key="active-task" on-stopped("refreshEntryList")
+entry-list key="entry-list" on-continuetask("continueTask")

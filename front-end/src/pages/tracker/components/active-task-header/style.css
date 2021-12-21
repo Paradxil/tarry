@@ -1,0 +1,60 @@
+.stealthy {
+    background-color: unset !important;
+    border: none !important;
+}
+
+.timer-header-wrapper, .page-content-wrapper {
+    /*padding: 50px 100px !important;*/
+    max-width: 1200px;
+}
+
+.timer-header-wrapper {
+    font-size: 1.5em;
+    font-weight: 100 !important;
+    color: white !important;
+    padding-top: 75px !important;
+    padding-bottom: 100px !important;
+}
+
+.timer-header-wrapper .task-name {
+    color: var(--text-light) !important;
+}
+
+.timer-header-wrapper input:focus {
+    background-color: rgba(0,0,0,0.1) !important;
+}
+
+.timer-header-wrapper input:hover {
+    background-color: rgba(0,0,0,0.1) !important;
+}
+
+.timer-header-wrapper .ui-text {
+    font-weight: 100 !important;
+}
+
+.manual-input-wrapper {
+    font-size: min(100px, 15vw);
+    place-content: center;
+    align-items: flex-end;
+}
+
+.manual-input-button {
+    cursor: pointer;
+}
+
+.manual-input-button:hover {
+    background-color: rgba(0,0,0,0.1) !important;
+}
+
+.task-name::placeholder, .project-select::placeholder {
+    color: #f1f1f1;
+}
+
+.timer {
+    font-variant-numeric: tabular-nums;
+    font-size: min(124px, 15vw);
+}
+
+.timer-header-wrapper .ui-textbox-label {
+    --label-small-scale: 0.5 !important;
+}

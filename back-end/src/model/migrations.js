@@ -2,58 +2,112 @@ const TimeEntryDAO = require("../data/timeEntryDAO");
 const TaskDAO = require("../data/taskDAO");
 const UserDAO = require("../data/userDAO");
 const TimeEntryModel = require("../model/timeEntry");
+const config = require('../utils/config');
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
+const ProjectDAO = require("../data/projectDAO");
+const Project = require("./project");
+const Address = require("./address");
+const Task = require("./task");
 
 class Migrations {
     static MIGRATIONS = {
-        0: async function(userid) {
-            console.log("RUNNING MIGRATION 0");
+        // 1: async function (userid) {
+        //     console.log("MIGRATE ADDRESS SCHEMA - ENCRYPT EXISTING DOCUMENTS");
+        //     const tmpAddressSchema = new mongoose.Schema({
+        //         userid: {type: String, required: true},
+        //         name: String,
+        //         organization: String,
+        //         street: String,
+        //         city: String,
+        //         state: String,
+        //         zip: String,
+        //         phone: String,
+        //         email: String
+        //     });
 
-            let timeEntryDAO = new TimeEntryDAO();
+        //     tmpAddressSchema.plugin(encrypt.migrations, { secret: config.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid'] });
+        //     const TmpAddress = Address.compile(Address.modelName, tmpAddressSchema, Address.collection.name, Address.db, mongoose);
+        //     TmpAddress.migrateToA(function(err){
+        //         if (err){ throw err; }
+        //         console.log('Migration successful');
+        //     });
 
-            let taskDAO = new TaskDAO();
-            let tasks = await taskDAO.getAllTasks(userid);
+        //     let userDAO = new UserDAO();
+        //     let user = await userDAO.getUserById(userid);
+        //     user.schemaVersion = 2;
+        //     await user.save();
+        // },
+        // 2: async function (userid) {
+        //     console.log("MIGRATE PROJECT SCHEMA - ENCRYPT EXISTING DOCUMENTS");
+        //     const tmpProjectSchema = new mongoose.Schema({
+        //         name: {type: String, required: true},
+        //         userid: {type: String, required: true},
+        //         color: {type: String, required: true},
+        //         wage: {type: Number, required: true}
+        //     });
 
-            for(let task of tasks) {
-                await timeEntryDAO.add(userid, task._id, task.start, task.end);
-            }
+        //     tmpProjectSchema.plugin(encrypt.migrations, { secret: config.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid'] });
+        //     const TmpProject = Project.compile(Project.modelName, tmpProjectSchema, Project.collection.name, Project.db, mongoose);
+        //     TmpProject.migrateToA(function(err){
+        //         if (err){ throw err; }
+        //         console.log('Migration successful');
+        //     });
 
-            let userDAO = new UserDAO();
-            let user = await userDAO.getUserById(userid);
-            user.schemaVersion = 1;
-            await user.save();
-        }/*,
-        1: async function (userid) { //Remove encryption from timeEntries
-            console.log("RUNNING MIGRATION 1");
+        //     let userDAO = new UserDAO();
+        //     let user = await userDAO.getUserById(userid);
+        //     user.schemaVersion = 3;
+        //     await user.save();
+        // },
+        // 4: async function (userid) {
+        //     console.log("MIGRATE TASK SCHEMA - ENCRYPT EXISTING DOCUMENTS");
+        //     const tmpTaskSchema = new mongoose.Schema({
+        //         name: {type: String, required: true},
+        //         userid: {type: String, required: true},
+        //         status: {type: String, required: true, enum: ["untracked", "todo", "completed"], default: "untracked"},
+        //         project: {        
+        //             type: mongoose.Schema.Types.ObjectId,
+        //             ref: 'Projects',
+        //             autopopulate: true
+        //         }
+        //     });
 
-            // new schema without plugins
-            let tmpSchema = new mongoose.Schema({
-                userid: { type: String, required: true },
-                taskid: { type: String, required: true },
-                start: { type: Number, required: true },
-                end: { type: Number, required: true }
-            });
+        //     tmpTaskSchema.plugin(encrypt.migrations, {secret: process.env.SECRET, encryptedFields: ['name']});
+        //     const TmpTask = Task.compile(Task.modelName, tmpTaskSchema, Task.collection.name, Task.db, mongoose);
+        //     TmpTask.migrateToA(function(err){
+        //         if (err){ throw err; }
+        //         console.log('Migration successful');
+        //     });
 
-            tmpSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['start', 'end']});
-            let tmpModel = TimeEntryModel.compile(TimeEntryModel.modelName, tmpSchema, TimeEntryModel.collection.name, TimeEntryModel.db, mongoose);
+        //     // let taskDAO = new TaskDAO();
+        //     // let tasks = await taskDAO.getAllTasks(userid);
 
-            let timeEntryDAO = new TimeEntryDAO();
-            let entries = await tmpModel.find({ userid: userid });
-            for(let entry of entries) {
-                let e = await timeEntryDAO.get(entry._id);
-                console.log(entry);
-                console.log(e);
-                e.end = entry.end||e.end;
-                e.start = entry.start||e.start;
-                await e.save();
-            }
+        //     // let taskNum = 0;
 
-            let userDAO = new UserDAO();
-            let user = await userDAO.getUserById(userid);
-            user.schemaVersion = 2;
-            await user.save();
-        }*/
+        //     // for(let task of tasks) {
+        //     //     try {
+        //     //         task.decrypt(async (err) => {
+        //     //             if(err) {
+        //     //                 console.log(err);
+        //     //                 return;
+        //     //             }
+
+        //     //             task.name = "TASK " + taskNum;
+        //     //             taskNum += 1;
+        //     //             await task.save();
+
+        //     //         });
+        //     //     }
+        //     //     catch(err) {
+        //     //         console.log(err);
+        //     //     }
+        //     // }
+
+        //     let userDAO = new UserDAO();
+        //     let user = await userDAO.getUserById(userid);
+        //     user.schemaVersion = 5;
+        //     await user.save();
+        // }
     }
 
     static ShouldMigrate(version) {

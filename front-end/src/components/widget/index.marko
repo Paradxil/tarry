@@ -1,0 +1,16 @@
+ui-linear-layout.widget vertical fillspace fullwidth
+    if(input.title || input.subtitle)
+        @element padded light
+            ui-linear-layout aligncenter
+                @element fillspace
+                    if(input.title&&input.title.renderBody)
+                        <${input.title.renderBody}/>
+                    else
+                        ui-heading alignleft -- ${input.title}
+                @element
+                    if(input.subtitle&&input.subtitle.renderBody)
+                        <${input.subtitle.renderBody}/>
+                    else
+                        ui-heading alignright -- ${input.subtitle}
+    @element filled rounded raised padded=input.nopadding?false:true class=input.class
+        <${input.renderBody}/>

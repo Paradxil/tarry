@@ -4,12 +4,19 @@
     "@marko-tags/context": "^2.2.2",
     "@marko/build": "^4.2.1",
     "@marko/serve": "^4.2.1",
+    "@use-gesture/vanilla": "^10.2.2",
     "axios": "^0.21.1",
     "chart.js": "^3.4.1",
+    "chartjs-chart-matrix": "^1.1.0",
+    "date-fns": "^2.24.0",
     "feather-marko": "^0.0.3",
+    "fs": "^0.0.1-security",
     "marko": "^5.10.3",
-    "marko-block-editor": "file:../../marko-block-editor",
-    "simple-marko-ui": "file:../../simple-marko-ui"
+    "open-color": "^1.9.1",
+    "regenerator-runtime": "^0.13.9",
+    "simple-marko-router": "^1.1.1",
+    "simple-marko-ui": "^0.0.2",
+    "timezones-list": "^3.0.1"
   },
   "babel": {
     "plugins": [
@@ -24,13 +31,14 @@
   "name": "front-end",
   "version": "0.0.1",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "build": "npx marko-build ./src/templates/template.marko --static",
-    "dev": "npx marko-serve ./src/templates/template.marko"
+    "build": "NODE_ENV==production npx marko-build ./src/app/app.marko --static",
+    "dev": "npx marko-serve ./src/app/app.marko"
   },
   "author": "",
   "license": "GPL3",
   "description": "",
-  "proxy": "http://localhost:8080"
+  "devDependencies": {
+    "eslint": "^8.4.1"
+  }
 }

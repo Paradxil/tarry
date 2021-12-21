@@ -1,0 +1,37 @@
+class {
+    toggleSidebar() {
+        this.emit("togglesidebar");
+    }
+
+    changePage(page) {
+        window.location.assign("/"+page);
+    }
+}
+
+style {
+    .top-bar {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100vw;
+        font-size: 28px;
+        z-index: 100;
+        text-transform: capitalize;
+    }
+
+    .top-bar .ui-icon {
+        --feather-icon-stroke-width: 1px;
+    }
+
+    .top-bar .ui-heading {
+        font-weight: 100;
+    }
+}
+
+ui-linear-layout.top-bar filled aligncenter padded raised
+    @element
+        ui-button icon="menu" rounded on-click("toggleSidebar")
+    @element fillspace centered
+        ui-heading -- ${input.currentpage}
+    @element
+        ui-button rounded icon="user" on-click("changePage", "account")

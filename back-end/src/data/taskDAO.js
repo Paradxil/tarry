@@ -1,4 +1,3 @@
-const task = require('../model/task');
 const Task = require('../model/task');
 
 class TaskDAO {
@@ -30,7 +29,6 @@ class TaskDAO {
                 return this.getTask(err.taskid);
             }
             else {
-                console.log(err);
                 throw new Error("Error adding task.");
             }
         }

@@ -1,0 +1,115 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {emit} from "../../utils/events.js";
+import {navigate} from "simple-marko-router";
+
+class {
+    onCreate() {
+        this.state = {
+            invoices: []
+        };
+
+        ServerProxy.getInvoices((invoices)=>{
+            if(invoices.length > 0) {
+                this.state.invoices = invoices;
+            }
+        });
+    }
+
+    addInvoice() {
+        window.location.assign("/invoices/edit/new");
+    }
+
+    confirmDeleteInvoice(data, i) {
+        emit("confirm", {
+            title:"Delete Invoice?", 
+            message:"Are you sure you want to delete invoice #" + data.id + "? This cannot be undone.",
+            actions: [
+                {
+                    text: "Delete",
+                    icon: "check",
+                    callback: ()=>{
+                        this.deleteInvoice(data._id, i);
+                    }
+                },
+                {
+                    text: "Cancel",
+                    icon: "x",
+                    callback: function() {}
+                }
+            ]}
+        );
+    }
+
+    deleteInvoice(id, i) {
+        ServerProxy.deleteInvoice(id, ()=>{
+            this.state.invoices.splice(i, 1);
+            this.setStateDirty("invoices");
+            emit("push", {title: "Invoice Deleted", message:"Invoice deleted successfully!"});
+        });
+    }
+
+    viewInvoice(data) {
+        navigate("/invoices/view/" + data._id);
+    }
+
+    editInvoice(data) {
+        navigate("/invoices/edit/" + data._id);
+    }
+}
+
+listwidget items=state.invoices title="Invoices"
+    @subtitle
+        controls [
+            controls = [
+                {
+                    name: "add",
+                    title: "Create a new invoice.",
+                    icon: "plus"
+                }
+            ]
+            on-add("addInvoice")
+        ]
+    if(state.invoices.length === 0)
+        @first
+            ui-linear-layout aligncenter paddedwide
+                @element fillspace
+                    ui-text padded -- Looks like you don't have any invoices yet!
+                @element
+                    ui-button secondary rounded text='Add Invoice' icon='plus' on-click('addInvoice')
+    @item|{data, index}|
+        ui-linear-layout aligncenter paddedwide
+            @element fillspace
+                ui-linear-layout vertical gutter="0px"
+                    @element
+                        ui-text -- ${data.billto?data.billto.name:""} 
+                    @element
+                        ui-emphasis -- ${data.id}
+            @element
+                controls [
+                    controls = [
+                        {
+                            name: "delete",
+                            title: "Delete invoice.",
+                            icon: "trash"
+                        },
+                        {
+                            name: "view",
+                            title: "Preview invoice.",
+                            icon: "eye"
+                        },
+                        {
+                            name: "download",
+                            title: "Download invoice as PDF.",
+                            icon: "download"
+                        },
+                        {
+                            name: "edit",
+                            title: "Edit invoice.",
+                            icon: "edit-2"
+                        }
+                    ],
+                    on-delete("confirmDeleteInvoice", data, index),
+                    on-view("viewInvoice", data),
+                    on-download("downloadInvoice", data),
+                    on-edit("editInvoice", data)
+                ]

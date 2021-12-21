@@ -1,0 +1,16 @@
+class {
+    onCreate() {
+        this.popoutForm = null;
+    }
+
+    onMount() {
+        this.popoutForm = this.getComponent("login-popout-form");
+    }
+
+    toggleVisibility() {
+        this.popoutForm.toggleVisibility();
+    }
+}
+
+popout-form title="Login" key="login-popout-form"
+    login-form

@@ -1,0 +1,35 @@
+import {DragGesture} from '@use-gesture/vanilla';
+
+class {
+    onCreate() {
+        this.gesture = null;
+    }
+
+    onMount() {
+        this.el.classList.add('pan-right');
+        this.el.classList.add('swipeable');
+
+        const gesture = new DragGesture(this.el, this.onSwipe.bind(this));
+    }
+
+    onSwipe(state) {
+        this.el.style['transform'] = 'translateX(' +  state.movement[0] + 'px)';
+
+        if(!state.active) {
+            this.el.style['transform'] = 'translateX(' +  0 + 'px)';
+        }
+    }
+}
+
+style {
+    .swipeable {
+        user-select: none;
+        transition: transform 0.1s;
+    }
+
+    .pan-right {
+        touch-action: pan-right pan-y;
+    }
+}
+
+<${input.renderBody}/>

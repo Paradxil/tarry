@@ -1,0 +1,75 @@
+import network from '../../utils/network.js';
+import {Localize} from "../../utils/localization.js";
+
+class {
+    onCreate() {
+        this.state = {
+            username: "",
+            password: "",
+            email: "",
+            message: ""
+        }
+    }
+
+    onMount() {
+        window.loadCaptcha();
+    }
+
+    async register(event) {
+        let response = await network.post('/api/register', {
+            username: this.state.username,
+            password: this.state.password,
+            email: this.state.email,
+            captchaid: window.getCaptchaID()
+        });
+
+        if(response.success) {
+            window.location.replace("/tracker");
+        }
+        else {
+            this.state.message = response.message;
+        }
+    }
+
+    updatePassword(event) {
+        this.state.password = event.value;
+    }
+
+    updateUsername(event) {
+        this.state.username = event.value;
+    }
+
+    updateEmail(event) {
+        this.state.email = event.value;
+    }
+}
+
+style {
+    .ui-submit {
+        border: none !important;
+    }
+}
+
+$ const L = Localize(r.strings.register);
+ui-linear-layout vertical fullwidth placecenter aligncenter paddedwide gutter="16px"
+    @element fillspace
+        ui-heading heading=1 light centered -- ${L.register}
+    @element fullwidth centered
+        paper-modal
+            ui-form padded vertical gutter="16px"
+                @element
+                    ui-textbox label=L.username id="username" value=state.username on-input("updateUsername")
+                @element
+                    ui-textbox label=L.password id="password" value=state.password on-input("updatePassword") password
+                @element
+                    ui-textbox label=L.email id="email" value=state.email on-input("updateEmail")
+                @element
+                    div.icon-captcha key="icon-captcha" no-update
+                @element
+                    ui-emphasis centered -- ${state.message}
+                @element
+                    ui-submit preventdefault on-click("register")
+                        -- ${L.register}
+    @element fillspace
+        router-link path='/login'
+            ui-button rounded -- login

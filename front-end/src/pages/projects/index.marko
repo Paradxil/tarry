@@ -1,0 +1,107 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {emit} from "../../utils/events.js";
+
+class {
+    onCreate() {
+        this.state = {
+            projects: []
+        };
+
+        ServerProxy.getProjects((projects)=>{
+            this.state.projects = projects;
+        });
+
+        this.projectPopout = null;
+    }
+
+    onMount() {
+        this.projectPopout = this.getComponent("project-popout");
+    }
+
+    refreshProjects() {
+        ServerProxy.getProjects((projects)=>{
+            this.state.projects = projects;
+            this.setStateDirty("projects");
+        });
+    }
+
+    addProject() {
+        this.projectPopout.clearProject();
+        this.projectPopout.newProject();
+        this.projectPopout.toggleVisibility();
+    }
+
+    async editProject(id) {
+        this.projectPopout.clearProject();
+        await this.projectPopout.loadProject(id);
+        this.projectPopout.toggleVisibility();
+    }
+
+    async confirmDeleteProject(project, index) {
+        emit("confirm", {
+            title:"Delete Project?", 
+            message:"Are you sure you want to delete the project '" + project.name + "'? This cannot be undone.",
+            actions: [
+                {
+                    text: "Yes",
+                    icon: "check",
+                    callback: ()=>{
+                        this.deleteProject(project._id, index);
+                    }
+                },
+                {
+                    text: "Cancel",
+                    icon: "x",
+                    callback: function() {}
+                }
+            ]}
+        );
+    }
+
+    async deleteProject(id, index) {
+        ServerProxy.deleteProject(id, ()=>{
+            this.state.projects.splice(index, 1);
+            this.setStateDirty("projects");
+        });
+    }
+}
+
+project-popout key="project-popout" on-saved("refreshProjects")
+listwidget items=state.projects title="Projects"
+    @subtitle
+        controls [
+            controls = [
+                {
+                    name: "Add",
+                    icon: "plus"
+                }
+            ]
+            on-add("addProject")
+        ]
+    if(state.projects.length === 0) 
+        @first
+            ui-linear-layout aligncenter paddedwide
+                @element fillspace
+                    ui-text padded -- Looks like you don't have any projects yet!
+                @element
+                    ui-button secondary rounded text='Add Project' icon='plus' on-click('addProject')
+    @item|{data, index}|
+        ui-linear-layout aligncenter paddedwide
+            @element fillspace
+                project project=data emphasis=false
+            @element
+                ui-text -- ${data.rate}
+            @element
+                controls [
+                    controls = [{
+                        name: "Delete",
+                        icon: "trash"
+                    },
+                    {
+                        name: "Edit",
+                        icon: "edit-2"
+
+                    }]
+                    on-edit("editProject", data._id)
+                    on-delete("confirmDeleteProject", data, index)
+                ]

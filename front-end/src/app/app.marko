@@ -1,0 +1,79 @@
+import invoicesedit from "../pages/invoices/edit/[id].marko";
+import invoicesview from "../pages/invoices/view/[id].marko";
+import ServerProxy from '../utils/serverproxy.js';
+import {navigate} from 'simple-marko-router';
+
+class {
+    onCreate() {
+        this.state = {
+            currentpage: '',
+            title: '',
+            returnto: null,
+            sidebar: false,
+            loggedin: false
+        };
+
+        this.titles=['Paper Time', 'Login', 'Register', 'Tracker', 'Tasks', 'Projects', 'Invoices', 'Edit Invoice', 'View Invoice', 'Reports', 'Settings'];
+        this.pages=['index', 'login', 'register', 'tracker', 'tasks', 'projects', 'invoices', 'invoices', 'invoices', 'reports', 'settings'];
+    }
+
+    onMount() {
+        navigate('')
+        this.isLoggedIn();
+    }
+
+    isLoggedIn() {
+        ServerProxy.getUser(() => {
+            this.state.loggedin = true;
+            navigate('/tracker');
+        }, ()=> {
+            this.state.loggedin = false;
+            navigate('/login');
+        });
+    }
+
+    updateTopBar(event) {
+        let i = event.index;
+
+        this.state.title = this.titles[i];
+        this.state.currentpage = this.pages[i];
+        this.state.sidebar = !(i < 3);
+        this.state.returnto = null;
+
+        if(i === 7 || i === 8) {
+            this.state.returnto = 'invoices';
+        }
+        
+        this.forceUpdate();
+        this.update();
+    }
+}
+
+template title="Login"
+    page-background
+    app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar
+        router default-route='/loading' on-navigate('updateTopBar')
+            @route path='/'
+                index
+            @route path='/login'
+                login
+            @route path='/register'
+                register
+            @route path='/tracker'
+                tracker
+            @route path='/tasks'
+                tasks
+            @route path='/projects'
+                projects
+            @route path='/invoices'
+                invoices
+            @route|{params}| path='/invoices/edit/:id' component=invoicesedit
+            @route|{params}| path='/invoices/view/:id' component=invoicesview
+            @route path='/reports'
+                reports
+            @route path='/settings'
+                settings
+            @route path='/account'
+                account
+            @route path='/loading'
+                loader

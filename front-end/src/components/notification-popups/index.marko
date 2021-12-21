@@ -1,0 +1,46 @@
+import {listen} from "../../utils/events.js";
+
+class {
+    onCreate() {
+        this.state = {
+            notifications: []
+        };
+
+        listen("push", this.pushNotification.bind(this));
+    }
+
+    pushNotification(event) {
+        this.state.notifications.push({title: event.title||"Notification", message: event.message||"", id:Date.now()});
+        window.setTimeout(()=>{this.state.notifications.pop();this.setStateDirty("notifications");}, event.timeout?event.timeout*1000:1000*7);
+        this.setStateDirty("notifications");
+    }
+}
+
+style {
+    .notifications-wrapper {
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        z-index: 500;
+    }
+
+    .notification {
+        animation-name: fadeup;
+        animation-duration: 0.5s;
+        animation-timing-function: ease-in-out;
+        z-index: 100;
+        max-width: 350px;
+    }
+
+    @keyframes fadeup {
+        0%   {opacity: 0; transform: translateY(10px);}
+        100% {opacity: 1; transform: translateY(0px);}
+    }
+}
+
+ui-linear-layout.notifications-wrapper vertical
+    for|notification| of=state.notifications
+        @element class="notification" key=notification.id
+            ui-card rounded filled raised
+                @header title=notification.title heading=3 accent paddedwide
+                ui-text paddedwide -- ${notification.message}

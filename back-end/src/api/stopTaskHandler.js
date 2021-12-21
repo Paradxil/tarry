@@ -5,7 +5,7 @@ class StopTaskHandler {
     async handle(req, res) {
         let service = new StopTaskService();
 
-        let userid = req.body.userid||null;
+        let userid = req.user._id||null;
         let end = req.body.end||null;
 
         if(userid == null || end == null) {

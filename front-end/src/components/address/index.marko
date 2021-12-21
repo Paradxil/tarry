@@ -1,0 +1,14 @@
+div.address
+    if(!input.hidename)
+        ui-text -- ${input.address.name}
+    ui-text -- ${input.address.organization}
+    ui-text -- ${input.address.street}
+    ui-linear-layout
+        @element
+            ui-text -- ${input.address.city}
+        @element
+            ui-text -- ${input.address.state}
+        @element
+            ui-text -- ${input.address.zip}
+    ui-text -- ${input.address.phone}
+    ui-text -- ${input.address.email}

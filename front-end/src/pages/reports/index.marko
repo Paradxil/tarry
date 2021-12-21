@@ -1,0 +1,32 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {now, dateInPast} from "../../utils/dateutils.js";
+
+class {
+    async onCreate() {
+        this.state = {
+            data: null,
+            start: dateInPast(7),
+            end: now()
+        };
+
+        this.generateReport();
+    }
+    async generateReport() {
+        ServerProxy.generateReport(this.state.start, this.state.end, [], [], (data) => {
+            this.state.data = data;
+            this.setStateDirty('data');
+        });
+    }
+    setStartDate(event) {
+        this.state.start = event.value;
+        this.generateReport();
+    }
+    setEndDate(event) {
+        this.state.end = event.value;
+        this.generateReport();
+    }
+}
+
+ui-linear-layout
+    @element filled paddedwide raised rounded fullwidth
+        ui-text -- Reports coming soon!

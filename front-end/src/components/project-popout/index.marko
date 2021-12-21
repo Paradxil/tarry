@@ -1,0 +1,98 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {colors_list, color_to_css_var} from "../../utils/theme.js";
+import {emit} from "../../utils/events.js";
+
+class {
+    onCreate() {
+        this.state = {
+            id: null,
+            project: null
+        };
+        
+        this.popoutFormComponent = null;
+    }
+
+    onMount() {
+        this.popoutFormComponent = this.getComponent("project-popout-form");
+    }
+
+    loadProject(id) {
+        this.state.id = id;
+        return new Promise((resolve) => {
+            ServerProxy.getProject(id, (project) => {
+                this.state.project = project;
+                this.setStateDirty("project");
+                resolve();
+            });
+        });
+    }
+
+    newProject() {
+        this.state.project = {
+            name: null,
+            color: colors_list[0].value,
+            wage: 15
+        };
+    }
+
+    clearProject() {
+        this.state.id = null;
+        this.state.project = null;
+    }
+
+    toggleVisibility() {
+        this.popoutFormComponent.toggleVisibility();
+    }
+
+    saveProject() {
+        if(this.state.project._id) {
+            ServerProxy.updateProject(this.state.project, (project)=>{
+                emit("push", {title: "Success!", message:"Project saved successfully."});
+                this.emit("saved", {project: project});
+                this.popoutFormComponent.toggleVisibility();
+            });
+        }
+        else {
+            ServerProxy.addProject(this.state.project, (project)=>{
+                emit("push", {title: "Success!", message:"Project created successfully."});
+                this.emit("saved", {project: project});
+                this.state.project = project;
+                this.popoutFormComponent.toggleVisibility();
+            })
+        }
+    }
+
+    setColor(event) {
+        this.state.project.color = event.value;
+    }
+
+    setName(event) {
+        this.state.project.name = event.value;
+    }
+
+    setWage(event) {
+        this.state.project.wage = parseInt(event.value);
+    }
+}
+
+popout-form title=state.id==null?'Add Project':'Edit Project' key="project-popout-form"
+    @controls
+        controls [
+            controls = [
+                {
+                    name: 'save',
+                    icon: 'save'
+                }
+            ]
+            on-save("saveProject")
+        ]
+    if(state.project != null)
+        ui-linear-layout vertical padded
+            @element
+                ui-color-select rounded colors=colors_list value={value: state.project.color, color: color_to_css_var(state.project.color)} on-input('setColor') label="Project Color"
+            @element
+                ui-textbox label="Project Name" value=state.project.name on-input('setName')
+            @element
+                ui-textbox label="Hourly Rate" value=state.project.wage on-input('setWage')
+    else
+        ui-text -- Loading...

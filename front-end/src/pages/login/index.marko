@@ -1,0 +1,19 @@
+import {Localize} from "../../utils/localization.js";
+
+style {
+    .wrapper {
+        align-self: center;
+        place-self: center;
+    }
+}
+
+$ const L = Localize(r.strings.login);
+ui-linear-layout vertical aligncenter placecenter fullwidth paddedwide
+    @element fillspace centered
+        ui-heading light heading=1 -- ${L.login}
+    @element fillspace fullwidth centered
+        paper-modal 
+            login-form
+    @element fillspace
+        router-link path='/register'
+            ui-button rounded -- create new account

@@ -1,0 +1,80 @@
+import Chart from 'chart.js/auto';
+
+class {
+    async onCreate(input) {
+        this.state = {
+            data: input.data,
+            chart: null
+        };
+    }
+    async onInput(input) {
+        this.state.data = input.data;
+        if(this.state.data != null) {
+            this.buildChart();
+        }
+    }
+    async onMount() {
+        let input = this.input;
+        let ctx = "chartOverview";
+        this.state.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            text: "Hours",
+                            display: true
+                        },
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback: function(value, index, values) {
+                                return value+" hrs";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        if(this.state.data != null) {
+            this.buildChart();
+        }
+    }
+    buildChart() {
+        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        this.state.chart.data = {};
+        for(let day of this.state.data.days) {
+            let date = new Date(day.date);
+            this.state.chart.data.labels.push(days[date.getDay()]);
+        }
+        for(let projectID in this.state.data.projects) {
+            let project = this.state.data.projects[projectID];
+            let data = this.state.data.days.map((day) => {return (projectID in day.projects)?day.projects[projectID].hoursTracked:0});
+            
+            this.state.chart.data.datasets.push({
+                label: project.name,
+                backgroundColor: project.color+"55",
+                borderColor: project.color,
+                borderWidth: 1,
+                borderRadius: 2,
+                data: data
+            });
+        }
+        this.state.chart.update();
+    }
+}
+
+style {
+    #chartOverview {
+        width: 100%;
+        max-height: 400px !important;
+    }
+}
+
+canvas no-update id="chartOverview"

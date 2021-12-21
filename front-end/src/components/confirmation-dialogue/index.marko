@@ -1,0 +1,57 @@
+import {listen} from "../../utils/events.js";
+
+class {
+    onCreate() {
+        this.state = {
+            confirmations: []
+        };
+
+        listen("confirm", this.pushConfirmationDialogue.bind(this));
+    }
+
+    pushConfirmationDialogue(event) {
+        this.state.confirmations.push(event);
+        this.setStateDirty("confirmations");
+    }
+
+    closeConfirmation(event) {
+        this.state.confirmations.splice(0,1);
+        this.setStateDirty("confirmations");
+    }
+
+    confirmationCallback(action) {
+        this.closeConfirmation();
+        return action.callback?action.callback():console.log("No callback provided.");
+    }
+}
+
+style {
+    .confirmation-wrapper {
+        z-index: 100;
+    }
+
+    .confirmation-dialogue {
+        max-width: 500px;
+    }
+
+    .confirmation-options {
+        place-content: flex-end;
+    }
+}
+
+if(state.confirmations.length > 0)
+    $ let confirmation = state.confirmations[0];
+    ui-linear-layout.confirmation-wrapper vertical centered fullscreen
+        @element.confirmation-dialogue
+            ui-card rounded filled raised
+                @header accent padded
+                    ui-linear-layout fillspace
+                        @element fillspace placecenter
+                            ui-heading heading=3 alignleft -- ${confirmation.title}
+                        @element
+                            ui-button rounded icon="x" on-click("closeConfirmation")
+                ui-text padded alignleft -- ${confirmation.message}
+                ui-linear-layout.confirmation-options padded aligncenter fullwidth fillspace
+                    for|action| of=confirmation.actions
+                        @element
+                            ui-button rounded text=action.text trailingicon=action.icon on-click("confirmationCallback", action)

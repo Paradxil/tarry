@@ -1,0 +1,59 @@
+import ServerProxy from "../../../../../utils/serverproxy.js";
+import {color_to_css_var} from "../../../../../utils/theme.js";
+
+class {
+    onCreate(input) {
+        this.state = {
+            projects: [],
+            projectsMap: {},
+            selected: [] // A list of selected projects
+        };
+
+        this.comboboxControl = null;
+
+        ServerProxy.getProjects((projects, projectsMap) => {
+            this.state.projects = projects;
+            this.state.projectsMap = projectsMap;
+            this.state.selected = input.selectedprojects;
+        });
+    }
+
+    onMount() {
+        this.comboboxControl = this.getComponent("combobox");
+    }
+
+    setProjects(projects) {
+        this.state.projects = projects;
+        this.setStateDirty("projects");
+    }
+
+    selectProject(event) {
+        if(!this.state.selected.includes(event.value)) {
+            this.state.selected.push(event.value);
+            this.setStateDirty('selected');
+            this.emit("input", {selected: this.state.selected});
+        }
+
+        this.comboboxControl.setValue("");
+    }
+
+    removeProject(index) {
+        this.state.selected.splice(index, 1);
+        this.setStateDirty('selected');
+        this.emit("input", {selected: this.state.selected});
+    }
+}
+
+div.project-filter
+    $ let options = state.projects.map((item)=>{return {name: item.name, color: item.color, search: item.name, value: item._id}});
+    ui-combobox options=options label="Projects" on-select("selectProject") key="combobox"
+        @option|{option}|
+            project project=option
+    ui-spacer space="4px"
+    ui-linear-layout wrap
+        for|project, index| of=state.selected
+            @element
+                ui-button style={'--secondary': color_to_css_var(state.projectsMap[project].color)} secondary rounded text=state.projectsMap[project].name trailingicon="delete" on-click("removeProject", index)
+        if(state.selected.length === 0)
+            @element
+                ui-button secondary rounded text="All Projects Selected"

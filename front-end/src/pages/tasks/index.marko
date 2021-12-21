@@ -1,0 +1,135 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {emit} from "../../utils/events.js";
+
+class {
+    onCreate() {
+        this.state = {
+            tasks: [],
+            filteredTasks: [],
+            filter: 'all'
+        };
+
+        this.taskPopout = null;
+
+        this.loadTaskList();
+    }
+
+    onMount() {
+        this.taskPopout = this.getComponent("task-popout");
+    }
+
+    switchFilter(filter) {
+        this.state.filter = filter;
+
+        if(filter === 'all') {
+            this.state.filteredTasks = this.state.tasks;
+        }
+        else if(filter === 'todo') {
+            this.state.filteredTasks = this.state.tasks.filter((task) => {return task.status === 'todo'});
+        }
+
+        this.setStateDirty('filteredTasks');
+    }
+
+    loadTaskList() {
+        ServerProxy.getTasks((tasks, tasksMap) => {
+            this.state.tasks = tasks;
+            this.state.filteredTasks = tasks;
+            this.setStateDirty("tasks");
+        });
+    }
+
+    addNewTask() {
+        this.taskPopout.clearTask();
+        this.taskPopout.newTask();
+        this.taskPopout.toggleVisibility();
+    }
+    
+    async editTask(id) {
+        this.taskPopout.clearTask();
+        await this.taskPopout.loadTask(id);
+        this.taskPopout.toggleVisibility();
+    }
+
+    confirmDeleteTask(task) {
+        emit("confirm", {
+            title:"Delete Task?", 
+            message:"Are you sure you want to delete task '" + task.name + "'? Deleting this task will also delete all time entries associated with it. This cannot be undone.",
+            actions: [
+                {
+                    text: "Delete",
+                    icon: "check",
+                    callback: ()=>{
+                        this.deleteTask(task._id);
+                    }
+                },
+                {
+                    text: "Cancel",
+                    icon: "x",
+                    callback: function() {}
+                }
+            ]}
+        );
+    }
+
+    deleteTask(id) {
+        ServerProxy.deleteTask(id, ()=>{
+            this.loadTaskList();
+            emit("push", {title: "Task Deleted", message:"Task deleted successfully!"});
+        });
+    }
+}
+
+task-popout key="task-popout" on-saved("loadTaskList")
+listwidget items=state.filteredTasks
+    @title
+        ui-linear-layout
+            @element
+                ui-button rounded text="All" accent=state.filter=='all' on-click("switchFilter", 'all')
+            @element
+                ui-button rounded text="Todo" accent=state.filter=='todo' on-click("switchFilter", 'todo')
+    @subtitle
+        ui-button rounded icon="plus" title="Add new task." on-click("addNewTask")
+    if(state.filteredTasks.length === 0)
+        @first
+            ui-linear-layout aligncenter paddedwide
+                @element fillspace
+                    ui-text padded -- Looks like you don't have any tasks yet!
+                @element
+                    ui-button secondary rounded text='Add Task' icon='plus' on-click('addNewTask')
+    @item|{data, index}|
+        ui-linear-layout aligncenter paddedwide 
+            @element fillspace
+                ui-linear-layout vertical gutter="0px"
+                    @element
+                        ui-text -- ${data.name} 
+                    if(data.project)
+                        @element
+                            project project=data.project
+            @element
+                controls [
+                    controls = [
+                        {
+                            name: "delete",
+                            title: "Delete task.",
+                            icon: "trash"
+                        },
+                        {
+                            name: "flag",
+                            title: "Mark todo.",
+                            icon: "flag"
+                        },
+                        {
+                            name: "view",
+                            title: "View task details.",
+                            icon: "eye"
+                        },
+                        {
+                            name: "edit",
+                            title: "Edit task.",
+                            icon: "edit-2"
+                        }
+                    ],
+                    on-edit("editTask", data._id),
+                    on-delete("confirmDeleteTask", data)
+                ]

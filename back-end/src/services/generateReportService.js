@@ -1,12 +1,10 @@
 const TimeEntryDAO = require('../data/timeEntryDAO');
-const ProjectDAO = require('../data/projectDAO');
 const TaskDAO = require('../data/taskDAO');
 
 class GenerateReportService {
     constructor() {
         this.entryDAO = new TimeEntryDAO();
         this.taskDAO = new TaskDAO();
-        this.projectDAO = new ProjectDAO();
         this.projectsFilter = [];
     }
 
@@ -95,26 +93,36 @@ class GenerateReportService {
         let entries = await this.entryDAO.getAll(userid);
         let newEntries = [];
 
-        //Compile entry, project, and task data.
+        //Compile entry and project data.
         for (let i = 0; i < entries.length; i++) {
             let entry = entries[i].toJSON();
 
-            let task = await this.taskDAO.getTask(entry.taskid);
-            entry.task = task.toJSON();
-            entry.name = task.name;
-            entry.projectid = task.project;
-            entry.status = task.status;
-
-            //Filter out entries that have projects not included in the filter
-            if(this.projectsFilter != null && this.projectsFilter.length > 0 && !this.projectsFilter.includes(entry.projectid)) {
+            if(!entry.task) {
                 continue;
             }
 
-            let project = await this.projectDAO.get(task.project);
-            if(project != null) {
-                entry.project = project.toJSON();
-                newEntries.push(entry);
+            if(!entry.task.project) {
+                entry.task.project = {
+                    _id: "noproject",
+                    wage: 0,
+                    name: "No Project",
+                    color: "#444"
+                };
             }
+
+            //Filter out entries that have projects not included in the filter
+            if(this.projectsFilter != null && this.projectsFilter.length > 0 && (entry.task.project != null && !this.projectsFilter.includes(entry.task.project._id.toString()))) {
+                continue;
+            }
+
+            entry.taskid = entry.task._id;
+            
+            let project = entry.task.project;
+            entry.projectid = project._id;
+            entry.project = project.toJSON?project.toJSON():project;
+
+            newEntries.push(entry);
+            
         }
 
         return newEntries;
@@ -129,7 +137,9 @@ class GenerateReportService {
 
         for (let entry of entries) {
             timeTracked += (entry.end - entry.start); //Overall total
-            earnings += this.milliToHour(entry.end - entry.start) * entry.project.wage; //Overall earnings
+            if(entry.task.project != null) {
+                earnings += this.milliToHour(entry.end - entry.start) * entry.task.project.wage; //Overall earnings
+            }
             hoursTracked += this.milliToHour(entry.end - entry.start);
 
             if (entry.taskid != null) { //Total per task
@@ -138,16 +148,18 @@ class GenerateReportService {
                         timeTracked: 0, 
                         hoursTracked: 0,
                         earnings: 0,
-                        project: entry.project,
-                        name: entry.name,
+                        project: entry.task.project,
+                        name: entry.task.name,
                         status: entry.status,
-                        id: entry.taskid
+                        id: entry.task._id
                     };
                 }
 
                 tasks[entry.taskid].timeTracked += (entry.end - entry.start);
                 tasks[entry.taskid].hoursTracked += this.milliToHour(entry.end - entry.start);
-                tasks[entry.taskid].earnings += this.milliToHour(entry.end - entry.start) * entry.project.wage;
+                if(entry.task.project != null) {
+                    tasks[entry.taskid].earnings += this.milliToHour(entry.end - entry.start) * entry.task.project.wage;
+                }
             }
 
             //Add a default project for entries with no project given
@@ -158,7 +170,7 @@ class GenerateReportService {
                 color: "#aaa"
             };
 
-            if(entry.projectid != null) { //Total per project
+            if(entry.projectid != null && entry.task.project != null) { //Total per project
                 if (!(entry.projectid in projects)) {
                     projects[entry.projectid] = {
                         timeTracked: 0,
@@ -166,9 +178,9 @@ class GenerateReportService {
                         earnings: 0,
                         entries: [],
                         tasks: {},
-                        name: entry.project.name,
-                        color: entry.project.color,
-                        wage: entry.project.wage
+                        name: entry.task.project.name,
+                        color: entry.task.project.color,
+                        wage: entry.task.project.wage
                     };
                 }
 

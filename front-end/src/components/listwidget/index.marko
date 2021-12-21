@@ -1,0 +1,8 @@
+widget.listwidget title=input.title||null subtitle=input.subtitle||null nopadding class=input.class
+    ui-container vertical gutter="0px" rounded
+        if(input.first)
+            <${input.first.renderBody}/>
+        for|item, index| of=input.items
+            <${input.item.renderBody} data=item index=index/>
+        if(input.last)
+            <${input.last.renderBody}/>

@@ -1,0 +1,21 @@
+style {
+    @media print {
+        .invoice-preview-wrapper {
+            position: fixed;
+            top:0px;
+            left:0px;
+            border-radius: 0px !important;
+            width: 100%;
+            z-index: 200;
+            padding: 0in !important;
+        }
+    }
+
+    .invoice-preview-wrapper{
+        max-width: 8.5in;
+        height: 11in;
+        width: 100%;
+    }
+}
+
+invoice-preview invoiceid=input.params.id

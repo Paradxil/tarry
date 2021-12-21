@@ -1,3 +1,4 @@
+const config = require('../utils/config');
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
 
@@ -5,11 +6,10 @@ var encrypt = require('mongoose-encryption');
 const activeTaskSchema = new mongoose.Schema({
     taskid: {type: String, required: true},
     userid: {type: String, required: true, unique: true},
-    start: {type: Number, required: true},
-    project: {type: String, required: false}
+    start: {type: Number, required: true}
 });
 
-activeTaskSchema.plugin(encrypt, {secret: process.env.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
+activeTaskSchema.plugin(encrypt, {secret: config.SECRET, excludeFromEncryption: ['userid'], additionalAuthenticatedFields: ['userid']});
 
 // Create a model for users
 module.exports = mongoose.model('ActiveTasks', activeTaskSchema);

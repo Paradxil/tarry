@@ -12,28 +12,15 @@ const UserDAO = require('../data/userDAO');
 const LoginHandler = require('../api/loginHandler');
 const CaptchaHandler = require('../api/captchaHandler');
 const RegisterHandler = require('../api/registerHandler');
-const AllTasksHandler = require('../api/allTasksHandler');
-const AddTaskHandler = require('../api/addTaskHandler');
-const DeleteTaskHandler = require('../api/deleteTaskHandler');
 const StartTaskHandler = require('../api/startTaskHandler');
 const StopTaskHandler = require('../api/stopTaskHandler');
 const GetActiveTaskHandler = require('../api/getActiveTaskHandler');
-const SaveProjectHandler = require('../api/saveProjectHandler');
-const DeleteProjectHandler = require('../api/deleteProjectHandler');
-const AllProjectsHandler = require('../api/allProjectsHandler');
-const AllTimeEntriesHandler = require("../api/allTimeEntriesHandler");
-const PaginatedTimeEntriesHandler = require("../api/paginatedTimeEntriesHandler");
-const DeleteTimeEntryHandler = require("../api/deleteTimeEntryHandler");
-const GetTaskHandler = require("../api/getTaskHandler");
 const SetTaskStatusHandler = require('../api/setTaskStatusHandler');
-const UpdateTimeEntryHandler = require('../api/updateTimeEntryHandler');
 
 const Response = require("../model/response/response");
 const GenerateReportHandler = require('../api/generateReportHandler');
-const AllInvoiceHandler = require('../api/allInvoiceHandler');
-const SaveInvoiceHandler = require('../api/saveInvoiceHandler');
 const GenerateInvoicePDFHandler = require('../api/generateInvoicePDFHandler');
-const GetInvoiceHandler = require('../api/getInvoiceHandler');
+const DataAccessHandlerFactory = require('../api/dataAccessHandlerFactory');
 
 class Server {
     constructor() {
@@ -85,7 +72,7 @@ class Server {
         this.app.use(session({ 
             secret: process.env.SESSION_SECRET,
             cookie: {
-                maxAge: 1000 * 60 * 60 * 5 // 5 hours
+                maxAge: parseInt(process.env.SESSION_DURATION)
             },
             saveUninitialized: false,
             resave: false,
@@ -166,72 +153,17 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Get all time entries for a user
-        this.app.get('/api/time/all/:userid', this.isAuthenticated, async function(req, res) {
-            let handler = new AllTimeEntriesHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get paginated time entries for a user
-        this.app.post('/api/time/', this.isAuthenticated, async function(req, res) {
-            let handler = new PaginatedTimeEntriesHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Delete a time entry
-        this.app.delete('/api/time/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteTimeEntryHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Update a time entry
-        this.app.post('/api/time/update', this.isAuthenticated, async function(req, res) {
-            let handler = new UpdateTimeEntryHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Add a task
-        this.app.post('/api/task', this.isAuthenticated, async function(req, res) {
-            let handler = new AddTaskHandler(req, res);
-            await handler.handle(req, res);
-        });
-
         // Set the status of a task
         this.app.post('/api/task/status', this.isAuthenticated, async function(req, res) {
             let handler = new SetTaskStatusHandler(req, res);
             await handler.handle(req, res);
         });
-
-        // Delete a task
-        /*this.app.delete('/api/task/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteTaskHandler(req, res);
-            await handler.handle(req, res);
-        });*/
         
         // Get the users active running task.
         this.app.get('/api/task/active', this.isAuthenticated, async function(req, res) {
             let handler = new GetActiveTaskHandler(req, res);
             await handler.handle(req, res);
         });
-
-        // Get all tasks for a user
-        this.app.get('/api/task/all/:userid', this.isAuthenticated, async function(req, res) {
-            let handler = new AllTasksHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get all tasks for current user
-        this.app.get('/api/task/all', this.isAuthenticated, async function(req, res) {
-            let handler = new AllTasksHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get a task
-        this.app.get('/api/task/:userid/:taskid', this.isAuthenticated, async function(req, res) {
-            let handler = new GetTaskHandler(req, res);
-            await handler.handle(req, res);
-        });
-    
 
         // Start a task. Each user can only have one running active task at a time.
         this.app.post('/api/start', this.isAuthenticated, async function(req, res) {
@@ -245,46 +177,43 @@ class Server {
             await handler.handle(req, res);
         });
 
-        // Add/update a project
-        this.app.post('/api/project', this.isAuthenticated, async function(req, res) {
-            let handler = new SaveProjectHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Delete a project
-        this.app.delete('/api/project/:id', this.isAuthenticated, async function(req, res) {
-            let handler = new DeleteProjectHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get all projects for the current user
-        this.app.get('/api/project/all/', this.isAuthenticated, async function(req, res) {
-            let handler = new AllProjectsHandler(req, res);
-            await handler.handle(req, res);
-        });
-
-        // Get all invoices for the current user
-        this.app.get('/api/invoice/all/', this.isAuthenticated, async function (req, res) {
-            let handler = new AllInvoiceHandler();
-            await handler.handle(req, res);
-        });
-
-        this.app.get('/api/invoice/:id', async function (req, res) {
-            let handler = new GetInvoiceHandler();
-            await handler.handle(req, res);
-        });
-
-        // Add/update invoice for the user
-        this.app.post('/api/invoice/', this.isAuthenticated, async function (req, res) {
-            let handler = new SaveInvoiceHandler();
-            await handler.handle(req, res);
-        });
-
         this.app.get('/api/invoice/pdf/:id', this.isAuthenticated, async function(req, res) {
             let handler = new GenerateInvoicePDFHandler();
             await handler.handle(req, res);
         });
 
+        //TODO: Have all data access routes use this factory.
+        this.dataAccessRouteFactory('setting');
+        this.dataAccessRouteFactory('entry');
+        this.dataAccessRouteFactory('task');
+        this.dataAccessRouteFactory('project');
+        this.dataAccessRouteFactory('address');
+        this.dataAccessRouteFactory('invoice');
+    }
+
+    dataAccessRouteFactory(schema, routes=['get', 'all', 'add', 'update', 'delete']) {
+        let baseUrl = '/api/'+schema+'/';
+        let dataAccessHandler = DataAccessHandlerFactory.createHandler(schema);
+
+        if(routes.includes('all')) {
+            this.app.get(baseUrl + 'all/', this.isAuthenticated, dataAccessHandler.all.bind(dataAccessHandler));
+        }
+
+        if(routes.includes('get')) {
+            this.app.get(baseUrl+':id', this.isAuthenticated, dataAccessHandler.get.bind(dataAccessHandler));
+        }
+
+        if(routes.includes('add')) {
+            this.app.post(baseUrl, this.isAuthenticated, dataAccessHandler.add.bind(dataAccessHandler));
+        }
+
+        if(routes.includes('update')) {
+            this.app.post(baseUrl+'update/:id', this.isAuthenticated, dataAccessHandler.update.bind(dataAccessHandler));
+        }
+
+        if(routes.includes('delete')) {
+            this.app.delete(baseUrl+':id', this.isAuthenticated, dataAccessHandler.delete.bind(dataAccessHandler));
+        }
     }
 
     initLoginHandler() {

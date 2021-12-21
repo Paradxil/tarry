@@ -1,0 +1,47 @@
+.ui-sidebar .ui-icon {
+    --feather-icon-stroke-width: 1px;
+    font-size: 28px !important;
+}
+
+.ui-sidebar {
+    margin-right: calc(var(--padding-wide) * 2);
+    min-width: unset !important;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.ui-sidebar .ui-list {
+    max-height: 100vh;
+    top: 0px;
+    position: sticky;
+    overflow: auto;
+}
+
+.ui-sidebar .site-title {
+    position: sticky;
+    top: 0px;
+}
+
+.ui-sidebar .ui-linear-layout-child {
+    overflow-y: clip;
+}
+
+.ui-sidebar .ui-linear-layout-child.accent .ui-list-item {
+    box-shadow: 0px 0px 15px var(--secondary);
+}
+
+.ui-sidebar .ui-button:hover {
+    background-color: var(--secondary-dark);
+}
+
+.ui-sidebar .ui-list-item:hover {
+    box-shadow: 0px 0px 5px var(--secondary-dark) !important;
+}
+
+.ui-sidebar .ui-button {
+    padding: var(--padding-wide) var(--padding-wide) !important;
+}
+
+.ui-sidebar .ui-button:not(.site-title) .ui-text {
+    padding-left: var(--padding-wide) !important;
+}

@@ -15,35 +15,18 @@ const invoiceSchema = new mongoose.Schema({
         amount: Number
     }], //Stores additional costs or expenses to add to the invoice.
     billfrom: {
-        name: String,
-        company: String,
-        address: {
-            street: String,
-            city: String,
-            state: String,
-            zip: String
-        },
-        contact: {
-            phone: String,
-            email: String
-        }
-    },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
+        autopopulate: true
+    }, 
     billto: {
-        name: String,
-        company: String,
-        address: {
-            street: String,
-            city: String,
-            state: String,
-            zip: String
-        },
-        contact: {
-            phone: String,
-            email: String
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
+        autopopulate: true
     }
 });
 
+invoiceSchema.plugin(require('mongoose-autopopulate'));
 
 //TODO: Add field encryption.
 //invoiceSchema.plugin(encrypt, { secret: process.env.SECRET, excludeFromEncryption: ['userid', 'template'], additionalAuthenticatedFields: ['userid', 'template'] });

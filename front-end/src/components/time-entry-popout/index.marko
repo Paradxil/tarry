@@ -1,0 +1,96 @@
+import ServerProxy from "../../utils/serverproxy.js";
+import {now, hoursPast} from "../../utils/dateutils.js";
+
+class {
+    onCreate() {
+        this.state = {
+            id: null,
+            entry: null
+        };
+        
+        this.popoutFormComponent = null;
+    }
+
+    onMount() {
+        this.popoutFormComponent = this.getComponent("time-entry-popout-form");
+    }
+
+    newTimeEntry() {
+        this.state.entry = {
+            task: null,
+            start: hoursPast(1),
+            end: now()
+        };
+    }
+
+    loadTimeEntry(id) {
+        this.state.id = id;
+        return new Promise((resolve) => {
+            ServerProxy.getEntry(id, (entry) => {
+                this.state.entry = entry;
+                this.setStateDirty("entry");
+                resolve();
+            });
+        });
+    }
+
+    clearTimeEntry() {
+        this.state.id = null;
+        this.state.entry = null;
+    }
+
+    toggleVisibility() {
+        this.popoutFormComponent.toggleVisibility();
+    }
+
+    saveTimeEntry() {
+        if(this.state.entry._id) {
+            ServerProxy.updateEntry(this.state.entry);
+            this.emit("saved");
+            this.popoutFormComponent.toggleVisibility();
+        }
+        else {
+            ServerProxy.addEntry(this.state.entry, (entry)=>{
+                this.state.entry = entry;
+                this.emit("saved");
+                this.popoutFormComponent.toggleVisibility();
+            });
+        }
+    }
+
+    setTask(e) {
+        this.state.entry.task = e.taskid;
+    }
+
+    setStartDate(e) {
+        this.state.entry.start = e.value;
+    }
+
+    setEndDate(e) {
+        this.state.entry.end = e.value;
+    }
+}
+
+popout-form title=state.id==null?'Add Entry':'Edit Entry' key="time-entry-popout-form"
+    @controls
+        controls [
+            controls = [
+                {
+                    name: 'save',
+                    icon: 'save'
+                }
+            ]
+            on-save("saveTimeEntry")
+        ]
+    if(state.entry != null)
+        ui-linear-layout vertical padded
+            @element
+                ui-linear-layout
+                    @element
+                        ui-date-select label="Start" rounded milliseconds=state.entry.start||Date.now() on-input("setStartDate")
+                    @element
+                        ui-date-select label="End" rounded milliseconds=state.entry.end||Date.now() on-input("setEndDate")
+            @element
+                task-select on-select("setTask") key="task-select" task=state.entry.task?state.entry.task._id:null
+    else
+        ui-text -- Loading...

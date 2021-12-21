@@ -1,0 +1,108 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+
+class {
+    onCreate(input) {
+        this.state = {
+            invoice: input.invoice||null
+        };
+
+        if(this.state.invoice == null && input.invoiceid) {
+            ServerProxy.getInvoice(input.invoiceid, (invoice)=>{
+                this.state.invoice = invoice;
+                this.setStateDirty('invoice');
+            });
+        }
+    } 
+    
+    onInput(input) {
+        if(input.invoice != null) {
+            this.state.invoice = input.invoice;
+        }
+    }
+
+    setInvoice(invoice) {
+        this.state.invoice = invoice;
+        this.setStateDirty('invoice');
+    }
+}
+
+style {
+    .invoice-preview-wrapper{
+        padding: min(0.5in, 8%) !important;
+        max-width: 8.5in;
+        height: 11in;
+        width: 100%;
+    }
+
+    .invoice-preview-content {
+        place-content: space-between;
+        height: 100%;
+    }
+
+    .invoice-footer {
+        background-image: linear-gradient(45deg, var(--tertiary), var(--secondary));
+        padding: 16px;
+        width: 100%;
+        color: white;
+        place-content: center;
+        align-items: center;
+        place-self: flex-end;
+        align-self: flex-end;
+        margin-bottom: 0.25in;
+    }
+
+    .invoice-heading, .invoice-address {
+        font-weight: 100;
+    }
+
+    .invoice-address {
+        line-height: 1.75em;
+    }
+
+    .invoice-preview-wrapper .listwidget > *:nth-child(odd):not(:first-child) {
+        background-color: #f8f9fa;
+    }
+
+    .invoice-preview-date {
+        place-self: flex-end;
+    }
+}
+
+$ const addressPlaceholder = {
+    name: "Name",
+    organization: "Organization",
+    street: "Street Address",
+    city: "City",
+    state: "State",
+    zip: "Zipcode",
+    phone: "(000) 123-4567",
+    email: "email@email.com"
+}
+
+widget.invoice-preview-wrapper title="Invoice Preview"
+    if(state.invoice!=null)
+        ui-linear-layout.invoice-preview-content vertical
+            @element
+                ui-linear-layout wrap
+                    @element fillspace
+                        ui-linear-layout vertical
+                            @element
+                                ui-heading.invoice-heading heading=1 -- ${(state.invoice.billfrom||addressPlaceholder).name}
+                            @element.invoice-address
+                                address hidename=true address=state.invoice.billfrom||addressPlaceholder
+                    @element
+                        ui-linear-layout vertical
+                            @element
+                                ui-heading.invoice-heading heading=1 -- Invoice
+                            @element alignright
+                                ui-emphasis.invoice-id -- ${state.invoice.id}
+                            @element alignright
+                                ui-date.invoice-preview-date time=false milliseconds=state.invoice.end
+            @element.invoice-address
+                ui-heading.invoice-heading -- Bill To
+                address address=state.invoice.billto||addressPlaceholder
+            @element
+                invoice-time-chart key="time-chart" data=state.invoice?state.invoice.data:{}
+                invoice-totals expenses=state.invoice?state.invoice.expenses:[] data=state.invoice?state.invoice.data:{}
+            @element.invoice-footer
+                ui-text -- Thank you for your business!

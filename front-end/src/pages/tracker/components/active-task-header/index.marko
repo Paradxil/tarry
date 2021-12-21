@@ -1,0 +1,105 @@
+import ServerProxy from "../../../../utils/serverproxy.js";
+import {dateInPast, now} from "../../../../utils/dateutils.js";
+import {emit} from "../../../../utils/events.js";
+
+class {
+    onCreate() {
+        this.state = {
+            tracking: false,
+            projectID: null,
+            taskID: null,
+            name: null,
+            startTime: now(),
+            task: null,
+            projects: [],
+            tasklist: [],
+            now: now()
+        };
+
+        this.taskSelectComponent = null;
+
+        ServerProxy.getProjects((projects) => this.state.projects=projects);
+    }
+
+    onMount() {
+        this.taskSelectComponent = this.getComponent("task-select");
+
+        // Perform this request onMount becuase we need to update a component's value.
+        // Components are not available until the onMount event is called.
+        ServerProxy.getActiveTask((task) => {
+            this.state.taskID = task.taskid;
+            this.state.startTime = task.start;
+            this.state.tracking = true;
+
+            this.taskSelectComponent.setTask(task.taskid);
+        });
+
+        window.setInterval(()=>this.state.now = now(), 500);
+    }
+
+    continueTask(taskid) {
+        if(this.state.tracking) {
+            emit("push", {title: "Error Continuing Task", message:"Stop current task before starting a new one."})
+            return;
+        }
+
+        this.taskSelectComponent.setTask(taskid);
+        this.state.startTime = now();
+        ServerProxy.startTask(taskid, ()=>{
+            this.state.tracking = true;
+        });
+    }
+
+    async startTracker(event) {
+        if(this.state.taskID === null) {
+            emit("push", {title: "Warning", message:"Unable to start tracker, no task selected."})
+            return;
+        }
+        this.state.startTime = now();
+        ServerProxy.startTask(this.state.taskID, ()=>{
+            this.state.tracking = true;
+        });
+    }
+
+    async stopTracker(event) {
+        ServerProxy.stopActiveTask(Date.now(), (entry)=>{
+            //this.state.data.days[0].entries.splice(0, 0, entry);
+            //this.setStateDirty("data");
+            this.state.tracking = false;
+            this.state.projectID = null;
+            this.taskSelectComponent.clearTask();
+            this.emit("stopped");
+        });
+    }
+
+    selectTask(event) {
+        this.state.taskID = event.taskid;
+        this.state.projectID = event.projectid;
+    }
+
+    /*selectProject(event) {
+        if(event.option == null && event.option.value == null && event.option.projectid == null) {
+            return;
+        }
+
+        this.taskProjectComponent.setValue(event.option.project||event.option.name);
+        this.state.projectID = event.option.projectid||event.option.value;
+    }*/
+
+    removeProject() {
+        this.state.projectID = null;
+    }
+}
+
+ui-linear-layout.timer-header-wrapper light fullwidth paddedwide wrap
+    @element fillspace
+        ui-linear-layout vertical
+            @element.timer-wrapper
+                ui-timer.timer start=state.tracking?state.startTime:now()
+            @element.task-name-wrapper
+                task-select on-select("selectTask") class="stealthy" key="task-select"
+    @element.manual-input-wrapper centered
+        ui-button.manual-input-button rounded icon=state.tracking?"x":"play" title=state.tracking?"Stop tracker":"Start tracker" on-click(state.tracking?"stopTracker":"startTracker")
+    /*@element.project-select-wrapper
+        $ let options = state.projects.map((item)=>{return {name: item.name, search: item.name, value: item._id}});
+        ui-combobox.project-select.stealthy rounded label="Project" id="project-select" includeblank options=options key='task-project' on-select("selectProject")*/
