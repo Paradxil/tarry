@@ -75,13 +75,22 @@ style {
         background-color: var(--secondary);
         color: var(--text-light);
     }
+
+    .invoice-chart-header {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+    .invoice-chart-row {
+        background-color: var(--oc-gray-0);
+    }
 }
 
 $ let items = Object.values(state.data.projects||{}).filter((project) => {return project.timeTracked > 0;});
 div.invoice-chart-wrapper
     listwidget.invoice-chart vertical items=items
         @first
-            ui-linear-layout.invoice-chart-header secondary padded rounded
+            ui-linear-layout.invoice-chart-header secondary paddedwide rounded
                 @element.invoice-expanded-column
                     ui-heading.invoice-heading heading=3 -- Description
                 @element fillspace alignright
@@ -94,7 +103,7 @@ div.invoice-chart-wrapper
             @last
                 ui-text -- No time entries found for the selected date range and filters.
         @item|{data}|
-            ui-linear-layout
+            ui-linear-layout.invoice-chart-row paddedwide
                 @element.invoice-expanded-column.invoice-row-description
                     ui-linear-layout vertical
                         @element
