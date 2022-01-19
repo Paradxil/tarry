@@ -12,8 +12,8 @@
     font-size: 1.5em;
     font-weight: 100 !important;
     color: white !important;
-    padding-top: 75px !important;
-    padding-bottom: 100px !important;
+    padding-top: min(75px, 7%) !important;
+    padding-bottom: min(100px, 10%) !important;
 }
 
 .timer-header-wrapper .task-name {

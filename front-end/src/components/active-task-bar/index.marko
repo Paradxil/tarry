@@ -28,11 +28,19 @@ style {
         bottom: 2%;
         max-width: var(--content-width);
         background-image: linear-gradient(45deg, var(--oc-gray-7), var(--oc-gray-8));
+        animation-name: popup;
+        animation-duration: 1s;
+        animation-fill-mode: both;
     }
 
     .active-task-bar-timer {
         font-size: 20px;
         font-variant-numeric: tabular-nums;
+    }
+
+    @keyframes popup {
+        0% {bottom: -5%; opacity: 0}
+        100% {bottom: 2%; opacity: 1}
     }
 }
 
