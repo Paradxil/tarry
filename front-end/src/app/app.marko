@@ -13,8 +13,8 @@ class {
             loggedin: false
         };
 
-        this.titles=['Paper Time', 'Login', 'Register', 'Tracker', 'Tasks', 'Projects', 'Invoices', 'Edit Invoice', 'View Invoice', 'Reports', 'Settings'];
-        this.pages=['index', 'login', 'register', 'tracker', 'tasks', 'projects', 'invoices', 'invoices', 'invoices', 'reports', 'settings'];
+        this.titles=['Paper Time', 'Login', 'Register', 'Tracker', 'Tasks', 'Projects', 'Invoices', 'Edit Invoice', 'View Invoice', 'Settings'];
+        this.pages=['index', 'login', 'register', 'tracker', 'tasks', 'projects', 'invoices', 'invoices', 'invoices', 'settings'];
     }
 
     onMount() {
@@ -69,11 +69,7 @@ template title="Login"
                 invoices
             @route|{params}| path='/invoices/edit/:id' component=invoicesedit
             @route|{params}| path='/invoices/view/:id' component=invoicesview
-            @route path='/reports'
-                reports
             @route path='/settings'
                 settings
-            @route path='/account'
-                account
             @route path='/loading'
                 loader

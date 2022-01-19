@@ -1,10 +1,12 @@
+import {navigate} from "simple-marko-router";
+
 class {
     toggleSidebar() {
         this.emit("togglesidebar");
     }
 
     changePage(page) {
-        window.location.assign("/"+page);
+        navigate(page);
     }
 }
 
@@ -34,4 +36,4 @@ ui-linear-layout.top-bar filled aligncenter padded raised
     @element fillspace centered
         ui-heading -- ${input.currentpage}
     @element
-        ui-button rounded icon="user" on-click("changePage", "account")
+        ui-button rounded icon="user" on-click("changePage", "settings")
