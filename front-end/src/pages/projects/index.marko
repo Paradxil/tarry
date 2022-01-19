@@ -78,6 +78,13 @@ listwidget items=state.projects title="Projects"
             ]
             on-add("addProject")
         ]
+    if(state.projects.length === 0) 
+        @first
+            ui-linear-layout aligncenter paddedwide
+                @element fillspace
+                    ui-text padded -- Looks like you don't have any projects yet!
+                @element
+                    ui-button secondary rounded text='Add Project' icon='plus' on-click('addProject')
     @item|{data, index}|
         ui-linear-layout aligncenter paddedwide
             @element fillspace

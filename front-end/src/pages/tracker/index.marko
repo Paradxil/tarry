@@ -26,7 +26,14 @@ class {
     }
 }
 
+style {
+    .controls-wrapper > .ui-container {
+        place-content: flex-end;
+    }
+}
+
 time-entry-popout key="time-entry-popout" on-saved("refreshEntryList")
-controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
+ui-container.controls-wrapper light fullwidth
+    controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
 active-task-header key="active-task" on-stopped("refreshEntryList")
 entry-list key="entry-list" on-continuetask("continueTask")

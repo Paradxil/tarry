@@ -95,7 +95,7 @@ widget.invoice-preview-wrapper title="Invoice Preview"
                             @element
                                 ui-heading.invoice-heading heading=1 -- Invoice
                             @element alignright
-                                ui-text.invoice-id -- #${state.invoice.id}
+                                ui-emphasis.invoice-id -- ${state.invoice.id}
                             @element alignright
                                 ui-date.invoice-preview-date time=false milliseconds=state.invoice.end
             @element.invoice-address

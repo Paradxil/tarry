@@ -92,10 +92,10 @@ class {
 }
 
 ui-linear-layout.timer-header-wrapper light fullwidth paddedwide wrap
-    @element
-        ui-linear-layout vertical placecenter
-            @element.timer-wrapper placecenter
-                ui-timer.timer placecenter start=state.tracking?state.startTime:now()
+    @element fillspace
+        ui-linear-layout vertical
+            @element.timer-wrapper
+                ui-timer.timer start=state.tracking?state.startTime:now()
             @element.task-name-wrapper
                 task-select on-select("selectTask") class="stealthy" key="task-select"
     @element.manual-input-wrapper centered
