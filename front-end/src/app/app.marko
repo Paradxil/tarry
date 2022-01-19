@@ -10,7 +10,7 @@ class {
             title: '',
             returnto: null,
             sidebar: false,
-            loggedin: false
+            loggedin: null
         };
 
         this.titles=['Paper Time', 'Login', 'Register', 'Tracker', 'Tasks', 'Projects', 'Invoices', 'Edit Invoice', 'View Invoice', 'Settings'];
@@ -18,15 +18,15 @@ class {
     }
 
     onMount() {
-        navigate('')
         this.isLoggedIn();
     }
 
     isLoggedIn() {
         ServerProxy.getUser(() => {
             this.state.loggedin = true;
-            navigate('/tracker');
+            console.log(this.state.loggedin);
         }, ()=> {
+            console.log(this.state.loggedin);
             this.state.loggedin = false;
             navigate('/login');
         });
@@ -51,8 +51,8 @@ class {
 
 template title="Login"
     page-background
-    app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar
-        router default-route='/loading' on-navigate('updateTopBar')
+    app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar ready=state.loggedin!=null
+        router on-navigate('updateTopBar')
             @route path='/'
                 index
             @route path='/login'
@@ -71,5 +71,3 @@ template title="Login"
             @route|{params}| path='/invoices/view/:id' component=invoicesview
             @route path='/settings'
                 settings
-            @route path='/loading'
-                loader
