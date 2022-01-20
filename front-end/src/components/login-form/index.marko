@@ -45,9 +45,13 @@ class {
                     sessionStorage.setItem(setting.name, setting.value);
                     if('primary-color' === setting.name) {
                         document.querySelector(':root').style.setProperty('--secondary', 'var(--oc-'+setting.value+'-4)');
+                        document.querySelector(':root').style.setProperty('--secondary-dark', 'var(--oc-'+setting.value+'-6)');
+                        document.querySelector(':root').style.setProperty('--secondary-light', 'var(--oc-'+setting.value+'-2)');
                     }
                     if('secondary-color' === setting.name) {
                         document.querySelector(':root').style.setProperty('--tertiary', 'var(--oc-'+setting.value+'-4)');
+                        document.querySelector(':root').style.setProperty('--tertiary-dark', 'var(--oc-'+setting.value+'-6)');
+                        document.querySelector(':root').style.setProperty('--tertiary-light', 'var(--oc-'+setting.value+'-2)');
                     }
                 }
                 navigate("/tracker");
