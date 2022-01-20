@@ -51,7 +51,7 @@ class {
 
 template title="Login"
     page-background
-    app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar ready=state.loggedin!=null
+    app-layout currentpage=state.currentpage title=state.title returnto=state.returnto sidebar=state.sidebar ready=state.loggedin!=null fullwidth=['', 'index', 'login', 'register'].includes(state.currentpage)
         router on-navigate('updateTopBar')
             @route path='/'
                 index
