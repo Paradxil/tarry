@@ -38,12 +38,16 @@ class DAO {
     }
 
     /**
-     * Returns all documents in the schema with a matching userid.
-     * @param {String} userid 
-     * @returns All documents associated with the given userid.
+     * Returns all documents in the schema with a matching value.
+     * @param {*} value Required value of field
+     * @param {String} field Field to match on
+     * @returns All documents associated with the given value for the given field.
      */
-    async all(userid) {
-        return await this.schema.find({userid: userid});
+    async all(value, field='userid') {
+        let query = {};
+        query[field] = value;
+
+        return await this.schema.find(query);
     }
 
     /**

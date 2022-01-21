@@ -1,9 +1,18 @@
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
 
-//TODO: Consider using population.
+function getTime(val) {
+    return val.getTime?val.getTime():val;
+}
 
 // Create a scheme for time entry
+/**
+ * @typedef {Object} TimeEntry
+ * @property {string} userid
+ * @property {Task|ID} task
+ * @property {Date} start Milliseconds when the time entry started.
+ * @property {Date} end Milliseconds when time entry ended. 
+ */
 const timeEntrySchema = new mongoose.Schema({
     userid: {type: String, required: true},
     task: { 
@@ -11,11 +20,11 @@ const timeEntrySchema = new mongoose.Schema({
         ref: 'Tasks',
         autopopulate: {path: 'task', populate: { path: 'project' }}
     },
-    start: {type: Number, required: true},
-    end: {type: Number, required: true}
+    start: {type: Date, required: true, get: getTime, transform: getTime},
+    end: {type: Date, required: true, get: getTime, transform: getTime}
 });
 
-timeEntrySchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: []});
+timeEntrySchema.index({ userid: 1, start: -1 });
 
 timeEntrySchema.plugin(require('mongoose-autopopulate'));
 

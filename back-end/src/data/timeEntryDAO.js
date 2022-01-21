@@ -47,43 +47,89 @@ class TimeEntryDAO {
         let queries = [query];
 
         //Add range filter
-        if(this.startTime != null && this.endTime != null) {
+        if (this.startTime != null && this.endTime != null) {
             queries.push({ start: { $gte: this.startTime } });
             queries.push({ start: { $lte: this.endTime } });
         }
 
         //TODO: Add other filters
 
-        return {$and: queries};
+        return { $and: queries };
     }
 
     async get(id) {
-        return await TimeEntry.findOne(this.buildQuery({_id: id}));
+        return await TimeEntry.findOne(this.buildQuery({ _id: id }));
     }
 
     async remove(id) {
-        return await TimeEntry.deleteOne({_id: id});
+        return await TimeEntry.deleteOne({ _id: id });
     }
 
     async getAll(userid) {
-        return await TimeEntry.find(this.buildQuery({userid: userid}));
+        return await TimeEntry.find(this.buildQuery({ userid: userid }));
     }
 
     async getAllFromTask(taskid) {
-        return await TimeEntry.find({task: taskid});
+        return await TimeEntry.find({ task: taskid });
     }
 
-    async getPaginated(userid, max=10, last=null) {
-        let query = {
-            _id: {$gt: last},
-            userid: userid
-        };
+    /**
+     * Get at most max days worth of timeEntries before last for a given user.
+     * For example setting max to 5 will return the timeEntries for the last
+     * 5 days with timeEntries, skipping any days without.
+     * 
+     * @param {string} userid 
+     * @param {number} max Number of days to find time entries for
+     * @param {number} last Start time of last TimeEntry
+     * @returns {import('../model/timeEntry').TimeEntry[]}
+     */
+    async getPaginated(userid, max = 5, last = null) {
+        let query = [
+            {
+                $match: {
+                    userid: userid.toString(),
+                    start: { $lt: last }
+                }
+            },
+            {
+                $project: {
+                    year: { $year: "$start" },
+                    month: { $month: "$start" },
+                    day: { $dayOfMonth: "$start" },
+                    task: 1,
+                    start: 1,
+                    end: 1
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: '$year',
+                        month: '$month',
+                        day: '$day'
+                    },
+                    entries: { $push: "$$ROOT" }
+                }
+            },
+            {
+                $sort: {
+                    '_id.year': -1,
+                    '_id.month': -1,
+                    '_id.day': -1
+                }
+            },
+            {
+                $limit: max
+            }
+        ];
 
-        if(last === null) {
-            delete query._id;
+        if (last === null) {
+            delete query[0]['$match'].start;
         }
 
-        return await TimeEntry.find(query).sort({_id: -1}).limit(max);
+        let result = await TimeEntry.aggregate(query);
+
+        return await TimeEntry.populate(result, { path: "entries.task" });
     }
 
     async add(userid, taskid, start, end) {

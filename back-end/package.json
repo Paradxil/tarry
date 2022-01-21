@@ -4,7 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "dev": "nodemon --watch src start",
+    "start": "node src/index.js",
+    "test": "tap --reporter=specy --nyc-arg=--all"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +30,10 @@
     "timezones-list": "^3.0.1"
   },
   "devDependencies": {
-    "eslint": "^8.2.0"
+    "eslint": "^8.2.0",
+    "mongodb-memory-server": "^8.2.0",
+    "nodemon": "^2.0.15",
+    "tap": "^15.1.6",
+    "treport": "^3.0.2"
   }
 }
