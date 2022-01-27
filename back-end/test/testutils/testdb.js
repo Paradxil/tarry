@@ -4,8 +4,8 @@ process.env.SECRET = 'test secret';
 const Task = require('../../src/model/task');
 const Project = require('../../src/model/project');
 
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+//const mongoose = require('mongoose');
+//const { MongoMemoryServer } = require('mongodb-memory-server');
 
 class TestDB {
     constructor() {
@@ -15,17 +15,17 @@ class TestDB {
      * Connect to the in-memory database.
      */
     async connect() {
-        this.mongod = await MongoMemoryServer.create();
-        const uri = this.mongod.getUri();
+        // this.mongod = await MongoMemoryServer.create();
+        // const uri = this.mongod.getUri();
 
-        const mongooseOpts = {
-            useNewUrlParser: true,
-            autoReconnect: true,
-            reconnectTries: Number.MAX_VALUE,
-            reconnectInterval: 1000
-        };
+        // const mongooseOpts = {
+        //     useNewUrlParser: true,
+        //     autoReconnect: true,
+        //     reconnectTries: Number.MAX_VALUE,
+        //     reconnectInterval: 1000
+        // };
 
-        await mongoose.connect(uri, mongooseOpts);
+        // await mongoose.connect(uri, mongooseOpts);
     }
 
     /**

@@ -129,6 +129,14 @@ class ServerProxy {
         }
     }
 
+    async getPaginatedEntries(max = 2, last = null, cb) {
+        let response = await network.post('/api/entry/paginated', {max: max, last: last});
+
+        if(response.success && cb) {
+            cb(response.data);
+        }
+    }
+
     async deleteEntry(id, cb) {
         let response = await network.delete("/api/entry/"+id);
         if(response.success && cb) {

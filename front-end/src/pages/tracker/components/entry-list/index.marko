@@ -1,29 +1,52 @@
 import ServerProxy from "../../../../utils/serverproxy.js";
-import {niceDate, dateInPast, now} from "../../../../utils/dateutils.js";
-import {emit} from "../../../../utils/events.js";
-
+import { niceDate, dateInPast, now } from "../../../../utils/dateutils.js";
+import { emit } from "../../../../utils/events.js";
 class {
     onCreate() {
         this.state = {
             data: {},
             disabled: [],
-            loadingData: false
+            loadingData: false,
+            entries: []
         };
 
+        this.more = true;
         this.timeEntryPopout = null;
-        this.daysInPast = 30
-        this.generateReport();
+        this.daysInPast = 30;
+        this.getEntries();
+        this.last = null;
     }
 
     generateReport() {
-        ServerProxy.generateReport(dateInPast(this.daysInPast), now(), [], [], (report) => {
-            this.state.data = report;
-            this.state.data.days = this.state.data.days.reverse();
+        ServerProxy.generateReport(
+            dateInPast(this.daysInPast),
+            now(),
+            [],
+            [],
+            (report) => {
+                this.state.data = report;
+                this.state.data.days = this.state.data.days.reverse();
+            }
+        );
+    }
+
+    getEntries() {
+        if(!this.more) {
+            return;
+        }
+
+        ServerProxy.getPaginatedEntries(10, this.last, (result) => {
+            this.state.entries = this.state.entries.concat(result.entries);
+            this.last = result.last;
+            this.more = result.more;
+            this.state.loadingData = false;
+            this.setStateDirty("entries");
         });
     }
 
     refresh() {
-        this.generateReport();
+        this.getEntries();
+        //this.generateReport();
     }
 
     onMount() {
@@ -32,49 +55,70 @@ class {
     }
 
     async loadMoreData(event) {
-        if (document.documentElement.scrollHeight - document.documentElement.scrollTop <= document.documentElement.clientHeight + 500 && !this.state.loadingData) {
+        if (
+            document.documentElement.scrollHeight -
+                document.documentElement.scrollTop <=
+                document.documentElement.clientHeight + 500 &&
+            !this.state.loadingData && this.more
+        ) {
             this.state.loadingData = true;
-            let end = dateInPast(this.daysInPast + 1);
+            this.getEntries();
+            /*let end = dateInPast(this.daysInPast + 1);
             this.daysInPast += 7;
             let start = dateInPast(this.daysInPast);
 
             ServerProxy.generateReport(start, end, [], [], (report) => {
                 this.state.loadingData = false;
-                this.state.data.days = this.state.data.days.concat(report.days.reverse());
+                this.state.data.days = this.state.data.days.concat(
+                    report.days.reverse()
+                );
 
                 this.setStateDirty("data");
-            });
+            });*/
         }
     }
 
     confirmDeleteEntry(entry, index, dayIndex) {
         emit("confirm", {
-            title:"Delete Entry?", 
-            message:"Are you sure you want to delete the entry for '" + entry.task.name + "' on " + new Date(entry.start).toDateString() + "? This cannot be undone.",
+            title: "Delete Entry?",
+            message:
+                "Are you sure you want to delete the entry for '" +
+                entry.task.name +
+                "' on " +
+                new Date(entry.start).toDateString() +
+                "? This cannot be undone.",
             actions: [
                 {
                     text: "Yes",
                     icon: "check",
-                    callback: ()=>{
-                        this.deleteEntry(entry, index, dayIndex); 
+                    callback: () => {
+                        this.deleteEntry(entry, index, dayIndex);
                         this.state.disabled.push(entry._id);
                         this.setStateDirty("disabled");
-                    }
+                    },
                 },
                 {
                     text: "Cancel",
                     icon: "x",
-                    callback: function() {}
-                }
-            ]}
-        );
+                    callback: function () {},
+                },
+            ],
+        });
     }
 
     async deleteEntry(entry, index, dayIndex) {
-        ServerProxy.deleteEntry(entry._id, ()=>{
+        ServerProxy.deleteEntry(entry._id, () => {
             this.state.data.days[dayIndex].entries.splice(index, 1);
             this.setStateDirty("data");
-            emit("push", {title: "Success!", message:"Time entry for " + entry.task.name + " on " + new Date(entry.start).toDateString() + " deleted."});
+            emit("push", {
+                title: "Success!",
+                message:
+                    "Time entry for " +
+                    entry.task.name +
+                    " on " +
+                    new Date(entry.start).toDateString() +
+                    " deleted.",
+            });
         });
     }
 
@@ -89,11 +133,11 @@ class {
         let response = await utils.post("/api/task/status", {
             userid: this.userid,
             taskid: id,
-            status: "todo"
+            status: "todo",
         });
-        if(response.success) {
-            for(let entry of this.input.entries) {
-                if(entry.taskid === id) {
+        if (response.success) {
+            for (let entry of this.input.entries) {
+                if (entry.taskid === id) {
                     entry.status = "todo";
                 }
             }
@@ -105,7 +149,6 @@ class {
         this.emit("continuetask", taskid);
     }
 }
-
 style {
     .duration-wrapper {
         align-items: flex-end;
@@ -114,37 +157,88 @@ style {
 
 time-entry-popout key="time-entry-popout" on-saved("refresh")
 
-ui-linear-layout vertical gutter="16px" id="entries-wrapper"
-    for|day, dayIndex| of=state.data.days?state.data.days.filter(day=>day.entries.length>0):[]
-        if(day.entries.length > 0)
-            @element key=dayIndex style={animationName: 'load', animationDuration: '0.5s', animationDelay: (dayIndex * 0.1) + 's', animationFillMode: 'both'}
-                listwidget title=niceDate(day.date) subtitle=day.hoursTracked.toFixed(2)+"hrs" items=day.entries.sort((el1, el2) => {return el2.start - el1.start;})
-                    @item|{data, index}| // Data here is a timeEntry from the items list. 
-                        swipeable left
-                            ui-linear-layout aligncenter wrap paddedwide fillspace placecenter filled rounded
-                                @element fillspace
-                                    ui-linear-layout vertical gutter="0px"
-                                        @element fillspace
-                                            ui-text -- ${data.task.name}
-                                        if(data.project)
+ui-linear-layout#entries-wrapper vertical gutter="16px"
+    for|day, dayIndex| of=state.entries || []
+        @element [
+            key=dayIndex
+            style={
+                animationName: "load",
+                animationDuration: "0.5s",
+                animationDelay: dayIndex * 0.1 + "s",
+                animationFillMode: "both",
+            }
+        ]
+            listwidget [
+                title=niceDate(
+                    (new Date(day._id.year, day._id.month, day._id.day)).getTime()
+                )
+                subtitle=day.hoursTracked.toFixed(2) + "hrs"
+                items=day.entries
+            ]
+                @item|{
+                    data,
+                    index,
+                }| // Data here is a timeEntry from the items list.
+                    swipeable left
+                        ui-linear-layout [
+                            aligncenter
+                            wrap
+                            paddedwide
+                            fillspace
+                            placecenter
+                            filled
+                            rounded
+                        ]
+                            @element fillspace
+                                ui-linear-layout vertical gutter="0px"
+                                    @element fillspace
+                                        ui-text -- ${data.task.name}
+                                    if(data.project)
+                                        @element
+                                            project project=data.project
+                            @element
+                                ui-linear-layout.duration-wrapper [
+                                    vertical
+                                    gutter="0px"
+                                    alignright
+                                ]
+                                    @element
+                                        ui-linear-layout
                                             @element
-                                                project project=data.project
-                                @element
-                                    ui-linear-layout.duration-wrapper vertical gutter="0px" alignright
-                                        @element
-                                            ui-linear-layout
-                                                @element
-                                                    ui-date date=false milliseconds=data.start
-                                                @element
-                                                    ui-text -- -
-                                                @element
-                                                    ui-date date=false milliseconds=data.end
-                                        @element
-                                            ui-emphasis
-                                                ui-duration start=data.start end=data.end
-                                @element fullwidth=input.ismobile alignright
-                                    $ let controls = [{name: "Todo", icon: "flag"}, {name: "Delete", icon: "trash"}, {name: "Edit", icon: "edit-2"}, {name: "Continue", icon: "play"}]
-                                    controls controls=controls on-continue("continueTask", data.task._id) on-delete("confirmDeleteEntry", data, index, dayIndex) on-edit("editTimeEntry", data._id)
+                                                ui-date [
+                                                    date=false
+                                                    milliseconds=(new Date(...Object.values(data.start))).getTime()
+                                                ]
+                                            @element
+                                                ui-text -- -
+                                            @element
+                                                ui-date [
+                                                    date=false
+                                                    milliseconds=(new Date(...Object.values(data.end))).getTime()
+                                                ]
+                            @element
+                                ui-emphasis
+                                    ui-duration start=(new Date(...Object.values(data.start))).getTime() end=(new Date(...Object.values(data.end))).getTime()
+                            @element fullwidth=input.ismobile alignright
+                                $ {
+                                    let controls = [
+                                        { name: "Todo", icon: "flag" },
+                                        { name: "Delete", icon: "trash" },
+                                        { name: "Edit", icon: "edit-2" },
+                                        { name: "Continue", icon: "play" },
+                                    ];
+                                }
+                                controls [
+                                    controls=controls
+                                    on-continue("continueTask", data.task._id)
+                                    on-delete(
+                                        "confirmDeleteEntry",
+                                        data,
+                                        index,
+                                        dayIndex,
+                                    )
+                                    on-edit("editTimeEntry", data._id)
+                                ]
     if(state.loadingData)
         @element fullwidth aligncenter paddedwide light
             loader

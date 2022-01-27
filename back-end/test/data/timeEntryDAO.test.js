@@ -24,29 +24,48 @@ t.test('getAll() returns correct number of TimeEntries for a user', async t => {
     t.end();
 });
 
-t.test('getPaginated() returns days in descending order', async t => {
-    for(let i = 0; i < 10; i++) {
+t.test('getPaginated()', async t => {
+    // Add 2 entries per day for 9 days in a row
+    for(let i = 0; i < 9; i++) {
         await t.dao.add(0, 0, i * (1000 * 60 * 60 * 24), i * (1000 * 60 * 60 * 24) + 10);
+        await t.dao.add(0, 0, i * (1000 * 60 * 60 * 24) + 15, i * (1000 * 60 * 60 * 24) + 20);
     }
 
+    // Get first page of results
     let result = await t.dao.getPaginated(0);
-    t.equal(result.length, 5);
+    let entries = [];
+    result.forEach(el => entries = entries.concat(el.entries));
 
-    let lastStart = result[0].entries[0].start;
-    for(let i = 1; i < result.length; i++) {
-        t.equal(result[i].entries.length, 1);
-        t.ok(result[i].entries[0].start < lastStart);
-        lastStart = result[i].entries[0].start;
+    t.equal(result.length, 5, 'returns correct number of days');
+    t.equal(entries.length, 10, 'returns correct number of entries');
+
+    for(let i = 0; i < result.length; i++) {
+        t.equal(result[i].entries.length, 2, 'each day includes the correct number of entries');
     }
 
-    result = await t.dao.getPaginated(0, 5, new Date(result[4].entries[0].start));
-    t.equal(result.length, 5);
+    // Check that entries are sorted correctly.
+    let lastStart = result[0].entries[0].start;
+    for(let i = 1; i < entries.length; i++) {
+        t.ok(entries[i].start < lastStart, 'time entries are sorted in descending order from most recent');
+        lastStart = entries[i].start;
+    }
+
+    // Get second page of results
+    result = await t.dao.getPaginated(0, 5, new Date(result[4].entries[1].start));
+    entries = [];
+    result.forEach(el => entries = entries.concat(el.entries));
+
+    t.equal(result.length, 4, 'returns correct number of days when not full page');
+    t.equal(entries.length, 8, 'returns correct number of entries when not full page');
+
+    for(let i = 0; i < result.length; i++) {
+        t.equal(result[i].entries.length, 2, 'each day includes the correct number of entries');
+    }
 
     lastStart = result[0].entries[0].start;
-    for(let i = 1; i < result.length; i++) {
-        t.equal(result[i].entries.length, 1);
-        t.ok(result[i].entries[0].start < lastStart);
-        lastStart = result[i].entries[0].start;
+    for(let i = 1; i < entries.length; i++) {
+        t.ok(entries[i].start < lastStart, 'time entries are sorted in descending order from most recent');
+        lastStart = entries[i].start;
     }
 
     t.end();

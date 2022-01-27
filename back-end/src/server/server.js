@@ -21,6 +21,7 @@ const Response = require("../model/response/response");
 const GenerateReportHandler = require('../api/generateReportHandler');
 const GenerateInvoicePDFHandler = require('../api/generateInvoicePDFHandler');
 const DataAccessHandlerFactory = require('../api/dataAccessHandlerFactory');
+const PaginatedTimeEntryHandler = require('../api/paginatedTimeEntryHandler');
 
 class Server {
     constructor() {
@@ -59,7 +60,7 @@ class Server {
 
     useSessions() {
         var store = MongoStore.create({
-            mongoUrl: 'mongodb://localhost:27017/timetracker',
+            mongoUrl: 'mongodb://127.0.0.1:27017/timetracker',
             ttl: 14 * 24 * 60 * 60, // = 14 days. Default
             touchAfter: 3600, // time period in seconds
             autoRemove: 'interval',
@@ -147,9 +148,14 @@ class Server {
             ));
         });
 
-        // Get paginated time entries for a user
+        // Get time entry report for a user
         this.app.post('/api/report/', this.isAuthenticated, async function (req, res) {
             let handler = new GenerateReportHandler();
+            await handler.handle(req, res);
+        });
+
+        this.app.post('/api/entry/paginated', this.isAuthenticated, async function (req, res) {
+            let handler = new PaginatedTimeEntryHandler();
             await handler.handle(req, res);
         });
 

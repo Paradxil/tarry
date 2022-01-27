@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
 
 function getTime(val) {
-    return val.getTime?val.getTime():val;
+    return val.getTime?val.getTime():new Date(val);
 }
 
 // Create a scheme for time entry
@@ -20,8 +20,8 @@ const timeEntrySchema = new mongoose.Schema({
         ref: 'Tasks',
         autopopulate: {path: 'task', populate: { path: 'project' }}
     },
-    start: {type: Date, required: true, get: getTime, transform: getTime},
-    end: {type: Date, required: true, get: getTime, transform: getTime}
+    start: {type: Date, required: true, transform: getTime},
+    end: {type: Date, required: true, transform: getTime}
 });
 
 timeEntrySchema.index({ userid: 1, start: -1 });

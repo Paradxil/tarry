@@ -80,7 +80,7 @@ class TimeEntryDAO {
      * 
      * @param {string} userid 
      * @param {number} max Number of days to find time entries for
-     * @param {number} last Start time of last TimeEntry
+     * @param {Date} last Start time of last TimeEntry
      * @returns {import('../model/timeEntry').TimeEntry[]}
      */
     async getPaginated(userid, max = 5, last = null) {
@@ -92,13 +92,41 @@ class TimeEntryDAO {
                 }
             },
             {
+                $lookup: {
+                    from: 'tasks',
+                    localField: 'task',
+                    foreignField: '_id',
+                    as: 'task'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$task'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'projects',
+                    localField: 'task.project',
+                    foreignField: '_id',
+                    as: 'project'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$project'
+                }
+            },
+            {
                 $project: {
                     year: { $year: "$start" },
                     month: { $month: "$start" },
                     day: { $dayOfMonth: "$start" },
                     task: 1,
-                    start: 1,
-                    end: 1
+                    project: 1,
+                    start: {$dateToParts: {date: '$start'}},
+                    end: {$dateToParts: {date: '$end'}},
+                    duration: { $subtract: ['$end', '$start'] }
                 }
             },
             {
@@ -108,7 +136,9 @@ class TimeEntryDAO {
                         month: '$month',
                         day: '$day'
                     },
-                    entries: { $push: "$$ROOT" }
+                    entries: { $push: "$$ROOT" },
+                    count: { $sum: 1 },
+                    hoursTracked: { $sum: {$divide: ['$duration',  1000 * 60 * 60]} } // Convert milliseconds to hours.
                 }
             },
             {
@@ -129,7 +159,7 @@ class TimeEntryDAO {
 
         let result = await TimeEntry.aggregate(query);
 
-        return await TimeEntry.populate(result, { path: "entries.task" });
+        return result;
     }
 
     async add(userid, taskid, start, end) {

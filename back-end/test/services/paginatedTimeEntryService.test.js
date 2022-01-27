@@ -9,7 +9,7 @@ const PaginatedTimeEntryService = t.mock('../../src/services/paginatedTimeEntryS
 
 t.beforeEach(async t => {
     t.service = new PaginatedTimeEntryService();
-  })
+})
 
 t.test('getPaginatedTimeEntries() returns correct types', async t => {
     let result = await t.service.getPaginatedTimeEntries();

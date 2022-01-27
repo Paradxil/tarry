@@ -1,7 +1,7 @@
 const TimeEntryDAO = require("../data/timeEntryDAO");
 const TaskDAO = require("../data/taskDAO");
 const UserDAO = require("../data/userDAO");
-const TimeEntryModel = require("../model/timeEntry");
+const TimeEntry = require("../model/timeEntry");
 const config = require('../utils/config');
 var mongoose = require('mongoose');
 var encrypt = require('mongoose-encryption');
@@ -108,6 +108,38 @@ class Migrations {
         //     user.schemaVersion = 5;
         //     await user.save();
         // }
+        // 2: async function (userid) {
+        //     console.log("MIGRATE TIME ENTRY START AND END TO DATES");
+        //     console.log(userid);
+        //     // const timeEntrySchema = new mongoose.Schema({
+        //     //     userid: {type: String, required: true},
+        //     //     task: { 
+        //     //         type: mongoose.Schema.Types.ObjectId,
+        //     //         ref: 'Tasks',
+        //     //         autopopulate: {path: 'task', populate: { path: 'project' }}
+        //     //     },
+        //     //     start: {type: Number},
+        //     //     end: {type: Number}
+        //     // });
+
+        //     // const TmpTimeEntry = TimeEntry.compile(TimeEntry.modelName, timeEntrySchema, TimeEntry.collection.name, TimeEntry.db, mongoose);
+
+        //     //await TimeEntry.updateOne({_id: '61b559e7a5753b1f6b5bdfc8'}, {start: new Date('$start')});
+
+        //     let entries = await TimeEntry.find({start: {$type: "number"}});
+
+        //     for(let entry of entries) {
+        //         entry.start = new Date(entry.start);
+        //         entry.end = new Date(entry.end);
+        //         await TimeEntry.updateOne({_id: entry._id}, {start: new Date(entry.start), end: new Date(entry.end)});
+        //         //await entry.save();
+        //     }
+
+        //     let userDAO = new UserDAO();
+        //     let user = await userDAO.getUserById(userid);
+        //     user.schemaVersion = 3;
+        //     await user.save();
+        // },
     }
 
     static ShouldMigrate(version) {

@@ -13,7 +13,7 @@ const taskSchema = new mongoose.Schema({
     }
 });
 
-taskSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ['name']});
+//taskSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ['name']});
 
 taskSchema.plugin(require('mongoose-autopopulate'));
 

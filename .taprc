@@ -1,0 +1,4 @@
+coverage-report: html
+nyc-arg:
+  - --all
+  - --cwd="./back-end"

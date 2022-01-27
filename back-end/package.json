@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --watch src start",
     "start": "node src/index.js",
-    "test": "tap --reporter=specy --nyc-arg=--all"
+    "test": "tap --reporter=specy --nyc-arg=--all -o .tap-file"
   },
   "author": "",
   "license": "ISC",
