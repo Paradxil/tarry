@@ -60,7 +60,7 @@ class Server {
 
     useSessions() {
         var store = MongoStore.create({
-            mongoUrl: 'mongodb://127.0.0.1:27017/timetracker',
+            mongoUrl: process.env.DATABASE_URL||'mongodb://127.0.0.1:27017/tarry',
             ttl: 14 * 24 * 60 * 60, // = 14 days. Default
             touchAfter: 3600, // time period in seconds
             autoRemove: 'interval',
