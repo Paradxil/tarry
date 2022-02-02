@@ -24,9 +24,7 @@ class {
     isLoggedIn() {
         ServerProxy.getUser(() => {
             this.state.loggedin = true;
-            console.log(this.state.loggedin);
         }, ()=> {
-            console.log(this.state.loggedin);
             this.state.loggedin = false;
             navigate('/login');
         });
