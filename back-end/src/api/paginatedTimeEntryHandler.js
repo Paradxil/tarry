@@ -9,8 +9,6 @@ class PaginatedTimeEntryHandler {
         let last = req.body.last||null;
         let max = req.body.max;
 
-        console.log(last);
-
         try {
             let result = await service.getPaginatedTimeEntries(userid, max, last);
 

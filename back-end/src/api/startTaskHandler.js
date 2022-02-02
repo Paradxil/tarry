@@ -12,7 +12,6 @@ class StartTaskHandler {
         let start = req.body.start||null; 
 
         if(userid == null || taskid == null || start == null) {
-            console.log("NO");
             res.send(Response.InvalidRequest("Invalid request body."));
             return;
         }

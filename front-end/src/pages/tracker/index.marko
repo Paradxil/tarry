@@ -15,8 +15,13 @@ class {
         this.activeTaskComponent.continueTask(taskid);
     }
 
-    refreshEntryList() {
-        this.timeEntryList.refresh();
+    /**
+    * Refresh the entries for a given day.
+    * Useful for automatically updating the time entry
+    * list after adding or modifying an entry.
+    */
+    refreshEntryList(day) {
+        this.timeEntryList.refresh(day);
     }
 
     addTimeEntry() {
@@ -35,5 +40,5 @@ style {
 time-entry-popout key="time-entry-popout" on-saved("refreshEntryList")
 ui-container.controls-wrapper light fullwidth
     controls controls=[{name:"add", title:"Add time entry", icon:"plus"}] on-add("addTimeEntry")
-active-task-header key="active-task" on-stopped("refreshEntryList")
+active-task-header key="active-task" on-stopped("refreshEntryList", Date.now())
 entry-list key="entry-list" on-continuetask("continueTask")

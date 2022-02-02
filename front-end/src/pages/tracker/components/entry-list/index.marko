@@ -10,24 +10,15 @@ class {
             entries: []
         };
 
-        this.more = true;
+        // Stores a reference to the timeEntryPopout component.
+        // Populated on mount.
         this.timeEntryPopout = null;
-        this.daysInPast = 30;
-        this.getEntries();
-        this.last = null;
-    }
 
-    generateReport() {
-        ServerProxy.generateReport(
-            dateInPast(this.daysInPast),
-            now(),
-            [],
-            [],
-            (report) => {
-                this.state.data = report;
-                this.state.data.days = this.state.data.days.reverse();
-            }
-        );
+        this.more = true;
+        this.last = null;
+
+        // Fetch the first n days of time entries.
+        this.getEntries();
     }
 
     getEntries() {
@@ -40,17 +31,48 @@ class {
             this.last = result.last;
             this.more = result.more;
             this.state.loadingData = false;
-            this.setStateDirty("entries");
         });
     }
 
-    refresh() {
-        this.getEntries();
-        //this.generateReport();
+    /**
+    * Refresh time entries for a day given the start time in milliseconds of a time entry.
+    */
+    refresh(milliseconds) {
+        let date = new Date(milliseconds);
+        date.setMilliseconds(0);
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        date.setDate(date.getDate() + 1);
+        ServerProxy.getPaginatedEntries(1, date, (result) => {
+            // If there are no entries for this day don't do anything.
+            if(result.entries == null || result.entries.length === 0) {
+                return;
+            }
+
+            // Since we are retrieving entries for just one day we just need the first list of entries.
+            let newEntries = result.entries[0];
+
+            // If this day is already in our state.entries, we need to replace the old data with the new data.
+            let dayIndex = this.state.entries.findIndex(el => {return (el._id.year === newEntries._id.year && el._id.month === newEntries._id.month && el._id.day === newEntries._id.day)});
+
+            if(dayIndex !== -1) {
+                this.state.entries[dayIndex] = newEntries;
+            }
+            else {
+                this.state.entries.push(newEntries);
+                this.state.entries.sort((el, el2) => {return (new Date(el2._id.year, el2._id.month, el2._id.day).getTime() - new Date(el._id.year, el._id.month, el._id.day).getTime())})
+            }
+
+            this.setStateDirty("entries");
+
+        });
     }
 
     onMount() {
+        // Load more time entries on scroll.
         window.onscroll = this.loadMoreData.bind(this);
+
         this.timeEntryPopout = this.getComponent("time-entry-popout");
     }
 
@@ -63,18 +85,6 @@ class {
         ) {
             this.state.loadingData = true;
             this.getEntries();
-            /*let end = dateInPast(this.daysInPast + 1);
-            this.daysInPast += 7;
-            let start = dateInPast(this.daysInPast);
-
-            ServerProxy.generateReport(start, end, [], [], (report) => {
-                this.state.loadingData = false;
-                this.state.data.days = this.state.data.days.concat(
-                    report.days.reverse()
-                );
-
-                this.setStateDirty("data");
-            });*/
         }
     }
 
@@ -108,8 +118,14 @@ class {
 
     async deleteEntry(entry, index, dayIndex) {
         ServerProxy.deleteEntry(entry._id, () => {
-            this.state.data.days[dayIndex].entries.splice(index, 1);
-            this.setStateDirty("data");
+            this.state.entries[dayIndex].entries.splice(index, 1);
+
+            if(this.state.entries[dayIndex].entries.length === 0) {
+                this.state.entries.splice(dayIndex, 1);
+            }
+
+            this.setStateDirty("entries");
+
             emit("push", {
                 title: "Success!",
                 message:
@@ -170,7 +186,7 @@ ui-linear-layout#entries-wrapper vertical gutter="16px"
         ]
             listwidget [
                 title=niceDate(
-                    (new Date(day._id.year, day._id.month, day._id.day)).getTime()
+                    (new Date(day._id.year, day._id.month - 1, day._id.day)).getTime()
                 )
                 subtitle=day.hoursTracked.toFixed(2) + "hrs"
                 items=day.entries
@@ -207,18 +223,18 @@ ui-linear-layout#entries-wrapper vertical gutter="16px"
                                             @element
                                                 ui-date [
                                                     date=false
-                                                    milliseconds=(new Date(...Object.values(data.start))).getTime()
+                                                    milliseconds=(new Date(data.start)).getTime()
                                                 ]
                                             @element
                                                 ui-text -- -
                                             @element
                                                 ui-date [
                                                     date=false
-                                                    milliseconds=(new Date(...Object.values(data.end))).getTime()
+                                                    milliseconds=(new Date(data.end)).getTime()
                                                 ]
-                            @element
-                                ui-emphasis
-                                    ui-duration start=(new Date(...Object.values(data.start))).getTime() end=(new Date(...Object.values(data.end))).getTime()
+                                    @element
+                                        ui-emphasis
+                                            ui-duration start=(new Date(data.start)).getTime() end=(new Date(data.end)).getTime()
                             @element fullwidth=input.ismobile alignright
                                 $ {
                                     let controls = [

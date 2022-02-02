@@ -83,7 +83,7 @@ class TimeEntryDAO {
      * @param {Date} last Start time of last TimeEntry
      * @returns {import('../model/timeEntry').TimeEntry[]}
      */
-    async getPaginated(userid, max = 5, last = null) {
+    async getPaginated(userid, max = 5, last = null, timezone = 'America/Boise') {
         let query = [
             {
                 $match: {
@@ -119,13 +119,13 @@ class TimeEntryDAO {
             },
             {
                 $project: {
-                    year: { $year: "$start" },
-                    month: { $month: "$start" },
-                    day: { $dayOfMonth: "$start" },
+                    year: { $year: {date: "$start", timezone: timezone} },
+                    month: { $month: {date: "$start", timezone: timezone}  },
+                    day: { $dayOfMonth: {date: "$start", timezone: timezone}  },
                     task: 1,
                     project: 1,
-                    start: {$dateToParts: {date: '$start'}},
-                    end: {$dateToParts: {date: '$end'}},
+                    start: 1,
+                    end: 1,
                     duration: { $subtract: ['$end', '$start'] }
                 }
             },

@@ -45,14 +45,15 @@ class {
 
     saveTimeEntry() {
         if(this.state.entry._id) {
-            ServerProxy.updateEntry(this.state.entry);
-            this.emit("saved");
-            this.popoutFormComponent.toggleVisibility();
+            ServerProxy.updateEntry(this.state.entry, (entry)=>{
+                this.emit("saved", this.state.entry.start);
+                this.popoutFormComponent.toggleVisibility();
+            });
         }
         else {
             ServerProxy.addEntry(this.state.entry, (entry)=>{
                 this.state.entry = entry;
-                this.emit("saved");
+                this.emit("saved", this.state.entry.start);
                 this.popoutFormComponent.toggleVisibility();
             });
         }

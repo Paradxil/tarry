@@ -20,8 +20,14 @@ class PaginatedTimeEntryService {
     async getPaginatedTimeEntries(userid, numDays, lastTimestamp) {
         let entries = [];
 
+        let last = null;
+
+        if(lastTimestamp) {
+            last = new Date(lastTimestamp);
+        }
+
         let timeDAO = new TimeEntryDAO();
-        entries = await timeDAO.getPaginated(userid, numDays, lastTimestamp||null);
+        entries = await timeDAO.getPaginated(userid, numDays, last);
 
         if(entries == null || entries.length === 0) {
             return {
@@ -36,7 +42,7 @@ class PaginatedTimeEntryService {
 
         return {
             entries: entries,
-            last: lastDay.entries[lastDay.entries.length - 1].start,
+            last: new Date(lastDay.entries[lastDay.entries.length - 1].start),
             more: true
         }
     }
